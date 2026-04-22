@@ -31,9 +31,11 @@ const themeToggleButton = document.querySelector("#theme-toggle");
 const soundToggleButton = document.querySelector("#sound-toggle");
 const startButton = document.querySelector("#start-button");
 const startPanel = document.querySelector("#start-panel");
+const startPanelHeader = document.querySelector(".start-panel-header");
 const restartButton = document.querySelector("#restart-button");
 const taskbarTabs = document.querySelector("#taskbar-tabs");
 const taskbarClock = document.querySelector("#taskbar-clock");
+const taskbar = document.querySelector(".taskbar");
 const videoFullscreenButtons = document.querySelectorAll("[data-fullscreen-video]");
 const documentItems = document.querySelectorAll(".document-item[data-doc-target]");
 const documentPreviews = document.querySelectorAll(".document-preview[data-doc-preview]");
@@ -52,6 +54,8 @@ const gameDetailPlayerSection = document.querySelector("[data-game-detail-player
 const gameDetailDevlog = document.querySelector("[data-game-detail-devlog]");
 const gameDetailCover = document.querySelector(".game-detail-cover");
 const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]");
+const WINDOW_CLOSE_ANIMATION_MS = 160;
+const pendingHideTimers = new WeakMap();
 const windowRouteMap = {
   "about-window": "/about",
   "links-window": "/links",
@@ -391,6 +395,9 @@ const finePointerQuery = window.matchMedia("(pointer: fine)");
 const PANEL_GAP = 18;
 const PANEL_SEARCH_STEP = 18;
 const PANEL_POSITION_STORAGE_KEY = "webportfolio.panel-positions.v1";
+const TASKBAR_DRAG_THRESHOLD = 6;
+
+let activeTaskbarDrag = null;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -405,11 +412,23 @@ function getPanelStorageId(windowEl) {
     return null;
   }
 
+  if (windowEl === startPanel) {
+    return "start-panel";
+  }
+
   if (windowEl === homeWindow) {
     return "home-window";
   }
 
   return windowEl.dataset.windowId || null;
+}
+
+function isStartPanel(windowEl) {
+  return windowEl === startPanel;
+}
+
+function getTaskbarHeight() {
+  return taskbar?.offsetHeight || 42;
 }
 
 function readStoredPanelPositions() {
@@ -448,6 +467,19 @@ function isManagedPanel(windowEl) {
 }
 
 function getStageRelativeRect(windowEl) {
+  if (isStartPanel(windowEl)) {
+    const rect = windowEl.getBoundingClientRect();
+
+    return {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height,
+    };
+  }
+
   if (!desktopStage) {
     return null;
   }
@@ -503,6 +535,17 @@ function hasPanelOverlap(windowEl, left, top) {
 }
 
 function applyPanelPosition(windowEl, left, top) {
+  if (isStartPanel(windowEl)) {
+    windowEl.style.position = "fixed";
+    windowEl.style.left = `${left}px`;
+    windowEl.style.top = `${top}px`;
+    windowEl.style.right = "auto";
+    windowEl.style.bottom = "auto";
+    windowEl.style.transform = "none";
+    windowEl.dataset.dragReady = "true";
+    return;
+  }
+
   if (windowEl === homeWindow) {
     windowEl.style.position = "absolute";
     windowEl.style.margin = "0";
@@ -537,7 +580,7 @@ function savePanelPosition(windowEl) {
 }
 
 function restoreStoredPanelPosition(windowEl) {
-  if (!desktopStage || !desktopModeQuery.matches) {
+  if ((!desktopStage && !isStartPanel(windowEl)) || !desktopModeQuery.matches) {
     return false;
   }
 
@@ -552,6 +595,13 @@ function restoreStoredPanelPosition(windowEl) {
 
   if (!savedPosition) {
     return false;
+  }
+
+  if (isStartPanel(windowEl)) {
+    const maxLeft = Math.max(window.innerWidth - windowEl.offsetWidth, 0);
+    const maxTop = Math.max(window.innerHeight - getTaskbarHeight() - windowEl.offsetHeight - 4, 0);
+    applyPanelPosition(windowEl, clamp(savedPosition.left, 0, maxLeft), clamp(savedPosition.top, 0, maxTop));
+    return true;
   }
 
   const maxLeft = Math.max(desktopStage.clientWidth - windowEl.offsetWidth, 0);
@@ -923,20 +973,47 @@ function enableAutoplayForVideos(root = document) {
 function setupHoverTrailerPreviews() {
   hoverTrailerCards.forEach((card) => {
     const videoEl = card.querySelector("video[data-hover-preview='true']");
+    const previewImage = card.querySelector("img");
 
     if (!videoEl) {
       return;
     }
+
+    if (previewImage?.getAttribute("src") && !videoEl.getAttribute("poster")) {
+      videoEl.setAttribute("poster", previewImage.getAttribute("src"));
+    }
+
+    const revealPreview = () => {
+      if (card.matches(":hover") || document.activeElement === card) {
+        card.classList.add("is-previewing-trailer");
+      }
+    };
 
     const startPreview = () => {
       videoEl.muted = true;
       videoEl.defaultMuted = true;
       videoEl.loop = true;
       videoEl.playsInline = true;
-      videoEl.play().catch(() => {
+      videoEl.setAttribute("muted", "");
+      videoEl.setAttribute("loop", "");
+      videoEl.setAttribute("playsinline", "");
+      videoEl.preload = "auto";
+
+      if (videoEl.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+        videoEl.load();
+      }
+
+      if (videoEl.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        revealPreview();
+      } else {
+        videoEl.addEventListener("loadeddata", revealPreview, { once: true });
+      }
+
+      videoEl.play().then(() => {
+        revealPreview();
+      }).catch(() => {
         // Browser policy can still block playback in rare cases; ignore quietly.
       });
-      card.classList.add("is-previewing-trailer");
     };
 
     const stopPreview = () => {
@@ -944,6 +1021,14 @@ function setupHoverTrailerPreviews() {
       videoEl.currentTime = 0;
       card.classList.remove("is-previewing-trailer");
     };
+
+    videoEl.addEventListener("error", () => {
+      card.classList.remove("is-previewing-trailer");
+    });
+
+    videoEl.addEventListener("emptied", () => {
+      card.classList.remove("is-previewing-trailer");
+    });
 
     card.addEventListener("pointerenter", startPreview);
     card.addEventListener("focus", startPreview);
@@ -1211,7 +1296,7 @@ function renderGameDetail(gameId) {
   }
 
   if (gameDetailTrailerSection && gameDetailTrailer) {
-    if (game.trailer?.src && game.webPlayable === false) {
+    if (game.trailer?.src) {
       gameDetailTrailer.src = game.trailer.src;
       gameDetailTrailer.title = game.trailer.title || `${game.title} trailer`;
       gameDetailTrailerSection.classList.remove("is-hidden");
@@ -1449,15 +1534,37 @@ function hideWindow(windowEl, options = {}) {
     toggleWindowFullscreen(windowEl, false);
   }
 
+  const pendingHideTimer = pendingHideTimers.get(windowEl);
+  if (pendingHideTimer) {
+    window.clearTimeout(pendingHideTimer);
+    pendingHideTimers.delete(windowEl);
+  }
+
   delete windowEl.dataset.taskbarOrder;
-  windowEl.classList.add("is-hidden");
   syncFullscreenState();
   renderTaskbarTabs();
   syncRouteWithVisibleWindows({ replace: options.replaceRoute !== false });
+
+  windowEl.classList.add("is-closing");
+
+  const hideTimer = window.setTimeout(() => {
+    windowEl.classList.add("is-hidden");
+    windowEl.classList.remove("is-closing");
+    pendingHideTimers.delete(windowEl);
+  }, WINDOW_CLOSE_ANIMATION_MS);
+
+  pendingHideTimers.set(windowEl, hideTimer);
 }
 
 function showWindow(windowEl, options = {}) {
+  const pendingHideTimer = pendingHideTimers.get(windowEl);
+  if (pendingHideTimer) {
+    window.clearTimeout(pendingHideTimer);
+    pendingHideTimers.delete(windowEl);
+  }
+
   const wasHidden = windowEl.classList.contains("is-hidden");
+  windowEl.classList.remove("is-closing");
   windowEl.classList.remove("is-hidden");
   if (wasHidden) {
     taskbarOrderSeed += 1;
@@ -1518,14 +1625,114 @@ function getWindowIcon(windowEl) {
   return "assets/xp-icons/taskbar-folder.ico";
 }
 
+function getVisibleTaskbarWindows() {
+  return Array.from(draggableWindows)
+    .filter((windowEl) => !windowEl.classList.contains("is-hidden") && windowEl.dataset.windowId)
+    .sort((windowA, windowB) => {
+      const orderA = Number(windowA.dataset.taskbarOrder || 0);
+      const orderB = Number(windowB.dataset.taskbarOrder || 0);
+      return orderA - orderB;
+    });
+}
+
+function syncTaskbarOrderFromDom() {
+  if (!taskbarTabs) {
+    return;
+  }
+
+  const orderedTabs = Array.from(taskbarTabs.querySelectorAll(".taskbar-tab")).filter(
+    (tabButton) => !tabButton.classList.contains("taskbar-tab-placeholder")
+  );
+
+  orderedTabs.forEach((tabButton, index) => {
+    const windowId = tabButton.dataset.taskbarTarget;
+    const windowEl = windowId ? document.querySelector(`[data-window-id="${windowId}"]`) : null;
+
+    if (windowEl) {
+      windowEl.dataset.taskbarOrder = String(index + 1);
+    }
+  });
+
+  taskbarOrderSeed = orderedTabs.length;
+}
+
+function animateTaskbarShuffle(previousRects) {
+  if (!taskbarTabs || !previousRects) {
+    return;
+  }
+
+  Array.from(taskbarTabs.querySelectorAll(".taskbar-tab")).forEach((tabButton) => {
+    if (tabButton.classList.contains("is-dragging")) {
+      return;
+    }
+
+    const key = tabButton.dataset.taskbarTarget;
+    const previousRect = key ? previousRects.get(key) : null;
+
+    if (!previousRect) {
+      return;
+    }
+
+    const nextRect = tabButton.getBoundingClientRect();
+    const deltaX = previousRect.left - nextRect.left;
+
+    if (Math.abs(deltaX) < 1) {
+      return;
+    }
+
+    tabButton.style.transition = "none";
+    tabButton.style.transform = `translateX(${deltaX}px)`;
+    void tabButton.offsetWidth;
+    tabButton.classList.add("is-shuffling");
+    tabButton.style.transition = "";
+    tabButton.style.transform = "";
+
+    const clearShuffleState = () => {
+      tabButton.classList.remove("is-shuffling");
+      tabButton.style.transition = "";
+    };
+
+    tabButton.addEventListener("transitionend", clearShuffleState, { once: true });
+    window.setTimeout(clearShuffleState, 300);
+  });
+}
+
+function endTaskbarDrag(pointerId = null) {
+  if (!activeTaskbarDrag) {
+    return;
+  }
+
+  if (pointerId !== null && activeTaskbarDrag.pointerId !== pointerId) {
+    return;
+  }
+
+  const { tabButton, placeholder } = activeTaskbarDrag;
+
+  if (placeholder?.parentNode) {
+    placeholder.parentNode.insertBefore(tabButton, placeholder);
+    placeholder.remove();
+  }
+
+  tabButton.classList.remove("is-dragging");
+  tabButton.style.transform = "";
+  tabButton.style.zIndex = "";
+  tabButton.style.pointerEvents = "";
+  tabButton.style.position = "";
+  tabButton.style.left = "";
+  tabButton.style.top = "";
+  tabButton.style.width = "";
+  tabButton.style.height = "";
+  taskbarTabs?.classList.remove("is-sorting");
+  syncTaskbarOrderFromDom();
+  activeTaskbarDrag = null;
+}
+
 function renderTaskbarTabs() {
   if (!taskbarTabs) {
     return;
   }
 
-  const visibleWindows = Array.from(draggableWindows).filter((windowEl) => {
-    return !windowEl.classList.contains("is-hidden") && windowEl.dataset.windowId;
-  });
+  const visibleWindows = getVisibleTaskbarWindows();
 
   const activeWindowEl = visibleWindows.reduce((topWindow, windowEl) => {
     if (!topWindow) {
@@ -1539,13 +1746,7 @@ function renderTaskbarTabs() {
 
   taskbarTabs.innerHTML = "";
 
-  visibleWindows
-    .sort((windowA, windowB) => {
-      const orderA = Number(windowA.dataset.taskbarOrder || 0);
-      const orderB = Number(windowB.dataset.taskbarOrder || 0);
-      return orderA - orderB;
-    })
-    .forEach((windowEl) => {
+  visibleWindows.forEach((windowEl) => {
       const tabButton = document.createElement("button");
       const iconImage = document.createElement("img");
       const labelSpan = document.createElement("span");
@@ -1561,12 +1762,39 @@ function renderTaskbarTabs() {
       labelSpan.textContent = getWindowLabel(windowEl);
       tabButton.append(iconImage, labelSpan);
 
+      tabButton.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0 || !taskbarTabs || !finePointerQuery.matches) {
+          return;
+        }
+
+        activeTaskbarDrag = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          currentX: event.clientX,
+          moved: false,
+          windowEl,
+          tabButton,
+          placeholder: null,
+        };
+
+        tabButton.setPointerCapture?.(event.pointerId);
+      });
+
       tabButton.addEventListener("click", () => {
+        if (activeTaskbarDrag?.windowEl === windowEl && activeTaskbarDrag.moved) {
+          return;
+        }
+
+        if (tabButton.dataset.suppressClick === "true") {
+          delete tabButton.dataset.suppressClick;
+          return;
+        }
+
         focusWindow(windowEl, { updateRoute: true });
       });
 
       taskbarTabs.appendChild(tabButton);
-    });
+  });
 }
 
 function updateTaskbarClock() {
@@ -1757,6 +1985,10 @@ function toggleStartPanel() {
   const willOpen = startPanel.classList.contains("is-hidden");
   startPanel.classList.toggle("is-hidden", !willOpen);
   startButton.setAttribute("aria-expanded", String(willOpen));
+
+  if (willOpen) {
+    restoreStoredPanelPosition(startPanel);
+  }
 }
 
 function stopDragging() {
@@ -1784,7 +2016,7 @@ function openWindowLink(windowEl) {
 }
 
 function startDragging(event, windowEl) {
-  if (!desktopStage || !canDragWindows()) {
+  if ((!desktopStage && !isStartPanel(windowEl)) || !canDragWindows()) {
     return;
   }
 
@@ -1792,14 +2024,21 @@ function startDragging(event, windowEl) {
     return;
   }
 
-  const titlebar = event.target.closest(".titlebar, .home-titlebar");
+  if (isStartPanel(windowEl)) {
+    const interactiveTarget = event.target.closest("button, a, input, textarea, select, label");
+
+    if (interactiveTarget) {
+      return;
+    }
+  }
+
+  const titlebar = event.target.closest(".titlebar, .home-titlebar, .start-panel-header");
   const closeButton = event.target.closest("button");
 
-  if (!titlebar || closeButton) {
+  if ((!titlebar && !isStartPanel(windowEl)) || closeButton) {
     return;
   }
 
-  const stageRect = desktopStage.getBoundingClientRect();
   const windowRect = windowEl.getBoundingClientRect();
 
   activeWindow = windowEl;
@@ -1811,6 +2050,19 @@ function startDragging(event, windowEl) {
   document.body.classList.add("is-dragging");
 
   if (!windowEl.dataset.dragReady) {
+    if (isStartPanel(windowEl)) {
+      windowEl.style.position = "fixed";
+      windowEl.style.left = `${windowRect.left}px`;
+      windowEl.style.top = `${windowRect.top}px`;
+      windowEl.style.right = "auto";
+      windowEl.style.bottom = "auto";
+      windowEl.style.transform = "none";
+      windowEl.dataset.dragReady = "true";
+      return;
+    }
+
+    const stageRect = desktopStage.getBoundingClientRect();
+
     if (windowEl === homeWindow) {
       windowEl.style.position = "absolute";
       windowEl.style.margin = "0";
@@ -1826,7 +2078,19 @@ function startDragging(event, windowEl) {
 }
 
 function updateDragging(event) {
-  if (!activeWindow || !desktopStage || !canDragWindows()) {
+  if (!activeWindow || !canDragWindows()) {
+    return;
+  }
+
+  if (isStartPanel(activeWindow)) {
+    const windowRect = activeWindow.getBoundingClientRect();
+    const nextLeft = clamp(event.clientX - pointerOffsetX, 0, window.innerWidth - windowRect.width);
+
+    activeWindow.style.left = `${nextLeft}px`;
+    return;
+  }
+
+  if (!desktopStage) {
     return;
   }
 
@@ -1915,6 +2179,14 @@ homeTitlebar?.addEventListener("pointerdown", (event) => {
   startDragging(event, homeWindow);
 });
 
+startPanel?.addEventListener("pointerdown", (event) => {
+  if (!startPanel || startPanel.classList.contains("is-hidden")) {
+    return;
+  }
+
+  startDragging(event, startPanel);
+});
+
 homeWindow?.addEventListener("pointerdown", () => {
   if (desktopModeQuery.matches) {
     bringToFront(homeWindow);
@@ -1924,6 +2196,105 @@ homeWindow?.addEventListener("pointerdown", () => {
 window.addEventListener("pointermove", updateDragging);
 window.addEventListener("pointerup", stopDragging);
 window.addEventListener("pointercancel", stopDragging);
+window.addEventListener("pointermove", (event) => {
+  if (!activeTaskbarDrag || activeTaskbarDrag.pointerId !== event.pointerId || !taskbarTabs) {
+    return;
+  }
+
+  const deltaX = event.clientX - activeTaskbarDrag.startX;
+  activeTaskbarDrag.currentX = event.clientX;
+
+  if (!activeTaskbarDrag.moved && Math.abs(deltaX) < TASKBAR_DRAG_THRESHOLD) {
+    return;
+  }
+
+  if (!activeTaskbarDrag.moved) {
+    const rect = activeTaskbarDrag.tabButton.getBoundingClientRect();
+    const placeholder = document.createElement("div");
+    placeholder.className = "taskbar-tab taskbar-tab-placeholder";
+    placeholder.style.width = `${rect.width}px`;
+    placeholder.style.height = `${rect.height}px`;
+    placeholder.setAttribute("aria-hidden", "true");
+
+    activeTaskbarDrag.tabButton.parentNode?.insertBefore(placeholder, activeTaskbarDrag.tabButton);
+    activeTaskbarDrag.placeholder = placeholder;
+    activeTaskbarDrag.moved = true;
+    activeTaskbarDrag.pointerOffsetX = event.clientX - rect.left;
+    activeTaskbarDrag.pointerOffsetY = event.clientY - rect.top;
+    activeTaskbarDrag.tabButton.classList.add("is-dragging");
+    activeTaskbarDrag.tabButton.style.position = "fixed";
+    activeTaskbarDrag.tabButton.style.left = `${rect.left}px`;
+    activeTaskbarDrag.tabButton.style.top = `${rect.top}px`;
+    activeTaskbarDrag.tabButton.style.width = `${rect.width}px`;
+    activeTaskbarDrag.tabButton.style.height = `${rect.height}px`;
+    activeTaskbarDrag.tabButton.style.zIndex = "3";
+    activeTaskbarDrag.tabButton.style.pointerEvents = "none";
+  }
+
+  const floatingLeft = event.clientX - (activeTaskbarDrag.pointerOffsetX ?? 0);
+  const floatingTop = event.clientY - (activeTaskbarDrag.pointerOffsetY ?? 0);
+  activeTaskbarDrag.tabButton.style.left = `${floatingLeft}px`;
+  activeTaskbarDrag.tabButton.style.top = `${floatingTop}px`;
+  taskbarTabs.classList.add("is-sorting");
+
+  const placeholder = activeTaskbarDrag.placeholder;
+
+  if (!placeholder) {
+    return;
+  }
+
+  const previousTab = placeholder.previousElementSibling;
+  const nextTab = placeholder.nextElementSibling;
+  const draggedRect = activeTaskbarDrag.tabButton.getBoundingClientRect();
+
+  if (deltaX < 0 && previousTab?.classList.contains("taskbar-tab")) {
+    const previousRect = previousTab.getBoundingClientRect();
+    const overlapWidth = Math.min(draggedRect.right, previousRect.right) - Math.max(draggedRect.left, previousRect.left);
+
+    if (overlapWidth > previousRect.width / 2) {
+      const previousRects = new Map(
+        Array.from(taskbarTabs.querySelectorAll(".taskbar-tab")).map((tabButton) => [
+          tabButton.dataset.taskbarTarget,
+          tabButton.getBoundingClientRect(),
+        ])
+      );
+
+      taskbarTabs.insertBefore(placeholder, previousTab);
+      syncTaskbarOrderFromDom();
+      animateTaskbarShuffle(previousRects);
+    }
+  } else if (deltaX > 0 && nextTab?.classList.contains("taskbar-tab")) {
+    const nextRect = nextTab.getBoundingClientRect();
+    const overlapWidth = Math.min(draggedRect.right, nextRect.right) - Math.max(draggedRect.left, nextRect.left);
+
+    if (overlapWidth > nextRect.width / 2) {
+      const previousRects = new Map(
+        Array.from(taskbarTabs.querySelectorAll(".taskbar-tab")).map((tabButton) => [
+          tabButton.dataset.taskbarTarget,
+          tabButton.getBoundingClientRect(),
+        ])
+      );
+
+      taskbarTabs.insertBefore(placeholder, nextTab.nextElementSibling);
+      syncTaskbarOrderFromDom();
+      animateTaskbarShuffle(previousRects);
+    }
+  }
+});
+window.addEventListener("pointerup", (event) => {
+  if (!activeTaskbarDrag || activeTaskbarDrag.pointerId !== event.pointerId) {
+    return;
+  }
+
+  if (activeTaskbarDrag.moved) {
+    activeTaskbarDrag.tabButton.dataset.suppressClick = "true";
+  }
+
+  endTaskbarDrag(event.pointerId);
+});
+window.addEventListener("pointercancel", (event) => {
+  endTaskbarDrag(event.pointerId);
+});
 window.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") {
     return;
@@ -1972,6 +2343,16 @@ desktopModeQuery.addEventListener("change", () => {
     homeWindow.style.transform = "";
     delete homeWindow.dataset.dragReady;
   }
+
+  if (!desktopModeQuery.matches && startPanel) {
+    startPanel.style.position = "";
+    startPanel.style.left = "";
+    startPanel.style.top = "";
+    startPanel.style.right = "";
+    startPanel.style.bottom = "";
+    startPanel.style.transform = "";
+    delete startPanel.dataset.dragReady;
+  }
   arrangeVisiblePanels();
 });
 
@@ -1993,12 +2374,7 @@ folderShortcuts.forEach((shortcut) => {
     if (shortcut.dataset.gameId) {
       renderGameDetail(shortcut.dataset.gameId);
     }
-    beginPageTransition(() => {
-      showWindow(targetWindow);
-      window.setTimeout(() => {
-        document.body.classList.remove("is-transitioning");
-      }, 220);
-    });
+    showWindow(targetWindow);
   });
 });
 
@@ -2018,8 +2394,12 @@ startPanel?.addEventListener("click", (event) => {
 
 restartButton?.addEventListener("click", () => {
   closeStartPanel();
+  clearStoredPanelPositions();
+  const baseHref = document.querySelector("base")?.href || `${window.location.origin}/`;
+  const restartUrl = new URL(baseHref, window.location.href);
+  restartUrl.hash = "";
   beginPageTransition(() => {
-    window.location.reload();
+    window.location.replace(restartUrl.toString());
   });
 });
 

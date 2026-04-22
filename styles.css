@@ -42,7 +42,7 @@ body {
   cursor: none;
   background:
     linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.06)),
-    url("https://upload.wikimedia.org/wikipedia/en/2/27/Bliss_%28Windows_XP%29.png")
+    url("assets/kojima-please-hire-me.png")
       calc(50% + var(--parallax-x)) calc(50% + var(--parallax-y)) / calc(100% + 72px) calc(100% + 72px) no-repeat fixed;
   opacity: 0;
   overflow: hidden;
@@ -57,7 +57,7 @@ body.is-dark {
   --xp-line: #4f4f4f;
   background:
     linear-gradient(rgba(26, 26, 26, 0.68), rgba(26, 26, 26, 0.68)),
-    url("https://upload.wikimedia.org/wikipedia/en/2/27/Bliss_%28Windows_XP%29.png")
+    url("assets/kojima-please-hire-me.png")
       calc(50% + var(--parallax-x)) calc(50% + var(--parallax-y)) / calc(100% + 72px) calc(100% + 72px) no-repeat fixed;
 }
 
@@ -178,7 +178,16 @@ body.is-transitioning .page-transition {
 
 .utility-button:hover,
 .utility-button:focus-visible {
-  filter: brightness(0.96);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #e6e6e6 0%, #d4d4d4 100%);
+  border-top-color: #f8f8f8;
+  border-left-color: #f8f8f8;
+  border-right-color: #b7b7b7;
+  border-bottom-color: #b7b7b7;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 3px rgba(0, 0, 0, 0.12);
+  filter: none;
 }
 
 .utility-icon-image {
@@ -304,9 +313,12 @@ body.is-dark .collection-card:focus-visible {
 }
 
 .home-window {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  top: calc((100vh - var(--taskbar-height)) / 2);
+  transform: translate(-50%, -50%);
   width: min(800px, calc(100vw - 56px));
-  margin: 118px auto 0;
+  margin: 0;
   border: 1px solid #0f3ca8;
   outline: 3px solid #245edb;
   border-radius: 0;
@@ -354,15 +366,25 @@ body.is-dark .collection-card:focus-visible {
   pointer-events: auto;
   scale: 1;
   translate: 0 0;
-  filter: blur(0);
   transform-origin: center bottom;
-  will-change: opacity, scale, translate, filter;
+  will-change: opacity, scale, translate;
   transition:
-    opacity 260ms cubic-bezier(0.16, 1, 0.3, 1),
-    scale 360ms cubic-bezier(0.16, 1, 0.3, 1),
-    translate 360ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 240ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 360ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    scale 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    translate 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.window.is-closing {
+  opacity: 0;
+  visibility: visible;
+  pointer-events: none;
+  scale: 0.978;
+  translate: 0 16px;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.72),
+    inset -1px -1px 0 rgba(15, 60, 168, 0.7),
+    0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .window.is-hidden {
@@ -370,9 +392,8 @@ body.is-dark .collection-card:focus-visible {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  scale: 0.965;
+  scale: 0.972;
   translate: 0 24px;
-  filter: blur(12px);
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.72),
     inset -1px -1px 0 rgba(15, 60, 168, 0.7),
@@ -1944,24 +1965,21 @@ body.is-dark .game-detail-devlog-heading span {
   pointer-events: auto;
   scale: 1;
   translate: 0 0;
-  filter: blur(0);
   transform-origin: left bottom;
-  will-change: opacity, scale, translate, filter;
+  will-change: opacity, scale, translate;
   transition:
-    opacity 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    scale 320ms cubic-bezier(0.16, 1, 0.3, 1),
-    translate 320ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    scale 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    translate 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .start-panel.is-hidden {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  scale: 0.94;
+  scale: 0.965;
   translate: 0 18px;
-  filter: blur(10px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
 }
 
@@ -2073,6 +2091,14 @@ body.is-dark .game-detail-devlog-heading span {
   scrollbar-width: thin;
 }
 
+.taskbar-tabs.is-sorting .taskbar-tab {
+  transition:
+    transform 220ms cubic-bezier(0.22, 0.9, 0.2, 1),
+    background-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+}
+
 .taskbar-status {
   display: inline-flex;
   align-items: center;
@@ -2091,6 +2117,11 @@ body.is-dark .game-detail-devlog-heading span {
   color: #072b73;
   cursor: none;
   white-space: nowrap;
+  transition:
+    transform 220ms cubic-bezier(0.22, 0.9, 0.2, 1),
+    box-shadow 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
 }
 
 .taskbar-tab span {
@@ -2098,8 +2129,42 @@ body.is-dark .game-detail-devlog-heading span {
   text-overflow: ellipsis;
 }
 
+.taskbar-tab:hover,
+.taskbar-tab:focus-visible {
+  border-radius: 8px;
+  background: linear-gradient(180deg, #e3e3e3 0%, #d0d0d0 100%);
+  color: #1f1f1f;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+.taskbar-tab.is-dragging {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  transition: none;
+}
+
+.taskbar-tab-placeholder {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.taskbar-tab.is-shuffling {
+  transition:
+    transform 260ms cubic-bezier(0.18, 0.88, 0.18, 1),
+    box-shadow 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
 .taskbar-tab.is-active {
   background: linear-gradient(180deg, #fff4c7 0%, #e6d187 100%);
+  color: #362700;
+}
+
+.taskbar-tab.is-active:hover,
+.taskbar-tab.is-active:focus-visible {
+  background: linear-gradient(180deg, #f1e3af 0%, #dcc67a 100%);
   color: #362700;
 }
 
@@ -2235,6 +2300,26 @@ body.is-dark .game-detail-devlog-heading span {
   color: #fffdf1;
 }
 
+.taskbar-social-row .social-link:hover,
+.taskbar-social-row .social-link:focus-visible {
+  transform: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #e3e3e3 0%, #d0d0d0 100%);
+  border-color: #bcbcbc;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 3px rgba(0, 0, 0, 0.14);
+  color: #1f1f1f;
+}
+
+.taskbar-social-row .social-link:hover::before,
+.taskbar-social-row .social-link:focus-visible::before,
+.taskbar-social-row .social-link:hover::after,
+.taskbar-social-row .social-link:focus-visible::after {
+  opacity: 0;
+  transform: none;
+}
+
 .social-link:hover::before,
 .social-link:focus-visible::before {
   opacity: 0.95;
@@ -2307,7 +2392,6 @@ body.is-dark .game-detail-devlog-heading span {
   .start-panel.is-hidden {
     scale: 1;
     translate: 0 0;
-    filter: none;
   }
 }
 
@@ -2468,9 +2552,46 @@ body.is-dark .taskbar-tab {
   color: #f1eadb;
 }
 
+body.is-dark .taskbar-tab:hover,
+body.is-dark .taskbar-tab:focus-visible {
+  background: linear-gradient(180deg, #858585 0%, #686868 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
 body.is-dark .taskbar-tab.is-active {
   background: linear-gradient(180deg, #7d6f52 0%, #5d4f35 100%);
   color: #fff5d7;
+}
+
+body.is-dark .taskbar-tab.is-active:hover,
+body.is-dark .taskbar-tab.is-active:focus-visible {
+  background: linear-gradient(180deg, #8d7d5a 0%, #6b5b3d 100%);
+  color: #fff5d7;
+}
+
+body.is-dark .utility-button:hover,
+body.is-dark .utility-button:focus-visible {
+  background: linear-gradient(180deg, #7a7a7a 0%, #626262 100%);
+  border-top-color: #a0a0a0;
+  border-left-color: #a0a0a0;
+  border-right-color: #313131;
+  border-bottom-color: #313131;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 1px 3px rgba(0, 0, 0, 0.28);
+}
+
+body.is-dark .taskbar-social-row .social-link:hover,
+body.is-dark .taskbar-social-row .social-link:focus-visible {
+  background: linear-gradient(180deg, #7f7f7f 0%, #666 100%);
+  border-color: #5a5a5a;
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 1px 3px rgba(0, 0, 0, 0.22);
 }
 
 body.is-dark .taskbar-clock {
@@ -2505,6 +2626,10 @@ body.is-dark .card-badge {
   }
 
   .home-window {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
     margin-top: 104px;
     width: min(680px, calc(100vw - 28px));
   }
@@ -2630,6 +2755,10 @@ body.is-dark .card-badge {
   }
 
   .home-window {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
     width: calc(100vw - 20px);
     margin: 64px auto 0;
   }
