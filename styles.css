@@ -349,10 +349,34 @@ body.is-dark .collection-card:focus-visible {
     inset -1px -1px 0 rgba(15, 60, 168, 0.75),
     0 14px 30px rgba(0, 0, 0, 0.18);
   overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  scale: 1;
+  translate: 0 0;
+  filter: blur(0);
+  transform-origin: center bottom;
+  will-change: opacity, scale, translate, filter;
+  transition:
+    opacity 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    scale 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    translate 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 240ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 360ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .window.is-hidden {
-  display: none;
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  scale: 0.965;
+  translate: 0 24px;
+  filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.72),
+    inset -1px -1px 0 rgba(15, 60, 168, 0.7),
+    0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .is-hidden {
@@ -382,7 +406,7 @@ body.is-dark .collection-card:focus-visible {
 }
 
 .start-panel.is-hidden {
-  display: none;
+  display: block !important;
 }
 
 .titlebar {
@@ -1915,6 +1939,30 @@ body.is-dark .game-detail-devlog-heading span {
   border-bottom: 1px solid #173b8c;
   background: linear-gradient(180deg, #f8f4ec 0%, #e8ddc8 100%);
   box-shadow: 8px 10px 26px rgba(0, 0, 0, 0.28);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  scale: 1;
+  translate: 0 0;
+  filter: blur(0);
+  transform-origin: left bottom;
+  will-change: opacity, scale, translate, filter;
+  transition:
+    opacity 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    scale 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    translate 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.start-panel.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  scale: 0.94;
+  translate: 0 18px;
+  filter: blur(10px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
 }
 
 .start-panel-header {
@@ -2231,6 +2279,36 @@ body.is-dark .game-detail-devlog-heading span {
 .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window,
+  .start-panel,
+  .reveal,
+  body,
+  a,
+  button,
+  .home-action,
+  .quick-link,
+  .work-launch,
+  .contact-button,
+  .collection-card,
+  .video-fullscreen-button,
+  .social-link,
+  .titlebar button,
+  .utility-button {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .window,
+  .window.is-hidden,
+  .start-panel,
+  .start-panel.is-hidden {
+    scale: 1;
+    translate: 0 0;
+    filter: none;
+  }
 }
 
 .cursor-dot,
