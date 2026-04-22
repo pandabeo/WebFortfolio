@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PandaBeo04 | Portfolio</title>
+    <meta
+      name="description"
+      content="Portfolio for PandaBeo04 with featured games, projects, and contact links."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="desktop">
+      <div class="page-transition" aria-hidden="true"></div>
+      <div class="desktop-noise"></div>
+
+      <main class="desktop-stage reveal">
+        <div class="utility-toggles">
+          <button class="utility-button" id="theme-toggle" type="button" title="Enable dark mode" aria-label="Enable dark mode">
+            <img class="utility-icon-image" src="assets/xp-icons/theme.ico" alt="" aria-hidden="true" />
+          </button>
+          <button class="utility-button" id="sound-toggle" type="button" title="Mute audio" aria-label="Mute audio">
+            <img class="utility-icon-image utility-icon-sound" src="assets/xp-icons/sound.ico" alt="" aria-hidden="true" />
+          </button>
+        </div>
+
+      <button class="desktop-shortcut desktop-shortcut-left has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="thrifting-101" data-hover-trailer-card="true">
+          <span class="desktop-shortcut-media">
+            <img class="action-icon-image thrifting-shortcut-image" src="assets/MkzMwz.png" alt="" aria-hidden="true" />
+            <video class="desktop-shortcut-trailer collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+              <source src="assets/game-trailers/thrifting-101-trailer.mp4" type="video/mp4" />
+            </video>
+          </span>
+          <span class="desktop-shortcut-trailer-label">Trailer</span>
+          <span class="action-label">Thrifting 101</span>
+          <span class="desktop-shortcut-badge">Latest Release</span>
+          <span class="desktop-shortcut-meta">Play Now</span>
+        </button>
+
+      <button class="desktop-shortcut desktop-shortcut-coy has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="coy-commute" data-hover-trailer-card="true">
+          <span class="desktop-shortcut-media">
+            <img class="action-icon-image coy-shortcut-image" src="assets/game-covers/coy-commute.png" alt="" aria-hidden="true" />
+            <video class="desktop-shortcut-trailer collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+              <source src="assets/game-trailers/coy-commute-trailer.mp4" type="video/mp4" />
+            </video>
+          </span>
+          <span class="desktop-shortcut-trailer-label">Trailer</span>
+          <span class="action-label">Coy Commute</span>
+          <span class="desktop-shortcut-badge">1st Gameloft GameDev Mentorship</span>
+          <span class="desktop-shortcut-meta">Play Now</span>
+        </button>
+
+        <section class="home-window">
+          <div class="home-titlebar">
+            <span>home</span>
+          </div>
+          <div class="home-body">
+            <h1 class="home-heading">hi! <strong>i'm Panda</strong></h1>
+            <p class="home-subtitle">game designer, unity developer, focus on gameplay and level design</p>
+
+            <div class="home-actions">
+              <button class="home-action" type="button" data-target-window="about-window">
+                <img class="action-icon-image" src="assets/xp-icons/about.ico" alt="" aria-hidden="true" />
+                <span class="action-label">about</span>
+              </button>
+              <button class="home-action" type="button" data-target-window="cat-collection">
+                <img class="action-icon-image" src="assets/xp-icons/cat.ico" alt="" aria-hidden="true" />
+                <span class="action-label">my cat</span>
+              </button>
+              <button class="home-action" type="button" data-target-window="work-window">
+                <img class="action-icon-image" src="assets/xp-icons/work.ico" alt="" aria-hidden="true" />
+                <span class="action-label">work</span>
+              </button>
+              <button class="home-action" type="button" data-target-window="faq-window">
+                <img class="action-icon-image" src="assets/xp-icons/faq-question.ico" alt="" aria-hidden="true" />
+                <span class="action-label">faq</span>
+              </button>
+              <button class="home-action" type="button" data-target-window="contact-window">
+                <img class="action-icon-image" src="assets/xp-icons/contact.ico" alt="" aria-hidden="true" />
+                <span class="action-label">contact</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="window is-hidden" data-window-id="about-window">
+          <div class="titlebar">
+            <span>about</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="popup-body xp-content">
+              <h2>About Me</h2>
+              <p>
+                I'm Thinh Bui, a third-year Games student at RMIT University Vietnam. I focus on gameplay prototyping,
+                Unity implementation, and level design.
+              </p>
+              <p>
+                Most of my work sits between game design and hands-on development: building mechanics, shaping player
+                flow, and polishing mood through level layout, lighting, and iteration.
+              </p>
+              <div class="about-grid">
+                <section class="about-panel">
+                  <h3>Education</h3>
+                  <div class="about-education-card">
+                    <strong>RMIT University Vietnam</strong>
+                    <span>Bachelor of Design (Games)</span>
+                    <span>October 2023 - October 2026 (Expected)</span>
+                    <span>GPA: 3.8/4.0</span>
+                  </div>
+                </section>
+                <section class="about-panel">
+                  <h3>Software</h3>
+                  <div class="about-software-list">
+                    <div class="about-software-item">
+                      <img src="assets/software-icons/unity.png" alt="Unity logo" />
+                      <span>Unity (2D &amp; 3D)</span>
+                    </div>
+                    <div class="about-software-item">
+                      <img src="assets/software-icons/vscode.png" alt="Visual Studio Code logo" />
+                      <span>Visual Studio Code</span>
+                    </div>
+                    <div class="about-software-item">
+                      <img src="assets/software-icons/blender.png" alt="Blender logo" />
+                      <span>Blender</span>
+                    </div>
+                    <div class="about-software-item about-software-item-text">
+                      <span>AI Tools</span>
+                    </div>
+                  </div>
+                </section>
+              </div>
+              <p>
+                I'm open to internships, freelance opportunities, and collaborative projects. If you want to talk about
+                game design, development, or just want to say hi, feel free to reach out!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="window is-hidden" data-window-id="links-window">
+          <div class="titlebar">
+            <span>links</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="popup-body xp-content">
+              <h2>Find Me Online</h2>
+              <p class="link-note">These links open in a new tab.</p>
+              <div class="quick-links">
+                <a class="quick-link" href="https://pandabeo04.itch.io/" target="_blank" rel="noreferrer">
+                  <strong>itch.io</strong>
+                  <span>Published games, prototypes, and playable builds.</span>
+                </a>
+                <a class="quick-link" href="mailto:buitruongthinh2024@gmail.com">
+                  <strong>email</strong>
+                  <span>buitruongthinh2024@gmail.com</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window is-hidden" data-window-id="work-window">
+          <div class="titlebar">
+            <span>work</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="popup-body xp-content">
+              <h2>Open A Collection</h2>
+              <p>Choose what part of the portfolio you want to browse.</p>
+                <div class="work-launch-grid">
+                  <button class="work-launch work-launch-achievements" type="button" data-target-window="achievements-window">
+                    <img class="work-launch-icon" src="assets/xp-icons/achievement-star.ico" alt="" aria-hidden="true" />
+                    <strong>Achievements</strong>
+                    <span>Awards, scholarship, and RMIT Showcase entries.</span>
+                  </button>
+                  <button class="work-launch work-launch-games" type="button" data-target-window="game-collection">
+                    <img class="work-launch-icon" src="assets/xp-icons/games.ico" alt="" aria-hidden="true" />
+                    <strong>Games</strong>
+                    <span>Playable projects and published experiments.</span>
+                  </button>
+                  <button class="work-launch work-launch-3d" type="button" data-target-window="three-d-collection">
+                    <img class="work-launch-icon" src="assets/xp-icons/3d.ico" alt="" aria-hidden="true" />
+                    <strong>3D Work</strong>
+                    <span>Environment videos and scene studies.</span>
+                  </button>
+                  <button class="work-launch work-launch-documents" type="button" data-target-window="document-collection">
+                    <img class="work-launch-icon" src="assets/xp-icons/documents.ico" alt="" aria-hidden="true" />
+                    <strong>Documents</strong>
+                    <span>Pitches, PDFs, analysis files, and media.</span>
+                  </button>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="window is-hidden" data-window-id="faq-window">
+          <div class="titlebar">
+            <span>faq</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="popup-body xp-content">
+              <h2>FAQ</h2>
+              <div class="faq-list">
+                <article class="faq-item">
+                  <h3 class="faq-question">What is your experience with game development?</h3>
+                  <p class="faq-answer">I mainly work in Unity with C# for prototypes, assignments, and small polished releases.</p>
+                </article>
+                <article class="faq-item">
+                  <h3 class="faq-question">What is your approach to game design?</h3>
+                  <p class="faq-answer">I like building mechanics first, then tightening feel, readability, and atmosphere.</p>
+                </article>
+                <article class="faq-item">
+                  <h3 class="faq-question">What is your experience with 3D modeling and animation?</h3>
+                  <p class="faq-answer">I have experience with 3D modeling in Blender and basic animation techniques.</p>
+                </article>
+                <article class="faq-item">
+                  <h3 class="faq-question">Are you open to internships or freelance work?</h3>
+                  <p class="faq-answer">Yes, I'm open to internships, freelance opportunities, and collaborative game projects.</p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window is-hidden" data-window-id="contact-window">
+          <div class="titlebar">
+            <span>contact</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="popup-body xp-content">
+              <h2>Contact</h2>
+              <p class="contact-copy">
+                The easiest way to reach me is by email. If you want to talk about game design, Unity work, internships,
+                or collaborations, send me a message.
+              </p>
+              <p>
+                If you can not access the send an email feature, use this button to copy the email address
+                <button
+                  class="contact-inline-copy"
+                  type="button"
+                  data-copy-email="buitruongthinh2004@gmail.com"
+                  aria-label="Copy email address to clipboard"
+                >
+                  <span class="contact-inline-copy-text">mail</span>
+                </button>
+                or find me on itch.io where I post my projects and prototypes.
+              </p>
+              <div class="contact-actions">
+                <a class="contact-button" href="mailto:buitruongthinh2024@gmail.com">Send an Email</a>
+                <a class="contact-button" href="https://pandabeo04.itch.io/" target="_blank" rel="noreferrer">Open itch.io</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window is-hidden" data-window-id="achievements-window">
+          <div class="titlebar">
+            <span>achievements</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="popup-body xp-content">
+              <h2>Achievements & Showcase</h2>
+              <p>Awards, programs, scholarships, and RMIT Showcase projects.</p>
+              <div class="quick-links">
+                <div class="achievement-group">
+                  <h3 class="achievement-group-title">Exhibitions</h3>
+                  <a class="quick-link" href="https://www.instagram.com/p/DULbxOnDwau/?img_index=1" target="_blank" rel="noreferrer">
+                    <strong>Instagram: Exhibition Post</strong>
+                    <span>Open the Instagram post for the game exhibition feature.</span>
+                  </a>
+                  <a class="quick-link" href="https://tuoitre.vn/du-hanh-ve-thoi-di-net-bi-me-gank-cung-su-kien-doc-la-cua-game-indie-viet-20250720134200116.htm" target="_blank" rel="noreferrer">
+                    <strong>Tuoi Tre: Indie Game Exhibition Feature</strong>
+                    <span>Open the exhibition article that highlights the indie game event coverage.</span>
+                  </a>
+                </div>
+                <div class="achievement-group">
+                  <h3 class="achievement-group-title">Awards</h3>
+                  <a class="quick-link" href="https://www.facebook.com/share/p/18cK4As5cR/" target="_blank" rel="noreferrer">
+                    <strong>Facebook: Gameloft GameDev Mentorship</strong>
+                    <span>Open the Facebook share post for the Gameloft GameDev Mentorship feature.</span>
+                  </a>
+                  <div class="quick-link">
+                    <strong>Gameloft GameDev Mentorship Program 2025</strong>
+                    <span>Selected participant in the 2025 mentorship program and recipient of the Favorite Game award.</span>
+                  </div>
+                  <div class="quick-link">
+                    <strong>Scholarship for Current Students</strong>
+                    <span>Recipient of a current-student scholarship at RMIT Vietnam.</span>
+                  </div>
+                </div>
+                <div class="achievement-group">
+                  <h3 class="achievement-group-title">Showcase</h3>
+                  <a class="quick-link" href="https://www.rmitvn-showcase.com/scd-games-y3/passive-connections-in-single-player-video-games-design-strategies-to-enhance-immersion-and-role-playing" target="_blank" rel="noreferrer">
+                    <strong>RMIT Showcase: Passive Connections in Single-Player Video Games</strong>
+                    <span>Year 3 research project listed under Bui Truong Thinh.</span>
+                  </a>
+                  <a class="quick-link" href="https://www.rmitvn-showcase.com/scd-games-y3/you-never-made-your-choices-and-that-s-ok" target="_blank" rel="noreferrer">
+                    <strong>RMIT Showcase: You Never Made Your Choices and that's ok</strong>
+                    <span>Research zine project with Bui Truong Thinh on the team.</span>
+                  </a>
+                  <a class="quick-link" href="https://www.rmitvn-showcase.com/scd-games-y2/game-narrative-the-peak-beyond" target="_blank" rel="noreferrer">
+                    <strong>RMIT Showcase: The Peak Beyond</strong>
+                    <span>Team project featuring Bui Truong Thinh on the student list.</span>
+                  </a>
+                  <a class="quick-link" href="https://www.rmitvn-showcase.com/scd-games-y2/a-game-about-me" target="_blank" rel="noreferrer">
+                    <strong>RMIT Showcase: A game about me</strong>
+                    <span>Project listed on RMIT Vietnam Showcase under student name Bui Truong Thinh.</span>
+                  </a>
+                  <a class="quick-link" href="https://www.rmitvn-showcase.com/scd-games-y1/en/equilibrium" target="_blank" rel="noreferrer">
+                    <strong>RMIT Showcase: Equilibrium</strong>
+                    <span>Solo showcase project listed under Bui Truong Thinh.</span>
+                  </a>
+                  <a class="quick-link" href="https://www.rmitvn-showcase.com/scd-games-y1/en/ame-no-naka" target="_blank" rel="noreferrer">
+                    <strong>RMIT Showcase: Ame no Naka</strong>
+                    <span>Team project with Bui Truong Thinh credited as programmer.</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window collection-window is-hidden" id="game-collection" data-window-id="game-collection">
+          <div class="titlebar">
+            <span>games</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="collection-body xp-content">
+              <h3>Game Collection</h3>
+              <p>Published work, assignments, and prototypes.</p>
+              <div class="collection-grid xp-icon-grid">
+              <button class="collection-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="thrifting-101" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/thrifting-101.png" alt="Thrifting 101 cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/thrifting-101-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">Thrifting 101</span>
+                <span class="card-description">Arcade-forward browser game with a fast hook and strong visual identity.</span>
+              </button>
+              <button class="collection-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="tales-of-a-playboy" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/tales-of-a-playboy.png" alt="Tales of a Playboy cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/tales-of-a-playboy-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">Tales Of A Playboy</span>
+                <span class="card-description">Adventure project presented as a browser-playable character-led piece.</span>
+              </button>
+              <button class="collection-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="ame-no-naka" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/ame-no-naka.png" alt="Ame no Naka cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/ame-no-naka-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">Ame no Naka</span>
+                <span class="card-description">Mood-heavy adventure built around rain, pressure, and mortality.</span>
+              </button>
+              <button class="collection-card" type="button" data-target-window="game-detail-window" data-game-id="homeward">
+                <img src="assets/game-covers/homeward.png" alt="Homeward cover" />
+                <span class="card-title">Homeward</span>
+                <span class="card-description">Action adventure with dungeon and boss-fight energy.</span>
+              </button>
+              <button class="collection-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="coy-commute" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/coy-commute.png" alt="Coy Commute cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/coy-commute-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">Coy Commute</span>
+                <span class="card-description">Featured at Gameloft GameDev Mentorship and playable directly in the browser.</span>
+              </button>
+              <button class="collection-card" type="button" data-target-window="game-detail-window" data-game-id="my-color-is-not-colorfull">
+                <img src="assets/game-covers/my-color-is-not-colorfull.png" alt="My Color Is Not Colorfull cover" />
+                <span class="card-title">My Color Is Not Colorfull</span>
+                <span class="card-description">Adventure game with a visually driven emotional tone.</span>
+              </button>
+              <button class="collection-card" type="button" data-target-window="game-detail-window" data-game-id="equilibrium">
+                <img src="assets/game-covers/equilibrium.png" alt="Equilibrium cover" />
+                <span class="card-title">Equilibrium</span>
+                <span class="card-description">Twine visual novel focused on reading and branching balance.</span>
+              </button>
+              <button class="collection-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="d-fishy-finals" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/d-fishy-finals.jpg" alt="D Fishy Finals cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/d-fishy-finals-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">D' Fishy Finals</span>
+                <span class="card-description">Adventure game about teenage intrusive thoughts on a collaborator account.</span>
+              </button>
+              <button class="collection-card fallback-game-card" type="button" data-target-window="game-detail-window" data-game-id="blocknout">
+                <img src="assets/game-covers/blocknout.png" alt="BlocknOut cover" />
+                <span class="card-title">BlocknOut</span>
+                <span class="card-description">Third-person action prototype released for RMIT GDS4 Blockout 01.</span>
+              </button>
+              <button class="collection-card fallback-game-card" type="button" data-target-window="game-detail-window" data-game-id="hours-before-blue">
+                <img src="assets/game-covers/hours-before-blue.png" alt="Hours Before Blue cover" />
+                <span class="card-title">Hours Before Blue</span>
+                <span class="card-description">Short cozy adventure jam game published on itch.</span>
+              </button>
+              <button class="collection-card fallback-game-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="chaotet" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/chaotet.gif" alt="ChaoTet cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/chaotet-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">ChaoTet!</span>
+                <span class="card-description">Tet-themed 3D survival-simulation release made with collaborators.</span>
+              </button>
+              <button class="collection-card fallback-game-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="into-the-dungeon" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/into-the-dungeon.png" alt="IntoTheDungeon cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/into-the-dungeon-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">IntoTheDungeon</span>
+                <span class="card-description">Procedural dungeon experiment released as a downloadable build.</span>
+              </button>
+              <button class="collection-card fallback-game-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="a-game-about-me" data-hover-trailer-card="true">
+                <span class="collection-card-media">
+                  <img src="assets/game-covers/a-game-about-me.png" alt="A game about me cover" />
+                  <video class="collection-card-trailer" data-hover-preview="true" preload="metadata" muted loop playsinline aria-hidden="true">
+                    <source src="assets/game-trailers/a-game-about-me-trailer.mp4" type="video/mp4" />
+                  </video>
+                </span>
+                <span class="collection-card-hover-label">Trailer</span>
+                <span class="card-title">A Game About Me</span>
+                <span class="card-description">HTML5 and Windows visual-novel style project playable on itch.</span>
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window collection-window is-hidden game-player-window game-detail-window" data-window-id="game-detail-window">
+          <div class="titlebar">
+            <span>game detail</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="collection-body xp-content game-detail-body">
+              <div class="game-detail-shell">
+                <div class="game-detail-header">
+                  <img class="game-detail-cover" src="assets/game-covers/thrifting-101.png" alt="Game cover" />
+                  <div class="game-detail-summary">
+                    <span class="game-detail-kicker">Selected Game</span>
+                    <h3 data-game-detail-title>Thrifting 101</h3>
+                    <p data-game-detail-description>Playable Unity WebGL build embedded directly into the portfolio.</p>
+                    <div class="document-preview-actions game-detail-actions" data-game-detail-actions></div>
+                  </div>
+                </div>
+                <section class="game-detail-section">
+                  <h4>About This Project</h4>
+                  <div class="game-detail-meta" data-game-detail-meta></div>
+                </section>
+                <section class="game-detail-section is-hidden" data-game-detail-trailer-section>
+                  <h4>Trailer</h4>
+                  <video
+                    class="game-detail-trailer-frame"
+                    data-game-detail-trailer
+                    controls
+                    preload="metadata"
+                    playsinline
+                  ></video>
+                </section>
+                <section class="game-detail-section is-hidden" data-game-detail-stills-section>
+                  <div class="game-detail-stills-heading">
+                    <h4>In-Game Image</h4>
+                  </div>
+                  <div class="game-detail-stills" data-game-detail-stills></div>
+                </section>
+                <section class="game-detail-section" data-game-detail-player-section>
+                  <h4>Playable Build</h4>
+                  <iframe
+                    class="game-player-frame"
+                    data-game-detail-frame
+                    src="games/ThriftingShopWebGL/index.html"
+                    title="Thrifting 101"
+                    loading="lazy"
+                    allowfullscreen
+                  ></iframe>
+                </section>
+                <section class="game-detail-section">
+                  <div class="game-detail-devlog-heading">
+                    <h4>Devlog</h4>
+                    <span>Ready for future updates</span>
+                  </div>
+                  <div class="game-devlog-list" data-game-detail-devlog></div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window collection-window is-hidden" id="three-d-collection" data-window-id="three-d-collection">
+          <div class="titlebar">
+            <span>3d work</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="collection-body xp-content">
+              <h3>3D Work</h3>
+              <p>Environment studies and walkthrough captures.</p>
+              <div class="collection-grid xp-icon-grid">
+              <article class="collection-card">
+                <video controls preload="metadata" playsinline>
+                  <source src="3d/Buitruongthinh S3975580 Benthanhmarketvideo.mp4" type="video/mp4" />
+                </video>
+                <button class="video-fullscreen-button" type="button" data-fullscreen-video>Fullscreen</button>
+                <span class="card-title">Ben Thanh Market</span>
+                <span class="card-description">Scene walkthrough focused on atmosphere, composition, and environmental detail.</span>
+              </article>
+              <article class="collection-card">
+                <video controls preload="metadata" playsinline>
+                  <source src="3d/Buitruongthinh S3975580 Orenchicafevideo.mp4" type="video/mp4" />
+                </video>
+                <button class="video-fullscreen-button" type="button" data-fullscreen-video>Fullscreen</button>
+                <span class="card-title">Orenchi Cafe</span>
+                <span class="card-description">Cafe environment showcase with mood-first interior presentation.</span>
+              </article>
+              <article class="collection-card">
+                <video controls preload="metadata" playsinline>
+                  <source src="3d/Movement Showcase.mp4" type="video/mp4" />
+                </video>
+                <button class="video-fullscreen-button" type="button" data-fullscreen-video>Fullscreen</button>
+                <span class="card-title">Movement Showcase</span>
+                <span class="card-description">Movement-focused 3D showcase demonstrating player control and traversal feel.</span>
+              </article>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window collection-window is-hidden" id="document-collection" data-window-id="document-collection">
+          <div class="titlebar">
+            <span>documents</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="collection-body xp-content">
+              <h3>Documents</h3>
+              <p>Choose a file from the list to preview it here.</p>
+              <div class="document-explorer">
+                <div class="document-list" role="listbox" aria-label="Documents">
+                  <button class="document-item is-active" type="button" data-doc-target="doc-concept">
+                    <strong>Concept Sketch</strong>
+                    <span>PDF - COMM2865</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-lupaci">
+                    <strong>LuPaCi Game Pitch</strong>
+                    <span>PDF - Pitch Deck</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-analysis">
+                    <strong>OART1093 Analysis</strong>
+                    <span>PDF - Analysis</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-gamespec">
+                    <strong>Game Spec 3 Pitch</strong>
+                    <span>PDF - A0 Pitch</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-expanded">
+                    <strong>Expanded Study</strong>
+                    <span>PDF - OART1097</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-response">
+                    <strong>Creative Response PDF</strong>
+                    <span>PDF - Assignment 3</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-podcast">
+                    <strong>Creative Response Podcast</strong>
+                    <span>MP3 - Audio</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-video">
+                    <strong>Game Loop Analysis Video</strong>
+                    <span>MP4 - Presentation</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-gameloop-pdf">
+                    <strong>Game Loop Analysis PDF</strong>
+                    <span>PDF • Assignment 1</span>
+                  </button>
+                  <button class="document-item" type="button" data-doc-target="doc-gamedesign-pdf">
+                    <strong>Game Design PDF</strong>
+                    <span>PDF • COMM2861</span>
+                  </button>
+                </div>
+                <div class="document-preview-pane">
+                  <article class="document-preview is-active" data-doc-preview="doc-concept">
+                    <h4>Concept Sketch</h4>
+                    <p>COMM2865 Assignment 2 Group 1 concept sketch PDF.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/Concept Sketch_COMM2865_Assign2_Group 1.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/Concept Sketch_COMM2865_Assign2_Group 1.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-lupaci">
+                    <h4>LuPaCi Game Pitch</h4>
+                    <p>Pitch deck preview embedded directly in the page.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/LuPaCi Game Pitch.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/LuPaCi Game Pitch.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-analysis">
+                    <h4>OART1093 Analysis</h4>
+                    <p>Assignment analysis PDF by Bui Truong Thinh.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/OART1093_A1_Analysis_BuiTruongThinh_S3975580.pdf.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/OART1093_A1_Analysis_BuiTruongThinh_S3975580.pdf.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-gamespec">
+                    <h4>Game Spec 3 Pitch</h4>
+                    <p>A0 pitch document preview in PDF format.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/GAME SPEC 3 - A0 PITCH.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/GAME SPEC 3 - A0 PITCH.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-expanded">
+                    <h4>Expanded Study</h4>
+                    <p>OART1097 Assignment 2 Group 1 PDF preview.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/ExpandedStudy_OART1097_Assign2_NguyenNgocTuQuyen_Group 1.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/ExpandedStudy_OART1097_Assign2_NguyenNgocTuQuyen_Group 1.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-response">
+                    <h4>Creative Response PDF</h4>
+                    <p>Assignment 3 written response document preview.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/GameCreativeResponse_OART1097_Assign3_Group 1_Document-2.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/GameCreativeResponse_OART1097_Assign3_Group 1_Document-2.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-podcast">
+                    <h4>Creative Response Podcast</h4>
+                    <p>Assignment 3 podcast audio playable directly in the browser.</p>
+                    <audio controls preload="metadata">
+                      <source src="documents/GameCreativeResponse_OART1097_Assign3_Group 1_Podcast-1.mp3" type="audio/mpeg" />
+                    </audio>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-video">
+                    <h4>Game Loop Analysis Video</h4>
+                    <p>OART1097 Assignment 1 presentation video embedded in the page.</p>
+                    <video controls preload="metadata" playsinline>
+                      <source src="documents/Gameloopanalysis Oart1097 Assign1 Buitruongthinh S3975580.mp4" type="video/mp4" />
+                    </video>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-gameloop-pdf">
+                    <h4>Game Loop Analysis PDF</h4>
+                    <p>Converted PDF version of the Game Loop Analysis document.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/GameLoopAnalysis_OART1097_Assign1_BuiTruongThinh_s3975580.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/GameLoopAnalysis_OART1097_Assign1_BuiTruongThinh_s3975580.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                  <article class="document-preview" data-doc-preview="doc-gamedesign-pdf">
+                    <h4>Game Design PDF</h4>
+                    <p>Converted PDF version of the COMM2861 group game design document.</p>
+                    <div class="pdf-preview-viewer" data-pdf-src="documents/Game design_COMM2861_Assign3_Group 4.pdf"></div>
+                    <div class="document-preview-actions">
+                      <a class="contact-button" href="documents/Game design_COMM2861_Assign3_Group 4.pdf" target="_blank" rel="noreferrer">Open PDF</a>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="window collection-window is-hidden" id="cat-collection" data-window-id="cat-collection">
+          <div class="titlebar">
+            <span>my cat</span>
+            <button type="button">x</button>
+          </div>
+          <div class="xp-window-body">
+            <div class="collection-body xp-content">
+              <h3>My Cat</h3>
+              <p>Baby photos, sleepy loaf moments, keyboard invasions, and chaos clips.</p>
+              <div class="cat-media-grid" id="cat-media-grid">
+                <p class="cat-loading">Loading cat archive...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div class="start-panel is-hidden" id="start-panel" aria-label="Start menu">
+        <div class="start-panel-header">
+          <span>thinh</span>
+        </div>
+        <div class="start-panel-body">
+          <button class="start-menu-item" type="button" data-target-window="about-window">
+            <img class="start-menu-icon" src="assets/xp-icons/about.ico" alt="" aria-hidden="true" />
+            <span>about</span>
+          </button>
+          <button class="start-menu-item" type="button" data-target-window="cat-collection">
+            <img class="start-menu-icon" src="assets/xp-icons/cat.ico" alt="" aria-hidden="true" />
+            <span>my cat</span>
+          </button>
+          <button class="start-menu-item" type="button" data-target-window="work-window">
+            <img class="start-menu-icon" src="assets/xp-icons/work.ico" alt="" aria-hidden="true" />
+            <span>work</span>
+          </button>
+          <button class="start-menu-item" type="button" data-target-window="faq-window">
+            <img class="start-menu-icon" src="assets/xp-icons/faq-question.ico" alt="" aria-hidden="true" />
+            <span>faq</span>
+          </button>
+          <button class="start-menu-item" type="button" data-target-window="contact-window">
+            <img class="start-menu-icon" src="assets/xp-icons/contact.ico" alt="" aria-hidden="true" />
+            <span>contact</span>
+          </button>
+        </div>
+        <div class="start-panel-footer">
+          <button class="start-menu-item start-menu-item-restart" id="restart-button" type="button" aria-label="Restart">
+            <img class="start-menu-icon" src="assets/xp-icons/restart.ico" alt="" aria-hidden="true" />
+            <span>restart</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="taskbar" aria-label="Open windows">
+        <button class="start-button" id="start-button" type="button" aria-label="Start" aria-controls="start-panel" aria-expanded="false">
+          <img class="start-button-badge" src="assets/xp-icons/faq.ico" alt="" aria-hidden="true" />
+          <span>start</span>
+        </button>
+        <div class="taskbar-tabs" id="taskbar-tabs"></div>
+        <div class="taskbar-status">
+          <div class="social-row taskbar-social-row">
+            <a class="social-link" href="https://www.facebook.com/truongthinh.bui.98" target="_blank" rel="noreferrer" aria-label="Facebook">
+              <span class="social-letter social-letter-facebook" aria-hidden="true">F</span>
+            </a>
+            <a class="social-link" href="https://www.youtube.com/@buitruongthinh3009" target="_blank" rel="noreferrer" aria-label="YouTube">
+              <span class="social-letter social-letter-youtube" aria-hidden="true">Y</span>
+            </a>
+            <a class="social-link" href="https://www.instagram.com/trngthinh30/" target="_blank" rel="noreferrer" aria-label="Instagram">
+              <span class="social-letter social-letter-instagram" aria-hidden="true">I</span>
+            </a>
+          </div>
+          <div class="taskbar-clock" id="taskbar-clock" aria-label="Current time"></div>
+        </div>
+      </div>
+
+      <footer class="desktop-footer reveal">  
+        <p class="copyright">&copy; 2026 Thinh Bui</p>
+      </footer>
+    </div>
+
+<script>
+  window.__pdfjsReady = import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs").then((pdfjsLib) => {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs";
+    window.pdfjsLib = pdfjsLib;
+    return pdfjsLib;
+  });
+</script>
+<script src="script.js"></script>
+  </body>
+</html>
