@@ -3,6 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        var href = window.location.href;
+        var baseHref = href.replace(/[^/]*([?#].*)?$/, "");
+
+        if (/\.github\.io$/i.test(window.location.hostname)) {
+          var segments = window.location.pathname.split("/").filter(Boolean);
+          if (segments.length > 0) {
+            baseHref = window.location.origin + "/" + segments[0] + "/";
+          } else {
+            baseHref = window.location.origin + "/";
+          }
+        }
+
+        document.write('<base href="' + baseHref + '">');
+      })();
+    </script>
     <title>PandaBeo04 | Portfolio</title>
     <meta
       name="description"

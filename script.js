@@ -2147,6 +2147,10 @@ window.addEventListener("popstate", () => {
   applyRouteFromLocation();
 });
 
+window.addEventListener("hashchange", () => {
+  applyRouteFromLocation();
+});
+
 window.addEventListener("load", () => {
   renderCatMedia();
   setupCursorEffect();
