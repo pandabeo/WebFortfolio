@@ -79,7 +79,7 @@ const gameDetails = {
       "Status: Playable in browser",
     ],
     actions: [
-      { label: "Open In New Tab", href: "games/ThriftingShopWebGL/index.html" },
+      { label: "Open In New Tab", href: "games/thriftingshopwebgl/index.html" },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/thrifting-101" },
     ],
     trailer: {
@@ -87,7 +87,7 @@ const gameDetails = {
       title: "Thrifting 101 trailer",
     },
     player: {
-      src: "games/ThriftingShopWebGL/index.html",
+      src: "games/thriftingshopwebgl/index.html",
       title: "Thrifting 101",
     },
     devlog: [
@@ -109,7 +109,7 @@ const gameDetails = {
       "Status: Playable in browser",
     ],
     actions: [
-      { label: "Open In New Tab", href: "games/TalesOfAPlayboyWebGL/TalesOfAPlayboyWebGL/index.html" },
+      { label: "Open In New Tab", href: "games/talesofaplayboywebgl/talesofaplayboywebgl/index.html" },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/tales-of-a-playboy" },
     ],
     trailer: {
@@ -117,7 +117,7 @@ const gameDetails = {
       title: "Tales Of A Playboy trailer",
     },
     player: {
-      src: "games/TalesOfAPlayboyWebGL/TalesOfAPlayboyWebGL/index.html",
+      src: "games/talesofaplayboywebgl/talesofaplayboywebgl/index.html",
       title: "Tales Of A Playboy",
     },
     devlog: [],
@@ -168,14 +168,14 @@ const gameDetails = {
       "Status: Playable in browser",
     ],
     actions: [
-      { label: "Open In New Tab", href: "games/CoyCommuteWebGLVer1.0/index.html" },
+      { label: "Open In New Tab", href: "games/coycommutewebglver1.0/index.html" },
     ],
     trailer: {
       src: "assets/game-trailers/coy-commute-trailer.mp4",
       title: "Coy Commute trailer",
     },
     player: {
-      src: "games/CoyCommuteWebGLVer1.0/index.html",
+      src: "games/coycommutewebglver1.0/index.html",
       title: "Coy Commute",
     },
     devlog: [
@@ -1419,14 +1419,15 @@ function getRouteForWindow(windowEl) {
 
 function syncHistoryRoute(route, { replace = false } = {}) {
   const nextRoute = normalizeRoutePath(route);
-  const currentRoute = normalizeRoutePath(window.location.pathname);
+  const currentRoute = normalizeRoutePath((window.location.hash || "").replace(/^#/, "") || "/");
 
   if (nextRoute === currentRoute) {
     return;
   }
 
   const historyMethod = replace ? "replaceState" : "pushState";
-  window.history[historyMethod]({}, "", nextRoute);
+  const nextHash = nextRoute === "/" ? "" : `#${nextRoute}`;
+  window.history[historyMethod]({}, "", `${window.location.pathname}${window.location.search}${nextHash}`);
 }
 
 function syncRouteWithVisibleWindows(options = {}) {
@@ -1597,11 +1598,18 @@ function closeAllWindows() {
 }
 
 function applyRouteFromLocation() {
+  const hashRoute = normalizeRoutePath((window.location.hash || "").replace(/^#/, "") || "/");
   const pathname = normalizeRoutePath(window.location.pathname);
-  const gameMatch = pathname.match(/^\/work\/game\/([^/]+)$/);
-  const legacyGameMatch = pathname.match(/^\/game\/([^/]+)$/);
-  const documentMatch = pathname.match(/^\/work\/documents\/([^/]+)$/);
-  const legacyDocumentMatch = pathname.match(/^\/documents\/([^/]+)$/);
+  const activeRoute =
+    hashRoute !== "/"
+      ? hashRoute
+      : ["/about", "/links", "/work", "/faq", "/contact", "/achievements", "/cat", "/work/game", "/games", "/game", "/work/documents", "/documents", "/work/3d", "/3d"].some((route) => pathname === route || pathname.startsWith(`${route}/`))
+        ? pathname
+        : "/";
+  const gameMatch = activeRoute.match(/^\/work\/game\/([^/]+)$/);
+  const legacyGameMatch = activeRoute.match(/^\/game\/([^/]+)$/);
+  const documentMatch = activeRoute.match(/^\/work\/documents\/([^/]+)$/);
+  const legacyDocumentMatch = activeRoute.match(/^\/documents\/([^/]+)$/);
   const legacyWindowRouteMap = {
     "game-collection": "/games",
     "three-d-collection": "/3d",
@@ -1609,11 +1617,11 @@ function applyRouteFromLocation() {
 
   closeAllWindows();
 
-  if (pathname === "/") {
+  if (activeRoute === "/") {
     return;
   }
 
-  if (pathname === "/work/game" || pathname === "/games") {
+  if (activeRoute === "/work/game" || activeRoute === "/games") {
     const gameCollectionWindow = document.querySelector('[data-window-id="game-collection"]');
 
     if (gameCollectionWindow) {
@@ -1623,7 +1631,7 @@ function applyRouteFromLocation() {
     return;
   }
 
-  if (pathname === "/game" || gameMatch || legacyGameMatch) {
+  if (activeRoute === "/game" || gameMatch || legacyGameMatch) {
     const routeSlug = gameMatch?.[1] || legacyGameMatch?.[1] || "";
     const gameId =
       getGameIdFromRouteSlug(routeSlug) || gameDetailWindow?.dataset.gameId || Object.keys(gameDetails)[0];
@@ -1636,7 +1644,7 @@ function applyRouteFromLocation() {
     return;
   }
 
-  if (pathname === "/work/documents" || pathname === "/documents" || documentMatch || legacyDocumentMatch) {
+  if (activeRoute === "/work/documents" || activeRoute === "/documents" || documentMatch || legacyDocumentMatch) {
     const targetId = documentMatch?.[1] || legacyDocumentMatch?.[1] || "doc-concept";
 
     if (documentItems.length && documentPreviews.length) {
@@ -1652,8 +1660,8 @@ function applyRouteFromLocation() {
     return;
   }
 
-  const matchedEntry = Object.entries(windowRouteMap).find(([, route]) => route === pathname);
-  const legacyMatchedEntry = Object.entries(legacyWindowRouteMap).find(([, route]) => route === pathname);
+  const matchedEntry = Object.entries(windowRouteMap).find(([, route]) => route === activeRoute);
+  const legacyMatchedEntry = Object.entries(legacyWindowRouteMap).find(([, route]) => route === activeRoute);
   const targetWindowId = matchedEntry?.[0] || legacyMatchedEntry?.[0];
   const targetWindow = targetWindowId
     ? document.querySelector(`[data-window-id="${targetWindowId}"]`)
