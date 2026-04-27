@@ -55,6 +55,7 @@ const gameDetailDevlog = document.querySelector("[data-game-detail-devlog]");
 const gameDetailCover = document.querySelector(".game-detail-cover");
 const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]");
 const WINDOW_CLOSE_ANIMATION_MS = 160;
+const TRAILER_SOUND_DELAY_MS = 900;
 const pendingHideTimers = new WeakMap();
 const windowRouteMap = {
   "about-window": "/about",
@@ -398,6 +399,28 @@ const PANEL_POSITION_STORAGE_KEY = "webportfolio.panel-positions.v1";
 const TASKBAR_DRAG_THRESHOLD = 6;
 
 let activeTaskbarDrag = null;
+
+function forceVideoMuted(videoEl) {
+  if (!videoEl) {
+    return;
+  }
+
+  videoEl.muted = true;
+  videoEl.defaultMuted = true;
+  videoEl.volume = 0;
+  videoEl.setAttribute("muted", "");
+}
+
+function forceVideoAudible(videoEl) {
+  if (!videoEl || isMuted) {
+    return;
+  }
+
+  videoEl.muted = false;
+  videoEl.defaultMuted = false;
+  videoEl.volume = Math.max(videoEl.volume || 0, 0.7);
+  videoEl.removeAttribute("muted");
+}
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -920,7 +943,7 @@ function renderCatMedia() {
       if (item.type === "video") {
         return `
           <article class="cat-media-card">
-            <video controls preload="metadata" playsinline>
+            <video controls preload="metadata" muted playsinline>
               <source src="${item.src}" type="video/mp4" />
             </video>
           </article>
@@ -942,20 +965,23 @@ function renderCatMedia() {
 function enableAutoplayForVideos(root = document) {
   root.querySelectorAll("video").forEach((videoEl) => {
     if (videoEl.dataset.hoverPreview === "true") {
+      forceVideoMuted(videoEl);
       return;
     }
 
     videoEl.autoplay = true;
     videoEl.loop = true;
-    videoEl.muted = true;
-    videoEl.defaultMuted = true;
+    forceVideoMuted(videoEl);
     videoEl.playsInline = true;
     videoEl.setAttribute("autoplay", "");
     videoEl.setAttribute("loop", "");
-    videoEl.setAttribute("muted", "");
     videoEl.setAttribute("playsinline", "");
 
     const startPlayback = () => {
+      if (isMediaInHiddenWindow(videoEl)) {
+        return;
+      }
+
       videoEl.play().catch(() => {
         // Ignore autoplay rejections triggered by browser policy or visibility state.
       });
@@ -974,6 +1000,7 @@ function setupHoverTrailerPreviews() {
   hoverTrailerCards.forEach((card) => {
     const videoEl = card.querySelector("video[data-hover-preview='true']");
     const previewImage = card.querySelector("img");
+    let trailerSoundTimer = null;
 
     if (!videoEl) {
       return;
@@ -989,12 +1016,42 @@ function setupHoverTrailerPreviews() {
       }
     };
 
+    const clearTrailerSoundTimer = () => {
+      if (!trailerSoundTimer) {
+        return;
+      }
+
+      window.clearTimeout(trailerSoundTimer);
+      trailerSoundTimer = null;
+    };
+
+    const activateTrailerSound = () => {
+      trailerSoundTimer = null;
+
+      if (!card.matches(":hover") && document.activeElement !== card) {
+        forceVideoMuted(videoEl);
+        return;
+      }
+
+      videoEl.dataset.trailerSoundActive = "true";
+      forceVideoAudible(videoEl);
+    };
+
+    const scheduleTrailerSound = () => {
+      clearTrailerSoundTimer();
+      trailerSoundTimer = window.setTimeout(activateTrailerSound, TRAILER_SOUND_DELAY_MS);
+    };
+
+    const deactivateTrailerSound = () => {
+      clearTrailerSoundTimer();
+      delete videoEl.dataset.trailerSoundActive;
+      forceVideoMuted(videoEl);
+    };
+
     const startPreview = () => {
-      videoEl.muted = true;
-      videoEl.defaultMuted = true;
+      deactivateTrailerSound();
       videoEl.loop = true;
       videoEl.playsInline = true;
-      videoEl.setAttribute("muted", "");
       videoEl.setAttribute("loop", "");
       videoEl.setAttribute("playsinline", "");
       videoEl.preload = "auto";
@@ -1011,22 +1068,26 @@ function setupHoverTrailerPreviews() {
 
       videoEl.play().then(() => {
         revealPreview();
+        scheduleTrailerSound();
       }).catch(() => {
         // Browser policy can still block playback in rare cases; ignore quietly.
       });
     };
 
     const stopPreview = () => {
+      deactivateTrailerSound();
       videoEl.pause();
       videoEl.currentTime = 0;
       card.classList.remove("is-previewing-trailer");
     };
 
     videoEl.addEventListener("error", () => {
+      deactivateTrailerSound();
       card.classList.remove("is-previewing-trailer");
     });
 
     videoEl.addEventListener("emptied", () => {
+      deactivateTrailerSound();
       card.classList.remove("is-previewing-trailer");
     });
 
@@ -1103,6 +1164,10 @@ function bindMediaMuteEnforcement(mediaEl) {
     }
 
     if (!mediaEl.muted && mediaEl.volume > 0) {
+      if (mediaEl.tagName === "VIDEO") {
+        mediaEl.dataset.userAudioEnabled = "true";
+      }
+
       mediaVolumeMemory.set(mediaEl, mediaEl.volume);
     }
   });
@@ -1110,10 +1175,79 @@ function bindMediaMuteEnforcement(mediaEl) {
   mediaEl.dataset.muteBound = "true";
 }
 
+function isMediaInHiddenWindow(mediaEl) {
+  const windowEl = mediaEl?.closest(".window");
+  return Boolean(windowEl?.classList.contains("is-hidden") || windowEl?.classList.contains("is-closing"));
+}
+
+function pauseWindowMedia(windowEl, { reset = false } = {}) {
+  if (!windowEl) {
+    return;
+  }
+
+  windowEl.querySelectorAll("audio, video").forEach((mediaEl) => {
+    if (mediaEl.tagName === "VIDEO") {
+      delete mediaEl.dataset.trailerSoundActive;
+      forceVideoMuted(mediaEl);
+    }
+
+    mediaEl.pause();
+
+    if (reset) {
+      try {
+        mediaEl.currentTime = 0;
+      } catch {
+        // Some media sources may not be seekable yet.
+      }
+    }
+  });
+}
+
+function syncVisibleMediaPlayback(root = document) {
+  root.querySelectorAll("video").forEach((videoEl) => {
+    if (videoEl.dataset.hoverPreview === "true") {
+      return;
+    }
+
+    if (isMediaInHiddenWindow(videoEl)) {
+      videoEl.pause();
+      return;
+    }
+
+    if (videoEl.autoplay || videoEl.hasAttribute("autoplay")) {
+      videoEl.play().catch(() => {
+        // Ignore autoplay rejections triggered by browser policy or visibility state.
+      });
+    }
+  });
+}
+
 function syncMediaMutedState() {
-  document.querySelectorAll("audio").forEach((mediaEl) => {
+  document.querySelectorAll("audio, video").forEach((mediaEl) => {
+    if (mediaEl.dataset.hoverPreview === "true") {
+      if (mediaEl.dataset.trailerSoundActive === "true" && !isMuted && !isMediaInHiddenWindow(mediaEl)) {
+        forceVideoAudible(mediaEl);
+      } else {
+        forceVideoMuted(mediaEl);
+      }
+      return;
+    }
+
     bindMediaMuteEnforcement(mediaEl);
+
+    if (mediaEl.tagName === "VIDEO" && mediaEl.dataset.userAudioEnabled !== "true") {
+      forceVideoMuted(mediaEl);
+      return;
+    }
+
     enforceMediaMuteState(mediaEl);
+  });
+  syncVisibleMediaPlayback();
+}
+
+function initializeVideoMuteDefaults(root = document) {
+  root.querySelectorAll("video").forEach((videoEl) => {
+    forceVideoMuted(videoEl);
   });
 }
 
@@ -1299,6 +1433,7 @@ function renderGameDetail(gameId) {
     if (game.trailer?.src) {
       gameDetailTrailer.src = game.trailer.src;
       gameDetailTrailer.title = game.trailer.title || `${game.title} trailer`;
+      forceVideoMuted(gameDetailTrailer);
       gameDetailTrailerSection.classList.remove("is-hidden");
       enableAutoplayForVideos(gameDetailTrailerSection);
     } else {
@@ -1438,7 +1573,7 @@ function normalizeRoutePath(pathname) {
 
 function getTopVisibleWindow() {
   const visibleWindows = Array.from(draggableWindows).filter((windowEl) => {
-    return !windowEl.classList.contains("is-hidden") && windowEl.dataset.windowId;
+    return !windowEl.classList.contains("is-hidden") && !windowEl.classList.contains("is-closing") && windowEl.dataset.windowId;
   });
 
   return visibleWindows.reduce((topWindow, windowEl) => {
@@ -1540,17 +1675,19 @@ function hideWindow(windowEl, options = {}) {
     pendingHideTimers.delete(windowEl);
   }
 
+  windowEl.classList.add("is-closing");
+  pauseWindowMedia(windowEl, { reset: true });
   delete windowEl.dataset.taskbarOrder;
   syncFullscreenState();
   renderTaskbarTabs();
   syncRouteWithVisibleWindows({ replace: options.replaceRoute !== false });
 
-  windowEl.classList.add("is-closing");
-
   const hideTimer = window.setTimeout(() => {
     windowEl.classList.add("is-hidden");
     windowEl.classList.remove("is-closing");
     pendingHideTimers.delete(windowEl);
+    syncFullscreenState();
+    renderTaskbarTabs();
   }, WINDOW_CLOSE_ANIMATION_MS);
 
   pendingHideTimers.set(windowEl, hideTimer);
@@ -1573,8 +1710,10 @@ function showWindow(windowEl, options = {}) {
   }
   bringToFront(windowEl);
   flashWindow(windowEl);
+  enableAutoplayForVideos(windowEl);
   syncFullscreenState();
   renderTaskbarTabs();
+  syncMediaMutedState();
 
   if (options.updateRoute !== false) {
     syncHistoryRoute(getRouteForWindow(windowEl), { replace: options.replaceRoute });
@@ -1589,8 +1728,10 @@ function focusWindow(windowEl, options = {}) {
 
   bringToFront(windowEl);
   flashWindow(windowEl);
+  enableAutoplayForVideos(windowEl);
   syncFullscreenState();
   renderTaskbarTabs();
+  syncMediaMutedState();
 
   if (options.updateRoute) {
     syncHistoryRoute(getRouteForWindow(windowEl), { replace: options.replaceRoute !== false });
@@ -1627,7 +1768,7 @@ function getWindowIcon(windowEl) {
 
 function getVisibleTaskbarWindows() {
   return Array.from(draggableWindows)
-    .filter((windowEl) => !windowEl.classList.contains("is-hidden") && windowEl.dataset.windowId)
+    .filter((windowEl) => !windowEl.classList.contains("is-hidden") && !windowEl.classList.contains("is-closing") && windowEl.dataset.windowId)
     .sort((windowA, windowB) => {
       const orderA = Number(windowA.dataset.taskbarOrder || 0);
       const orderB = Number(windowB.dataset.taskbarOrder || 0);
@@ -1819,10 +1960,12 @@ function closeAllWindows() {
   draggableWindows.forEach((windowEl) => {
     windowEl.classList.add("is-hidden");
     delete windowEl.dataset.taskbarOrder;
+    pauseWindowMedia(windowEl, { reset: true });
   });
 
   syncFullscreenState();
   renderTaskbarTabs();
+  syncMediaMutedState();
 }
 
 function applyRouteFromLocation() {
@@ -2540,6 +2683,7 @@ window.addEventListener("load", () => {
   syncFullscreenState();
   updateThemeToggleLabel();
   updateSoundToggleLabel();
+  initializeVideoMuteDefaults();
   enableAutoplayForVideos();
   syncMediaMutedState();
   renderActiveDocumentPdf();
