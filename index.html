@@ -31,6 +31,10 @@
     <div class="desktop">
       <div class="page-transition" aria-hidden="true"></div>
       <div class="desktop-noise"></div>
+      <div class="crt-overlay" aria-hidden="true">
+        <span class="crt-tracking-line crt-tracking-line-a"></span>
+        <span class="crt-tracking-line crt-tracking-line-b"></span>
+      </div>
 
       <main class="desktop-stage reveal">
         <div class="utility-toggles">
@@ -40,7 +44,13 @@
           <button class="utility-button" id="sound-toggle" type="button" title="Mute audio" aria-label="Mute audio">
             <img class="utility-icon-image utility-icon-sound" src="assets/xp-icons/sound.ico" alt="" aria-hidden="true" />
           </button>
+          <button class="utility-button crt-toggle" id="crt-toggle" type="button" title="Turn off CRT effect" aria-label="Turn off CRT effect">
+            <img class="utility-icon-image utility-icon-crt" src="assets/xp-icons/achievements.ico" alt="" aria-hidden="true" />
+          </button>
         </div>
+        <button class="utility-button wallpaper-toggle" id="wallpaper-toggle" type="button" title="Switch to Hideo Kojima wallpaper" aria-label="Switch to Hideo Kojima wallpaper">
+          <span class="wallpaper-toggle-label">Kojima</span>
+        </button>
 
       <button class="desktop-shortcut desktop-shortcut-left has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="thrifting-101" data-hover-trailer-card="true">
           <span class="desktop-shortcut-media">

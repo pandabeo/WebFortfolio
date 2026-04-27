@@ -29,6 +29,8 @@ const catMediaGrid = document.querySelector("#cat-media-grid");
 const resetLayoutButton = document.querySelector(".reset-layout-button");
 const themeToggleButton = document.querySelector("#theme-toggle");
 const soundToggleButton = document.querySelector("#sound-toggle");
+const crtToggleButton = document.querySelector("#crt-toggle");
+const wallpaperToggleButton = document.querySelector("#wallpaper-toggle");
 const startButton = document.querySelector("#start-button");
 const startPanel = document.querySelector("#start-panel");
 const startPanelHeader = document.querySelector(".start-panel-header");
@@ -396,6 +398,8 @@ const finePointerQuery = window.matchMedia("(pointer: fine)");
 const PANEL_GAP = 18;
 const PANEL_SEARCH_STEP = 18;
 const PANEL_POSITION_STORAGE_KEY = "webportfolio.panel-positions.v1";
+const WALLPAPER_STORAGE_KEY = "webportfolio.wallpaper.v1";
+const CRT_EFFECT_STORAGE_KEY = "webportfolio.crt-effect.v1";
 const TASKBAR_DRAG_THRESHOLD = 6;
 
 let activeTaskbarDrag = null;
@@ -1260,6 +1264,89 @@ function updateThemeToggleLabel() {
   const label = isDark ? "Disable dark mode" : "Enable dark mode";
   themeToggleButton.title = label;
   themeToggleButton.setAttribute("aria-label", label);
+}
+
+function getStoredWallpaperMode() {
+  try {
+    return window.localStorage.getItem(WALLPAPER_STORAGE_KEY) === "kojima" ? "kojima" : "normal";
+  } catch {
+    return "normal";
+  }
+}
+
+function saveWallpaperMode(mode) {
+  try {
+    window.localStorage.setItem(WALLPAPER_STORAGE_KEY, mode);
+  } catch {
+    // Ignore storage failures in private browsing modes.
+  }
+}
+
+function updateWallpaperToggleLabel() {
+  if (!wallpaperToggleButton) {
+    return;
+  }
+
+  const isKojimaWallpaper = document.body.classList.contains("wallpaper-kojima");
+  const label = isKojimaWallpaper ? "Normal" : "Kojima";
+  const ariaLabel = isKojimaWallpaper ? "Switch to normal wallpaper" : "Switch to Hideo Kojima wallpaper";
+  const labelEl = wallpaperToggleButton.querySelector(".wallpaper-toggle-label");
+
+  if (labelEl) {
+    labelEl.textContent = label;
+  }
+
+  wallpaperToggleButton.title = ariaLabel;
+  wallpaperToggleButton.setAttribute("aria-label", ariaLabel);
+}
+
+function applyWallpaperMode(mode, { save = false } = {}) {
+  const nextMode = mode === "kojima" ? "kojima" : "normal";
+  document.body.classList.toggle("wallpaper-kojima", nextMode === "kojima");
+
+  if (save) {
+    saveWallpaperMode(nextMode);
+  }
+
+  updateWallpaperToggleLabel();
+}
+
+function getStoredCrtEffectEnabled() {
+  try {
+    return window.localStorage.getItem(CRT_EFFECT_STORAGE_KEY) !== "off";
+  } catch {
+    return true;
+  }
+}
+
+function saveCrtEffectEnabled(isEnabled) {
+  try {
+    window.localStorage.setItem(CRT_EFFECT_STORAGE_KEY, isEnabled ? "on" : "off");
+  } catch {
+    // Ignore storage failures in private browsing modes.
+  }
+}
+
+function updateCrtToggleLabel() {
+  if (!crtToggleButton) {
+    return;
+  }
+
+  const isEnabled = !document.body.classList.contains("crt-disabled");
+  const ariaLabel = isEnabled ? "Turn off CRT effect" : "Turn on CRT effect";
+
+  crtToggleButton.title = ariaLabel;
+  crtToggleButton.setAttribute("aria-label", ariaLabel);
+}
+
+function applyCrtEffectState(isEnabled, { save = false } = {}) {
+  document.body.classList.toggle("crt-disabled", !isEnabled);
+
+  if (save) {
+    saveCrtEffectEnabled(isEnabled);
+  }
+
+  updateCrtToggleLabel();
 }
 
 function updateSoundToggleLabel() {
@@ -2551,6 +2638,16 @@ themeToggleButton?.addEventListener("click", () => {
   updateThemeToggleLabel();
 });
 
+crtToggleButton?.addEventListener("click", () => {
+  const nextState = document.body.classList.contains("crt-disabled");
+  applyCrtEffectState(nextState, { save: true });
+});
+
+wallpaperToggleButton?.addEventListener("click", () => {
+  const nextMode = document.body.classList.contains("wallpaper-kojima") ? "normal" : "kojima";
+  applyWallpaperMode(nextMode, { save: true });
+});
+
 soundToggleButton?.addEventListener("click", () => {
   isMuted = !isMuted;
   document.body.classList.toggle("is-muted", isMuted);
@@ -2682,6 +2779,8 @@ window.addEventListener("load", () => {
   arrangeVisiblePanels();
   syncFullscreenState();
   updateThemeToggleLabel();
+  applyWallpaperMode(getStoredWallpaperMode());
+  applyCrtEffectState(getStoredCrtEffectEnabled());
   updateSoundToggleLabel();
   initializeVideoMuteDefaults();
   enableAutoplayForVideos();
