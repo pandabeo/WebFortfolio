@@ -77,13 +77,14 @@ const gameDetails = {
     title: "Thrifting 101",
     routeSlug: "thrifting",
     cover: "assets/game-covers/thrifting-101.png",
-    shortDescription: "Arcade-forward browser game with a fast hook and strong visual identity.",
+    shortDescription: "Experimental Unity 2D game built around interpreting customer intent through outfit requests.",
     overview:
-      "Playable Unity WebGL build embedded directly in the portfolio. This panel is now the home for project notes, future iteration summaries, and milestone-style devlog entries.",
+      "Designed a request-response gameplay loop where customers present layered constraints and players assemble outfits based on hidden preference logic, ambiguous requests, and weighted interpretation accuracy.",
     meta: [
       "Role: Game designer and developer",
-      "Format: Unity WebGL",
-      "Status: Playable in browser",
+      "Engine: Unity 2D / C#",
+      "Systems: ScriptableObjects, modular data classes, event-driven UI",
+      "Impact: 20,000 views / 1,000 likes",
     ],
     actions: [
       { label: "Open In New Tab", href: "games/thriftingshopwebgl/index.html" },
@@ -99,8 +100,12 @@ const gameDetails = {
     },
     devlog: [
       {
-        title: "Devlog slot ready",
-        body: "Add future entries here for balancing changes, UX iterations, polish passes, or build updates.",
+        title: "Rule-based outfit evaluation",
+        body: "Implemented weighted scoring for style matching, constraint satisfaction, and interpretation accuracy, enabling outcomes beyond binary success or failure.",
+      },
+      {
+        title: "Responsive feedback systems",
+        body: "Developed Unity Canvas feedback with visual cues, dialogue variations, and character reactions to reinforce player understanding of the underlying request logic.",
       },
     ],
   },
@@ -133,11 +138,13 @@ const gameDetails = {
     title: "Ame no Naka",
     routeSlug: "ame",
     cover: "assets/game-covers/ame-no-naka.png",
-    shortDescription: "Mood-heavy adventure built around rain, pressure, and mortality.",
-    overview: "Atmosphere-driven adventure piece with room for future writeups on tone, pacing, and environment work.",
+    shortDescription: "2D platformer rich-story game developed over three months using Unity Visual Scripting.",
+    overview:
+      "My first fully realized serious game project, focused on balancing player control and narrative delivery through exploration, dialogue, and puzzle-solving states.",
     meta: [
-      "Role: Programmer",
-      "Format: Browser release",
+      "Role: Programmer / systems implementer",
+      "Engine: Unity Visual Scripting",
+      "Systems: State graphs, modular interactions, event-driven logic",
       "Status: Published on itch.io",
     ],
     actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/ame-no-naka" }],
@@ -146,7 +153,16 @@ const gameDetails = {
       title: "Ame no Naka trailer",
     },
     webPlayable: false,
-    devlog: [],
+    devlog: [
+      {
+        title: "Visual scripting workflow",
+        body: "Built modular interaction systems using state graphs and reusable graph structures, improving iteration speed and gameplay flow clarity.",
+      },
+      {
+        title: "Narrative gameplay flow",
+        body: "Connected exploration, dialogue, and puzzle-solving states with smooth transitions to support story pacing without removing player agency.",
+      },
+    ],
   },
   "homeward": {
     title: "Homeward",
@@ -166,12 +182,13 @@ const gameDetails = {
     title: "Coy Commute",
     routeSlug: "coy",
     cover: "assets/game-covers/coy-commute.png",
-    shortDescription: "Featured at Gameloft GameDev Mentorship and playable directly in the browser.",
+    shortDescription: "Emotion-driven Unity 2D game, winner of 1st Place and People's Choice at Gameloft GameDev Mentorship 2025.",
     overview:
-      "This panel combines project context, launch links, an embedded playable build, and a future-ready devlog area for iteration notes.",
+      "Designed and implemented a state-driven gameplay system where player emotional states dynamically influence movement, interaction speed, and environmental response.",
     meta: [
-      "Highlight: Gameloft GameDev Mentorship",
-      "Format: Unity WebGL",
+      "Award: 1st Place & People's Choice",
+      "Engine: Unity 2D / C#",
+      "Architecture: Modular state machine, ScriptableObjects, event-driven systems",
       "Status: Playable in browser",
     ],
     actions: [
@@ -187,8 +204,12 @@ const gameDetails = {
     },
     devlog: [
       {
-        title: "Devlog slot ready",
-        body: "Use this area later for updates on mentorship feedback, iteration changes, and build milestones.",
+        title: "Emotion-state feedback loop",
+        body: "Built a player input -> emotional state -> world reaction loop using data-driven parameters so internal states could be communicated without explicit UI or text.",
+      },
+      {
+        title: "Synchronized game feel",
+        body: "Tuned visuals, adaptive ambience, animation blending, input delay, friction, and responsiveness through prototyping and playtesting.",
       },
     ],
   },
@@ -399,7 +420,6 @@ const PANEL_GAP = 18;
 const PANEL_SEARCH_STEP = 18;
 const PANEL_POSITION_STORAGE_KEY = "webportfolio.panel-positions.v1";
 const WALLPAPER_STORAGE_KEY = "webportfolio.wallpaper.v1";
-const CRT_EFFECT_STORAGE_KEY = "webportfolio.crt-effect.v1";
 const TASKBAR_DRAG_THRESHOLD = 6;
 
 let activeTaskbarDrag = null;
@@ -1288,13 +1308,7 @@ function updateWallpaperToggleLabel() {
   }
 
   const isKojimaWallpaper = document.body.classList.contains("wallpaper-kojima");
-  const label = isKojimaWallpaper ? "Normal" : "Kojima";
   const ariaLabel = isKojimaWallpaper ? "Switch to normal wallpaper" : "Switch to Hideo Kojima wallpaper";
-  const labelEl = wallpaperToggleButton.querySelector(".wallpaper-toggle-label");
-
-  if (labelEl) {
-    labelEl.textContent = label;
-  }
 
   wallpaperToggleButton.title = ariaLabel;
   wallpaperToggleButton.setAttribute("aria-label", ariaLabel);
@@ -1311,22 +1325,6 @@ function applyWallpaperMode(mode, { save = false } = {}) {
   updateWallpaperToggleLabel();
 }
 
-function getStoredCrtEffectEnabled() {
-  try {
-    return window.localStorage.getItem(CRT_EFFECT_STORAGE_KEY) !== "off";
-  } catch {
-    return true;
-  }
-}
-
-function saveCrtEffectEnabled(isEnabled) {
-  try {
-    window.localStorage.setItem(CRT_EFFECT_STORAGE_KEY, isEnabled ? "on" : "off");
-  } catch {
-    // Ignore storage failures in private browsing modes.
-  }
-}
-
 function updateCrtToggleLabel() {
   if (!crtToggleButton) {
     return;
@@ -1339,13 +1337,8 @@ function updateCrtToggleLabel() {
   crtToggleButton.setAttribute("aria-label", ariaLabel);
 }
 
-function applyCrtEffectState(isEnabled, { save = false } = {}) {
+function applyCrtEffectState(isEnabled) {
   document.body.classList.toggle("crt-disabled", !isEnabled);
-
-  if (save) {
-    saveCrtEffectEnabled(isEnabled);
-  }
-
   updateCrtToggleLabel();
 }
 
@@ -2640,7 +2633,7 @@ themeToggleButton?.addEventListener("click", () => {
 
 crtToggleButton?.addEventListener("click", () => {
   const nextState = document.body.classList.contains("crt-disabled");
-  applyCrtEffectState(nextState, { save: true });
+  applyCrtEffectState(nextState);
 });
 
 wallpaperToggleButton?.addEventListener("click", () => {
@@ -2780,7 +2773,7 @@ window.addEventListener("load", () => {
   syncFullscreenState();
   updateThemeToggleLabel();
   applyWallpaperMode(getStoredWallpaperMode());
-  applyCrtEffectState(getStoredCrtEffectEnabled());
+  applyCrtEffectState(true);
   updateSoundToggleLabel();
   initializeVideoMuteDefaults();
   enableAutoplayForVideos();
