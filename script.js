@@ -56,9 +56,11 @@ const gameDetailPlayerSection = document.querySelector("[data-game-detail-player
 const gameDetailDevlog = document.querySelector("[data-game-detail-devlog]");
 const gameDetailCover = document.querySelector(".game-detail-cover");
 const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]");
-const WINDOW_CLOSE_ANIMATION_MS = 160;
+const WINDOW_OPEN_ANIMATION_MS = 260;
+const WINDOW_CLOSE_ANIMATION_MS = 220;
 const TRAILER_SOUND_DELAY_MS = 900;
 const pendingHideTimers = new WeakMap();
+const pendingOpenTimers = new WeakMap();
 const windowRouteMap = {
   "about-window": "/about",
   "links-window": "/links",
@@ -1755,6 +1757,13 @@ function hideWindow(windowEl, options = {}) {
     pendingHideTimers.delete(windowEl);
   }
 
+  const pendingOpenTimer = pendingOpenTimers.get(windowEl);
+  if (pendingOpenTimer) {
+    window.clearTimeout(pendingOpenTimer);
+    pendingOpenTimers.delete(windowEl);
+  }
+
+  windowEl.classList.remove("is-opening");
   windowEl.classList.add("is-closing");
   pauseWindowMedia(windowEl, { reset: true });
   delete windowEl.dataset.taskbarOrder;
@@ -1780,6 +1789,12 @@ function showWindow(windowEl, options = {}) {
     pendingHideTimers.delete(windowEl);
   }
 
+  const pendingOpenTimer = pendingOpenTimers.get(windowEl);
+  if (pendingOpenTimer) {
+    window.clearTimeout(pendingOpenTimer);
+    pendingOpenTimers.delete(windowEl);
+  }
+
   const wasHidden = windowEl.classList.contains("is-hidden");
   windowEl.classList.remove("is-closing");
   windowEl.classList.remove("is-hidden");
@@ -1787,6 +1802,14 @@ function showWindow(windowEl, options = {}) {
     taskbarOrderSeed += 1;
     windowEl.dataset.taskbarOrder = String(taskbarOrderSeed);
     centerWindow(windowEl);
+    windowEl.classList.remove("is-opening");
+    void windowEl.offsetWidth;
+    windowEl.classList.add("is-opening");
+    const openTimer = window.setTimeout(() => {
+      windowEl.classList.remove("is-opening");
+      pendingOpenTimers.delete(windowEl);
+    }, WINDOW_OPEN_ANIMATION_MS);
+    pendingOpenTimers.set(windowEl, openTimer);
   }
   bringToFront(windowEl);
   flashWindow(windowEl);
@@ -2038,6 +2061,19 @@ function updateTaskbarClock() {
 
 function closeAllWindows() {
   draggableWindows.forEach((windowEl) => {
+    const pendingHideTimer = pendingHideTimers.get(windowEl);
+    if (pendingHideTimer) {
+      window.clearTimeout(pendingHideTimer);
+      pendingHideTimers.delete(windowEl);
+    }
+
+    const pendingOpenTimer = pendingOpenTimers.get(windowEl);
+    if (pendingOpenTimer) {
+      window.clearTimeout(pendingOpenTimer);
+      pendingOpenTimers.delete(windowEl);
+    }
+
+    windowEl.classList.remove("is-opening", "is-closing");
     windowEl.classList.add("is-hidden");
     delete windowEl.dataset.taskbarOrder;
     pauseWindowMedia(windowEl, { reset: true });
@@ -2147,7 +2183,7 @@ async function copyTextToClipboard(value) {
 }
 
 function resetWindowLayout(windowEl) {
-  windowEl.classList.remove("is-fullscreen");
+  windowEl.classList.remove("is-fullscreen", "is-opening", "is-closing");
   windowEl.style.left = "";
   windowEl.style.top = "";
   windowEl.style.right = "";
