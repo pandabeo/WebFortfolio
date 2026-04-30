@@ -29,8 +29,7 @@ const catMediaGrid = document.querySelector("#cat-media-grid");
 const resetLayoutButton = document.querySelector(".reset-layout-button");
 const themeToggleButton = document.querySelector("#theme-toggle");
 const soundToggleButton = document.querySelector("#sound-toggle");
-const musicSelect = document.querySelector("#music-select");
-const musicFileInput = document.querySelector("#music-file-input");
+const musicTrackList = document.querySelector("#music-track-list");
 const musicPlayToggle = document.querySelector("#music-play-toggle");
 const musicVolume = document.querySelector("#music-volume");
 const musicAudio = document.querySelector("#music-audio");
@@ -508,6 +507,7 @@ let pointerY = 0;
 let isMuted = false;
 let buttonClickAudio = null;
 let taskbarOrderSeed = 0;
+let selectedMusicTrack = null;
 const mediaVolumeMemory = new WeakMap();
 
 const desktopModeQuery = window.matchMedia("(min-width: 981px)");
@@ -1573,7 +1573,7 @@ function setMusicSource(src) {
     return;
   }
 
-  const selectedLabel = musicSelect?.selectedOptions?.[0]?.textContent?.trim() || "";
+  const selectedLabel = selectedMusicTrack?.label || "";
   musicAudio.pause();
   musicAudio.src = src || "";
   musicAudio.load();
@@ -1582,19 +1582,30 @@ function setMusicSource(src) {
 }
 
 function populateMusicTracks() {
-  if (!musicSelect) {
+  if (!musicTrackList) {
     return;
   }
+
+  musicTrackList.innerHTML = "";
 
   MUSIC_TRACKS.forEach((track) => {
     if (!track.src || !track.label) {
       return;
     }
 
-    const option = document.createElement("option");
-    option.value = track.src;
-    option.textContent = track.label;
-    musicSelect.appendChild(option);
+    const button = document.createElement("button");
+    button.className = "music-track-item";
+    button.type = "button";
+    button.textContent = track.label;
+    button.addEventListener("click", () => {
+      selectedMusicTrack = track;
+      musicTrackList.querySelectorAll(".music-track-item").forEach((entry) => {
+        entry.classList.toggle("is-active", entry === button);
+      });
+      setMusicSource(track.src);
+      playSelectedMusic();
+    });
+    musicTrackList.appendChild(button);
   });
 }
 
@@ -3048,42 +3059,8 @@ musicPanelToggle?.addEventListener("keydown", (event) => {
   toggleMusicPanel();
 });
 
-musicSelect?.addEventListener("change", () => {
-  setMusicSource(musicSelect.value);
-  playSelectedMusic();
-});
-
-musicFileInput?.addEventListener("change", () => {
-  const file = musicFileInput.files?.[0];
-
-  if (!file) {
-    return;
-  }
-
-  const fileUrl = URL.createObjectURL(file);
-  const option = document.createElement("option");
-  option.value = fileUrl;
-  option.textContent = file.name.replace(/\.[^.]+$/, "");
-  option.dataset.localFile = "true";
-
-  musicSelect?.querySelectorAll("option[data-local-file='true']").forEach((entry) => {
-    if (entry.value.startsWith("blob:")) {
-      URL.revokeObjectURL(entry.value);
-    }
-    entry.remove();
-  });
-
-  musicSelect?.appendChild(option);
-  if (musicSelect) {
-    musicSelect.value = fileUrl;
-  }
-  setMusicSource(fileUrl);
-  playSelectedMusic();
-});
-
 musicPlayToggle?.addEventListener("click", () => {
   if (!musicAudio?.src) {
-    musicFileInput?.click();
     return;
   }
 
