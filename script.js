@@ -88,24 +88,21 @@ const gameDetails = {
       "Engine: Unity 2D / C#",
       "Systems: ScriptableObjects, modular data classes, event-driven UI",
       "Impact: 20,000 views / 1,000 likes",
+      "Status: Playable on itch.io",
     ],
     actions: [
-      { label: "Open In New Tab", href: "games/thriftingshopwebgl/index.html" },
+      { label: "Play on itch.io", href: "https://pandabeo04.itch.io/thrifting-101" },
       {
         label: "Download Game",
         href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/ThriftingShopWin.zip",
         download: "thrifting-101.zip",
       },
-      { label: "Open itch.io", href: "https://pandabeo04.itch.io/thrifting-101" },
     ],
     trailer: {
       src: "assets/game-trailers/thrifting-101-trailer.mp4",
       title: "Thrifting 101 trailer",
     },
-    player: {
-      src: "games/thriftingshopwebgl/index.html",
-      title: "Thrifting 101",
-    },
+    webPlayable: false,
     devlog: [
       {
         title: "Rule-based outfit evaluation",
@@ -126,25 +123,21 @@ const gameDetails = {
     meta: [
       "Role: Game designer and developer",
       "Format: Unity WebGL",
-      "Status: Playable in browser",
+      "Status: Playable on itch.io",
     ],
     actions: [
-      { label: "Open In New Tab", href: "games/talesofaplayboywebgl/talesofaplayboywebgl/index.html" },
+      { label: "Play on itch.io", href: "https://pandabeo04.itch.io/tales-of-a-playboy" },
       {
         label: "Download Game",
         href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/TalesOfAPlayboyWebGL.zip",
         download: "tales-of-a-playboy.zip",
       },
-      { label: "Open itch.io", href: "https://pandabeo04.itch.io/tales-of-a-playboy" },
     ],
     trailer: {
       src: "assets/game-trailers/tales-of-a-playboy-trailer.mp4",
       title: "Tales Of A Playboy trailer",
     },
-    player: {
-      src: "games/talesofaplayboywebgl/talesofaplayboywebgl/index.html",
-      title: "Tales Of A Playboy",
-    },
+    webPlayable: false,
     devlog: [],
   },
   "ame-no-naka": {
@@ -158,15 +151,15 @@ const gameDetails = {
       "Role: Programmer / systems implementer",
       "Engine: Unity Visual Scripting",
       "Systems: State graphs, modular interactions, event-driven logic",
-      "Status: Published on itch.io",
+      "Status: Playable on itch.io",
     ],
     actions: [
+      { label: "Play on itch.io", href: "https://pandabeo04.itch.io/ame-no-naka" },
       {
         label: "Download Game",
         href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/Ame%20no%20Naka%20Win.zip",
         download: "ame-no-naka.zip",
       },
-      { label: "Open itch.io", href: "https://pandabeo04.itch.io/ame-no-naka" },
     ],
     trailer: {
       src: "assets/game-trailers/ame-no-naka-trailer.mp4",
@@ -216,10 +209,10 @@ const gameDetails = {
       "Award: 1st Place & People's Choice",
       "Engine: Unity 2D / C#",
       "Architecture: Modular state machine, ScriptableObjects, event-driven systems",
-      "Status: Playable in browser",
+      "Status: Playable on itch.io",
     ],
     actions: [
-      { label: "Open In New Tab", href: "games/coycommutewebglver1.0/index.html" },
+      { label: "Play on itch.io", href: "https://pandabeo04.itch.io/coy-commute" },
       {
         label: "Download Game",
         href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/CoyCommuteWebGLVer1.0.zip",
@@ -230,10 +223,7 @@ const gameDetails = {
       src: "assets/game-trailers/coy-commute-trailer.mp4",
       title: "Coy Commute trailer",
     },
-    player: {
-      src: "games/coycommutewebglver1.0/index.html",
-      title: "Coy Commute",
-    },
+    webPlayable: false,
     devlog: [
       {
         title: "Emotion-state feedback loop",
@@ -268,15 +258,15 @@ const gameDetails = {
     meta: [
       "Role: Solo developer",
       "Format: Twine / browser release",
-      "Status: Published on itch.io",
+      "Status: Playable on itch.io",
     ],
     actions: [
+      { label: "Play on itch.io", href: "https://pandabeo04.itch.io/equilibrium" },
       {
         label: "Download Game",
         href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/equilibrium.zip",
         download: "equilibrium.zip",
       },
-      { label: "Open itch.io", href: "https://pandabeo04.itch.io/equilibrium" },
     ],
     devlog: [],
   },
@@ -402,15 +392,15 @@ const gameDetails = {
     meta: [
       "Role: Game designer and developer",
       "Format: HTML5 and Windows build",
-      "Status: Published on itch.io",
+      "Status: Playable on itch.io",
     ],
     actions: [
+      { label: "Play on itch.io", href: "https://pandabeo04.itch.io/a-game-about-me" },
       {
         label: "Download Game",
         href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/A%20game%20about%20me%20V2.zip",
         download: "a-game-about-me.zip",
       },
-      { label: "Open itch.io", href: "https://pandabeo04.itch.io/a-game-about-me" },
     ],
     trailer: {
       src: "assets/game-trailers/a-game-about-me-trailer.mp4",
