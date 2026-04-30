@@ -1505,6 +1505,14 @@ async function ensurePdfJs() {
     return window.__pdfjsReady;
   }
 
+  await new Promise((resolve) => {
+    window.setTimeout(resolve, 250);
+  });
+
+  if (window.pdfjsLib) {
+    return window.pdfjsLib;
+  }
+
   throw new Error("PDF.js is not available.");
 }
 
