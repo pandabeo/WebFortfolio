@@ -90,6 +90,11 @@ const gameDetails = {
     ],
     actions: [
       { label: "Open In New Tab", href: "games/thriftingshopwebgl/index.html" },
+      {
+        label: "Download Game",
+        href: "games/downloads/thrifting-101.zip",
+        download: "thrifting-101.zip",
+      },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/thrifting-101" },
     ],
     trailer: {
@@ -124,6 +129,11 @@ const gameDetails = {
     ],
     actions: [
       { label: "Open In New Tab", href: "games/talesofaplayboywebgl/talesofaplayboywebgl/index.html" },
+      {
+        label: "Download Game",
+        href: "games/downloads/tales-of-a-playboy.zip",
+        download: "tales-of-a-playboy.zip",
+      },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/tales-of-a-playboy" },
     ],
     trailer: {
@@ -149,7 +159,14 @@ const gameDetails = {
       "Systems: State graphs, modular interactions, event-driven logic",
       "Status: Published on itch.io",
     ],
-    actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/ame-no-naka" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/ame-no-naka.zip",
+        download: "ame-no-naka.zip",
+      },
+      { label: "Open itch.io", href: "https://pandabeo04.itch.io/ame-no-naka" },
+    ],
     trailer: {
       src: "assets/game-trailers/ame-no-naka-trailer.mp4",
       title: "Ame no Naka trailer",
@@ -177,7 +194,14 @@ const gameDetails = {
       "Format: Browser release",
       "Status: Published on itch.io",
     ],
-    actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/homeward" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/homeward.zip",
+        download: "homeward.zip",
+      },
+      { label: "Open itch.io", href: "https://pandabeo04.itch.io/homeward" },
+    ],
     devlog: [],
   },
   "coy-commute": {
@@ -195,6 +219,11 @@ const gameDetails = {
     ],
     actions: [
       { label: "Open In New Tab", href: "games/coycommutewebglver1.0/index.html" },
+      {
+        label: "Download Game",
+        href: "games/downloads/coy-commute.zip",
+        download: "coy-commute.zip",
+      },
     ],
     trailer: {
       src: "assets/game-trailers/coy-commute-trailer.mp4",
@@ -240,7 +269,14 @@ const gameDetails = {
       "Format: Twine / browser release",
       "Status: Published on itch.io",
     ],
-    actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/equilibrium" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/equilibrium.zip",
+        download: "equilibrium.zip",
+      },
+      { label: "Open itch.io", href: "https://pandabeo04.itch.io/equilibrium" },
+    ],
     devlog: [],
   },
   "d-fishy-finals": {
@@ -254,7 +290,14 @@ const gameDetails = {
       "Format: Browser release",
       "Status: Hosted on collaborator account",
     ],
-    actions: [{ label: "Open itch.io", href: "https://quyen-cvrix-nguyen.itch.io/d-fishy-finals" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/d-fishy-finals.zip",
+        download: "d-fishy-finals.zip",
+      },
+      { label: "Open itch.io", href: "https://quyen-cvrix-nguyen.itch.io/d-fishy-finals" },
+    ],
     trailer: {
       src: "assets/game-trailers/d-fishy-finals-trailer.mp4",
       title: "D' Fishy Finals trailer",
@@ -287,7 +330,14 @@ const gameDetails = {
       "Format: Browser release",
       "Status: Published on itch.io",
     ],
-    actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/hours" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/hours-before-blue.zip",
+        download: "hours-before-blue.zip",
+      },
+      { label: "Open itch.io", href: "https://pandabeo04.itch.io/hours" },
+    ],
     devlog: [],
   },
   chaotet: {
@@ -301,7 +351,14 @@ const gameDetails = {
       "Format: Downloadable build",
       "Status: Published on itch.io",
     ],
-    actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/chaostet" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/chaotet.zip",
+        download: "chaotet.zip",
+      },
+      { label: "Open itch.io", href: "https://pandabeo04.itch.io/chaostet" },
+    ],
     trailer: {
       src: "assets/game-trailers/chaotet-trailer.mp4",
       title: "ChaoTet! trailer",
@@ -320,7 +377,14 @@ const gameDetails = {
       "Format: Downloadable build",
       "Status: Published on itch.io",
     ],
-    actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/generatedungeontest" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/into-the-dungeon.zip",
+        download: "into-the-dungeon.zip",
+      },
+      { label: "Open itch.io", href: "https://pandabeo04.itch.io/generatedungeontest" },
+    ],
     trailer: {
       src: "assets/game-trailers/into-the-dungeon-trailer.mp4",
       title: "IntoTheDungeon trailer",
@@ -339,7 +403,14 @@ const gameDetails = {
       "Format: HTML5 and Windows build",
       "Status: Published on itch.io",
     ],
-    actions: [{ label: "Open itch.io", href: "https://pandabeo04.itch.io/a-game-about-me" }],
+    actions: [
+      {
+        label: "Download Game",
+        href: "games/downloads/a-game-about-me.zip",
+        download: "a-game-about-me.zip",
+      },
+      { label: "Open itch.io", href: "https://pandabeo04.itch.io/a-game-about-me" },
+    ],
     trailer: {
       src: "assets/game-trailers/a-game-about-me-trailer.mp4",
       title: "A Game About Me trailer",
@@ -1504,8 +1575,12 @@ function renderGameDetail(gameId) {
       element.className = "contact-button";
       element.textContent = action.label;
       element.href = action.href;
-      element.target = "_blank";
-      element.rel = "noreferrer";
+      if (action.download) {
+        element.download = action.download;
+      } else {
+        element.target = "_blank";
+        element.rel = "noreferrer";
+      }
 
       gameDetailActions.appendChild(element);
     });
