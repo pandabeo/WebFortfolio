@@ -569,6 +569,14 @@ body.is-dark .wallpaper-toggle:focus-visible {
   border: 2px solid #111;
 }
 
+.music-cover-art {
+  display: block;
+  width: 100%;
+  height: 244px;
+  object-fit: cover;
+  border: 2px solid #111;
+}
+
 .music-panel.has-soundcloud .music-transport {
   display: none;
 }
@@ -3245,6 +3253,10 @@ body.is-dark .card-badge {
 
   .music-visualizer {
     height: 28px;
+  }
+
+  .music-cover-art {
+    height: 150px;
   }
 
   #sc-player {

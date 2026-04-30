@@ -67,15 +67,25 @@ const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const TRAILER_SOUND_DELAY_MS = 900;
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
-const MUSIC_TRACKS = [
-  // Add background tracks here after placing the audio files in `sounds/`.
-  // Example: { label: "Track Name", src: "sounds/track-name.mp3" },
-  {
-    label: "Indigo",
-    soundcloudUrl: "https://soundcloud.com/magnolianmusic/indigo",
-    type: "soundcloud"
+let MUSIC_TRACKS = [];
+
+// Load music tracks from manifest.json
+async function loadMusicManifest() {
+  try {
+    const response = await fetch("playlists/manifest.json");
+    const data = await response.json();
+    if (data.playlists && data.playlists.length > 0) {
+      MUSIC_TRACKS = data.playlists[0].tracks.map(track => ({
+        label: track.label,
+        src: track.file,
+        cover: track.cover
+      }));
+      populateMusicTracks();
+    }
+  } catch (error) {
+    console.error("Failed to load music manifest:", error);
   }
-];
+}
 const pendingHideTimers = new WeakMap();
 const pendingOpenTimers = new WeakMap();
 const windowRouteMap = {
@@ -1581,13 +1591,35 @@ function setMusicSource(track) {
   const selectedLabel = selectedMusicTrack?.label || "";
   const musicVisualizer = document.getElementById("music-visualizer");
   const scPlayer = document.getElementById("sc-player");
+  const coverArt = document.getElementById("music-cover-art");
   
+  // Handle HTML5 audio (local files)
+  if (track.src) {
+    if (scPlayer) scPlayer.style.display = "none";
+    if (musicVisualizer) musicVisualizer.style.display = "block";
+    
+    musicAudio.pause();
+    musicAudio.src = track.src || "";
+    musicAudio.load();
+    
+    // Show cover art if available
+    if (coverArt && track.cover) {
+      coverArt.src = track.cover;
+      coverArt.style.display = "block";
+    } else if (coverArt) {
+      coverArt.style.display = "none";
+    }
+    
+    // Show transport controls
+    if (musicPanel) musicPanel.classList.remove("has-soundcloud");
+  } 
   // Handle SoundCloud
-  if (track.type === "soundcloud" && track.soundcloudUrl) {
+  else if (track.type === "soundcloud" && track.soundcloudUrl) {
     musicAudio.pause();
     musicAudio.src = "";
     
     if (musicVisualizer) musicVisualizer.style.display = "none";
+    if (coverArt) coverArt.style.display = "none";
     if (scPlayer) {
       const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(track.soundcloudUrl)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
       scPlayer.src = embedUrl;
@@ -1595,16 +1627,6 @@ function setMusicSource(track) {
     }
     // Hide transport controls for SoundCloud
     if (musicPanel) musicPanel.classList.add("has-soundcloud");
-  } else if (track.src) {
-    // Handle HTML5 audio
-    if (scPlayer) scPlayer.style.display = "none";
-    if (musicVisualizer) musicVisualizer.style.display = "block";
-    
-    musicAudio.pause();
-    musicAudio.src = track.src || "";
-    musicAudio.load();
-    // Show transport controls for regular audio
-    if (musicPanel) musicPanel.classList.remove("has-soundcloud");
   }
   
   updateMusicTrackTitle(track ? selectedLabel : "");
@@ -3260,7 +3282,7 @@ window.addEventListener("hashchange", () => {
 });
 
 window.addEventListener("load", () => {
-  populateMusicTracks();
+  loadMusicManifest();
   if (musicAudio && musicVolume) {
     musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
   }
