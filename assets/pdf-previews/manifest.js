@@ -1,42 +1,4 @@
 window.pdfPreviewManifest = {
-  "documents/concept sketch_comm2865_assign2_group 1.pdf": [
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-001.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-002.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-003.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-004.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-005.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-006.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-007.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-008.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-009.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-010.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-011.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-012.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-013.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-014.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-015.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-016.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-017.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-018.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-019.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-020.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-021.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-022.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-023.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-024.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-025.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-026.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-027.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-028.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-029.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-030.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-031.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-032.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-033.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-034.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-035.jpg",
-    "assets/pdf-previews/concept-sketch-comm2865-assign2-group-1/page-036.jpg"
-  ],
   "documents/game design_comm2861_assign3_group 4.pdf": [
     "assets/pdf-previews/game-design-comm2861-assign3-group-4/page-001.jpg",
     "assets/pdf-previews/game-design-comm2861-assign3-group-4/page-002.jpg",
@@ -118,35 +80,6 @@ window.pdfPreviewManifest = {
     "assets/pdf-previews/gameloopanalysis-oart1097-assign1-buitruongthinh-s3975580/page-043.jpg",
     "assets/pdf-previews/gameloopanalysis-oart1097-assign1-buitruongthinh-s3975580/page-044.jpg"
   ],
-  "documents/lupaci game pitch.pdf": [
-    "assets/pdf-previews/lupaci-game-pitch/page-001.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-002.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-003.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-004.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-005.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-006.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-007.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-008.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-009.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-010.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-011.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-012.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-013.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-014.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-015.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-016.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-017.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-018.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-019.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-020.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-021.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-022.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-023.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-024.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-025.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-026.jpg",
-    "assets/pdf-previews/lupaci-game-pitch/page-027.jpg"
-  ],
   "documents/oart1093_a1_analysis_buitruongthinh_s3975580.pdf.pdf": [
     "assets/pdf-previews/oart1093-a1-analysis-buitruongthinh-s3975580-pdf/page-001.jpg",
     "assets/pdf-previews/oart1093-a1-analysis-buitruongthinh-s3975580-pdf/page-002.jpg",
@@ -163,5 +96,7 @@ window.pdfPreviewManifest = {
   ]
 };
 window.pdfPreviewErrors = {
-  "documents/expandedstudy_oart1097_assign2_nguyenngoctuquyen_group 1.pdf": "This PDF has no readable pages. Replace or re-export the file."
+  "documents/expandedstudy_oart1097_assign2_nguyenngoctuquyen_group 1.pdf": "This PDF has no readable pages. Replace or re-export the file.",
+  "documents/lupaci game pitch.pdf": "This PDF file has damaged embedded fonts/assets. Please re-export the original document to PDF and replace this file.",
+  "documents/concept sketch_comm2865_assign2_group 1.pdf": "This PDF file has damaged embedded fonts/assets. Please re-export the original document to PDF and replace this file."
 };
