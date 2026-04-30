@@ -36,6 +36,10 @@ const musicAudio = document.querySelector("#music-audio");
 const musicTrackTitle = document.querySelector("#music-track-title");
 const musicPanel = document.querySelector("#music-panel");
 const musicPanelToggle = document.querySelector("#music-panel-toggle");
+const musicProgress = document.querySelector(".music-progress span");
+const musicProgressBar = document.querySelector(".music-progress");
+const musicTimeDisplay = document.querySelector("#music-time");
+const musicLoopToggle = document.querySelector("#music-loop-toggle");
 const crtToggleButton = document.querySelector("#crt-toggle");
 const wallpaperToggleButton = document.querySelector("#wallpaper-toggle");
 const startButton = document.querySelector("#start-button");
@@ -67,7 +71,40 @@ const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const TRAILER_SOUND_DELAY_MS = 900;
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
-let MUSIC_TRACKS = [];
+let MUSIC_TRACKS = [
+  {
+    label: "Cá Hồi Hoang - 2004",
+    src: "playlists/songs/Cá Hồi Hoang - 2004/2004.mp3",
+    cover: "playlists/songs/Cá Hồi Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
+    duration: "4:15"
+  },
+  {
+    label: "Magnolian - Indigo",
+    src: "playlists/songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
+    cover: "playlists/songs/Magnolian - Indigo/IndigoCoverArt.jpg",
+    duration: "5:07"
+  },
+  {
+    label: "Phùng Khánh Linh - Em Đau",
+    src: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/PHÙNG KHÁNH LINH  EM ĐAU (WITH THÀNH LUKE) (LYRIC VIDEO).mp3",
+    cover: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
+    duration: "4:30"
+  },
+  {
+    label: "Thành Luke - Cùng",
+    src: "playlists/songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
+    cover: "playlists/songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
+    duration: "3:00"
+  },
+  {
+    label: "Thành Luke - Cảnh Tiếp Theo",
+    src: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
+    cover: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
+    duration: "4:20"
+  }
+];
+
+let currentlyPlayingTrack = null;
 
 // Load music tracks from manifest.json
 async function loadMusicManifest() {
@@ -75,11 +112,36 @@ async function loadMusicManifest() {
     const response = await fetch("playlists/manifest.json");
     const data = await response.json();
     if (data.playlists && data.playlists.length > 0) {
-      MUSIC_TRACKS = data.playlists[0].tracks.map(track => ({
-        label: track.label,
-        src: track.file,
-        cover: track.cover
-      }));
+      MUSIC_TRACKS = data.playlists[0].tracks.map(track => {
+        let src = track.file || track.src || "";
+        let cover = track.cover || "";
+        let label = track.label;
+        
+        // Fix paths if they are missing the playlists/ prefix
+        if (src && !src.startsWith("http") && !src.startsWith("playlists/")) {
+          src = "playlists/" + src;
+        }
+        if (cover && !cover.startsWith("http") && !cover.startsWith("playlists/")) {
+          cover = "playlists/" + cover;
+        }
+
+        // Try to derive Artist - Song from folder name if folder exists
+        if (src.includes("songs/")) {
+          const parts = src.split("/");
+          const folderName = parts[parts.length - 2];
+          if (folderName && folderName.includes(" - ")) {
+            label = folderName;
+          }
+        }
+
+        return {
+          label: label,
+          src: src,
+          cover: cover,
+          type: track.type || "audio",
+          soundcloudUrl: track.soundcloudUrl
+        };
+      });
       populateMusicTracks();
     }
   } catch (error) {
@@ -1335,6 +1397,10 @@ function getMediaWindow(mediaEl) {
 }
 
 function isMediaInActiveWindow(mediaEl) {
+  if (mediaEl === musicAudio) {
+    return true;
+  }
+  
   const windowEl = getMediaWindow(mediaEl);
 
   if (!windowEl) {
@@ -1583,38 +1649,58 @@ function toggleMusicPanel() {
   setMusicPanelExpanded(musicPanel?.classList.contains("is-collapsed"));
 }
 
-function setMusicSource(track) {
-  if (!musicAudio) {
+function updateMusicUI(track) {
+  const musicCoverArt = document.getElementById("music-cover-art");
+  const musicVisualizer = document.getElementById("music-visualizer");
+  const trackInfo = document.getElementById("music-info-track");
+  const artistInfo = document.getElementById("music-info-artist");
+  const durationInfo = document.getElementById("music-info-duration");
+
+  if (!track) {
+    if (musicCoverArt) musicCoverArt.style.display = "none";
+    if (musicVisualizer) musicVisualizer.style.display = "block";
+    if (trackInfo) trackInfo.textContent = "No track selected";
+    if (artistInfo) artistInfo.textContent = "-";
+    if (durationInfo) durationInfo.textContent = "-";
     return;
   }
 
-  const selectedLabel = selectedMusicTrack?.label || "";
-  const musicVisualizer = document.getElementById("music-visualizer");
-  const scPlayer = document.getElementById("sc-player");
-  const coverArt = document.getElementById("music-cover-art");
-  
-  // Handle HTML5 audio (local files)
-  if (track.src) {
-    if (scPlayer) scPlayer.style.display = "none";
-    if (musicVisualizer) musicVisualizer.style.display = "block";
-    
-    musicAudio.pause();
-    musicAudio.src = track.src || "";
-    musicAudio.load();
-    
-    // Show cover art if available
-    if (coverArt && track.cover) {
-      coverArt.src = track.cover;
-      coverArt.style.display = "block";
-    } else if (coverArt) {
-      coverArt.style.display = "none";
+  // Update Cover Art
+  if (musicCoverArt) {
+    if (track.cover) {
+      musicCoverArt.src = track.cover;
+      musicCoverArt.style.display = "block";
+      if (musicVisualizer) musicVisualizer.style.display = "none";
+    } else {
+      musicCoverArt.style.display = "none";
+      if (musicVisualizer) musicVisualizer.style.display = "block";
     }
-    
-    // Show transport controls
-    if (musicPanel) musicPanel.classList.remove("has-soundcloud");
-  } 
-  // Handle SoundCloud
-  else if (track.type === "soundcloud" && track.soundcloudUrl) {
+  }
+
+  // Update Info
+  if (trackInfo && artistInfo) {
+    if (track.label.includes(" - ")) {
+      const [artist, title] = track.label.split(" - ");
+      trackInfo.textContent = title.trim();
+      artistInfo.textContent = artist.trim();
+    } else {
+      trackInfo.textContent = track.label;
+      artistInfo.textContent = "-";
+    }
+  }
+  
+  if (durationInfo) {
+    durationInfo.textContent = track.duration || "-";
+  }
+}
+
+function setMusicSource(track) {
+  if (!track) return;
+  
+  updateMusicUI(track);
+  currentlyPlayingTrack = track;
+
+  if (track.type === "soundcloud" && track.soundcloudUrl) {
     musicAudio.pause();
     musicAudio.src = "";
     
@@ -1627,9 +1713,21 @@ function setMusicSource(track) {
     }
     // Hide transport controls for SoundCloud
     if (musicPanel) musicPanel.classList.add("has-soundcloud");
+  } else if (track.src) {
+    if (scPlayer) scPlayer.style.display = "none";
+    
+    musicAudio.pause();
+    musicAudio.src = encodeURI(track.src);
+    musicAudio.load();
+    if (musicProgress) musicProgress.style.width = "0%";
+    
+    musicAudio.play().catch(e => console.warn("Play error:", e));
+    
+    // Show transport controls
+    if (musicPanel) musicPanel.classList.remove("has-soundcloud");
   }
   
-  updateMusicTrackTitle(track ? selectedLabel : "");
+  updateMusicTrackTitle(track ? track.label : "");
   updateMusicPlayLabel();
 }
 
@@ -1646,19 +1744,30 @@ function populateMusicTracks() {
       return;
     }
 
-    const button = document.createElement("button");
-    button.className = "music-track-item";
-    button.type = "button";
-    button.textContent = track.label;
-    button.addEventListener("click", () => {
-      selectedMusicTrack = track;
-      musicTrackList.querySelectorAll(".music-track-item").forEach((entry) => {
-        entry.classList.toggle("is-active", entry === button);
-      });
+    const btn = document.createElement("button");
+    btn.className = "music-track-item";
+    btn.type = "button";
+    btn.textContent = track.label;
+    
+    btn.addEventListener("click", () => {
+      currentlyPlayingTrack = track;
       setMusicSource(track);
+      musicTrackList.querySelectorAll(".music-track-item").forEach((entry) => {
+        entry.classList.toggle("is-active", entry === btn);
+      });
       playSelectedMusic();
     });
-    musicTrackList.appendChild(button);
+
+    // Hover preview logic
+    btn.addEventListener("mouseenter", () => {
+      updateMusicUI(track);
+    });
+
+    btn.addEventListener("mouseleave", () => {
+      updateMusicUI(currentlyPlayingTrack);
+    });
+
+    musicTrackList.appendChild(btn);
   });
 }
 
@@ -1668,7 +1777,7 @@ function playSelectedMusic() {
   }
   
   // Handle SoundCloud
-  if (selectedMusicTrack?.type === "soundcloud") {
+  if (currentlyPlayingTrack?.type === "soundcloud") {
     const scPlayer = document.querySelector("#sc-player");
     if (scPlayer && window.SC && window.SC.Widget) {
       const widget = window.SC.Widget(scPlayer);
@@ -3107,9 +3216,6 @@ document.addEventListener(
 soundToggleButton?.addEventListener("click", () => {
   isMuted = !isMuted;
   document.body.classList.toggle("is-muted", isMuted);
-  if (isMuted) {
-    musicAudio?.pause();
-  }
   syncMediaMutedState();
   updateSoundToggleLabel();
   updateMusicPlayLabel();
@@ -3131,7 +3237,7 @@ musicPanelToggle?.addEventListener("keydown", (event) => {
 
 musicPlayToggle?.addEventListener("click", () => {
   const hasAudioSrc = musicAudio?.src;
-  const hasSoundCloud = selectedMusicTrack?.type === "soundcloud";
+  const hasSoundCloud = currentlyPlayingTrack?.type === "soundcloud";
   
   if (!hasAudioSrc && !hasSoundCloud) {
     return;
@@ -3164,6 +3270,44 @@ musicVolume?.addEventListener("input", () => {
 
 musicAudio?.addEventListener("play", updateMusicPlayLabel);
 musicAudio?.addEventListener("pause", updateMusicPlayLabel);
+musicAudio?.addEventListener("timeupdate", () => {
+  if (musicAudio.duration) {
+    const progress = (musicAudio.currentTime / musicAudio.duration) * 100;
+    if (musicProgress) {
+      musicProgress.style.width = `${progress}%`;
+    }
+    
+    // Update time display
+    if (musicTimeDisplay) {
+      const current = formatMusicTime(musicAudio.currentTime);
+      const total = formatMusicTime(musicAudio.duration);
+      musicTimeDisplay.textContent = `${current} / ${total}`;
+    }
+  }
+});
+
+function formatMusicTime(seconds) {
+  if (!seconds || isNaN(seconds)) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+musicProgressBar?.addEventListener("click", (event) => {
+  if (musicAudio && musicAudio.duration) {
+    const rect = musicProgressBar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const clickedValue = (x / rect.width) * musicAudio.duration;
+    musicAudio.currentTime = clickedValue;
+  }
+});
+
+musicLoopToggle?.addEventListener("click", () => {
+  if (!musicAudio) return;
+  musicAudio.loop = !musicAudio.loop;
+  musicLoopToggle.classList.toggle("is-active", musicAudio.loop);
+  musicLoopToggle.title = musicAudio.loop ? "Disable loop" : "Enable loop";
+});
 
 documentItems.forEach((item) => {
   item.addEventListener("click", () => {
@@ -3282,10 +3426,15 @@ window.addEventListener("hashchange", () => {
 });
 
 window.addEventListener("load", () => {
+  populateMusicTracks();
+  if (MUSIC_TRACKS.length > 0) {
+    // Leave currentlyPlayingTrack null initially
+  }
   loadMusicManifest();
   if (musicAudio && musicVolume) {
     musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
   }
+  updateMusicUI(null); // Initial empty state
   updateMusicTrackTitle();
   updateMusicPlayLabel();
   renderCatMedia();

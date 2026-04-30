@@ -385,12 +385,22 @@ body.crt-disabled .crt-overlay {
   z-index: 2;
 }
 
-.utility-toggles {
+.utility-toggles-left {
   position: absolute;
   top: 26px;
   left: 22px;
   display: flex;
-  gap: 18px;
+  gap: 12px;
+  z-index: 100;
+}
+
+.utility-toggles {
+  position: absolute;
+  top: 26px;
+  right: 22px;
+  display: flex;
+  gap: 12px;
+  z-index: 100;
 }
 
 .wallpaper-toggle {
@@ -431,18 +441,14 @@ body.is-dark .wallpaper-toggle:focus-visible {
   box-shadow: 0 0 0 2px rgba(255, 245, 166, 0.78), 0 8px 18px rgba(0, 0, 0, 0.34);
 }
 
-.sound-floating-toggle {
-  position: absolute;
-  top: 26px;
-  right: 22px;
-}
+/* Sound button now integrated into utility-toggles */
 
 .music-panel {
   position: absolute;
   top: 16px;
   left: 50%;
-  width: min(760px, calc(100vw - 180px));
   transform: translateX(-50%);
+  width: min(660px, calc(100vw - 40px));
   border: 1px solid #0f3ca8;
   outline: 2px solid #245edb;
   border-radius: 0;
@@ -453,7 +459,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
     inset -1px -1px 0 rgba(15, 60, 168, 0.75),
     0 10px 26px rgba(0, 0, 0, 0.22);
   overflow: hidden;
-  z-index: 12;
+  z-index: 9999;
 }
 
 .music-titlebar {
@@ -486,14 +492,14 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-shell {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
   height: 260px;
-  padding: 8px;
   background: #ece9d8;
+  border-bottom: 1px solid #919b9c;
 }
 
 .music-panel.is-collapsed {
-  width: min(760px, calc(100vw - 180px));
+  width: min(660px, calc(100vw - 40px));
 }
 
 .music-panel.is-collapsed .music-titlebar {
@@ -529,6 +535,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
   line-height: 1.2;
   text-align: left;
   cursor: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .music-track-item:hover,
@@ -538,9 +547,54 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-main {
-  display: block;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
   min-width: 0;
-  padding-left: 8px;
+  padding: 8px 16px;
+}
+
+.music-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+  min-width: 0;
+  text-align: right;
+  align-items: flex-end;
+}
+
+.music-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.music-info-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #7f98c9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.music-info-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #143a82;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.is-dark .music-info-label {
+  color: #5a7ab9;
+}
+
+body.is-dark .music-info-value {
+  color: #fff;
 }
 
 .music-now {
@@ -556,7 +610,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-visualizer {
   position: relative;
+  width: 244px;
   height: 244px;
+  margin: 0 auto;
   overflow: hidden;
   border: 2px solid #111;
   background:
@@ -571,8 +627,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-cover-art {
   display: block;
-  width: 100%;
+  width: 244px;
   height: 244px;
+  margin: 0 auto;
   object-fit: cover;
   border: 2px solid #111;
 }
@@ -616,13 +673,45 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-transport {
   display: grid;
-  grid-template-columns: 58px minmax(180px, 1fr) 130px;
-  gap: 8px;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
   align-items: center;
-  min-height: 40px;
-  padding: 6px 10px 8px;
-  background: linear-gradient(180deg, #f8fbff 0%, #d9e5fa 55%, #9db8e8 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.85);
+  min-height: 52px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #f0f0f0 0%, #e0e0e0 100%);
+  box-shadow: inset 0 1px 0 #fff;
+}
+
+.music-progress-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.music-time {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #143a82;
+  text-align: right;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.music-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.music-loop-button {
+  min-width: 64px;
+}
+
+.music-loop-button.is-active {
+  background: linear-gradient(180deg, #7da0dd 0%, #dfefff 48%, #fff 100%);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 1px 0 #fff;
+  color: #000;
 }
 
 .music-round-button {
@@ -648,7 +737,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-progress span {
   display: block;
-  width: 36%;
+  width: 0%;
   height: 100%;
   background: linear-gradient(90deg, #91d376, #4dbd42);
 }
@@ -850,7 +939,7 @@ body.is-dark .collection-card:focus-visible {
 .home-window {
   position: absolute;
   left: 50%;
-  top: calc((100vh - var(--taskbar-height)) / 2 + 28px);
+  top: calc((100vh - var(--taskbar-height)) / 2 + 10px);
   transform: translate(-50%, -50%);
   width: min(800px, calc(100vw - 56px));
   margin: 0;
