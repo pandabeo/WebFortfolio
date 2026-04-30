@@ -5,9 +5,34 @@
       "name": "Main Playlist",
       "tracks": [
         {
-          "label": "Indigo",
+          "label": "Ca Hoi Hoang - 2004",
+          "file": "songs/Cá Hồi Hoang - 2004/2004.mp3",
+          "cover": "songs/Cá Hồi Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
+          "duration": "4:15"
+        },
+        {
+          "label": "Magnolian - Indigo",
           "file": "songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
-          "cover": "songs/Magnolian - Indigo/IndigoCoverArt.jpg"
+          "cover": "songs/Magnolian - Indigo/IndigoCoverArt.jpg",
+          "duration": "5:07"
+        },
+        {
+          "label": "Phung Khanh Linh - Em Dau",
+          "file": "songs/PHÙNG KHÁNH LINH – EM ĐAU/PHÙNG KHÁNH LINH  EM ĐAU (WITH THÀNH LUKE) (LYRIC VIDEO).mp3",
+          "cover": "songs/PHÙNG KHÁNH LINH – EM ĐAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
+          "duration": "4:30"
+        },
+        {
+          "label": "Thanh Luke - Cung",
+          "file": "songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
+          "cover": "songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
+          "duration": "3:00"
+        },
+        {
+          "label": "Thanh Luke - Canh Tiep Theo",
+          "file": "songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
+          "cover": "songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
+          "duration": "4:20"
         }
       ]
     }

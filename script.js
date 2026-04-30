@@ -110,13 +110,16 @@ let currentlyPlayingTrack = null;
 async function loadMusicManifest() {
   try {
     const response = await fetch("playlists/manifest.json");
+    if (!response.ok) {
+      throw new Error(`Music manifest returned ${response.status}`);
+    }
     const data = await response.json();
     if (data.playlists && data.playlists.length > 0) {
       MUSIC_TRACKS = data.playlists[0].tracks.map(track => {
         let src = track.file || track.src || "";
         let cover = track.cover || "";
         let label = track.label;
-        
+
         // Fix paths if they are missing the playlists/ prefix
         if (src && !src.startsWith("http") && !src.startsWith("playlists/")) {
           src = "playlists/" + src;
@@ -146,6 +149,7 @@ async function loadMusicManifest() {
     }
   } catch (error) {
     console.error("Failed to load music manifest:", error);
+    populateMusicTracks();
   }
 }
 const pendingHideTimers = new WeakMap();
@@ -1400,7 +1404,7 @@ function isMediaInActiveWindow(mediaEl) {
   if (mediaEl === musicAudio) {
     return true;
   }
-  
+
   const windowEl = getMediaWindow(mediaEl);
 
   if (!windowEl) {
@@ -1688,7 +1692,7 @@ function updateMusicUI(track) {
       artistInfo.textContent = "-";
     }
   }
-  
+
   if (durationInfo) {
     durationInfo.textContent = track.duration || "-";
   }
@@ -1696,16 +1700,20 @@ function updateMusicUI(track) {
 
 function setMusicSource(track) {
   if (!track) return;
-  
+
+  const musicCoverArt = document.getElementById("music-cover-art");
+  const musicVisualizer = document.getElementById("music-visualizer");
+  const scPlayer = document.getElementById("sc-player");
+
   updateMusicUI(track);
   currentlyPlayingTrack = track;
 
   if (track.type === "soundcloud" && track.soundcloudUrl) {
-    musicAudio.pause();
-    musicAudio.src = "";
-    
+    musicAudio?.pause();
+    if (musicAudio) musicAudio.src = "";
+
     if (musicVisualizer) musicVisualizer.style.display = "none";
-    if (coverArt) coverArt.style.display = "none";
+    if (musicCoverArt) musicCoverArt.style.display = "none";
     if (scPlayer) {
       const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(track.soundcloudUrl)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
       scPlayer.src = embedUrl;
@@ -1715,31 +1723,36 @@ function setMusicSource(track) {
     if (musicPanel) musicPanel.classList.add("has-soundcloud");
   } else if (track.src) {
     if (scPlayer) scPlayer.style.display = "none";
-    
-    musicAudio.pause();
-    musicAudio.src = encodeURI(track.src);
-    musicAudio.load();
-    if (musicProgress) musicProgress.style.width = "0%";
-    
-    musicAudio.play().catch(e => console.warn("Play error:", e));
-    
+
+    if (musicAudio) {
+      musicAudio.pause();
+      musicAudio.currentTime = 0;
+      musicAudio.src = encodeURI(track.src);
+      musicAudio.load();
+      musicAudio.muted = false;
+      isMuted = false;
+      document.body.classList.remove("is-muted");
+      musicAudio.volume = Number.parseFloat(musicVolume?.value || "0.45");
+      if (musicProgress) musicProgress.style.width = "0%";
+      if (musicTimeDisplay) musicTimeDisplay.textContent = `0:00 / ${track.duration || "0:00"}`;
+      updateSoundToggleLabel();
+      playSelectedMusic();
+    }
+
     // Show transport controls
     if (musicPanel) musicPanel.classList.remove("has-soundcloud");
   }
-  
+
   updateMusicTrackTitle(track ? track.label : "");
   updateMusicPlayLabel();
 }
 
 function populateMusicTracks() {
-  if (!musicTrackList) {
-    return;
-  }
+  const list = document.getElementById("music-track-list");
+  if (!list) return;
 
-  musicTrackList.innerHTML = "";
-
+  list.innerHTML = "";
   MUSIC_TRACKS.forEach((track) => {
-    // Support both src and soundcloudUrl
     if ((!track.src && !track.soundcloudUrl) || !track.label) {
       return;
     }
@@ -1749,25 +1762,17 @@ function populateMusicTracks() {
     btn.type = "button";
     btn.textContent = track.label;
     
-    btn.addEventListener("click", () => {
+    // Direct event assignment for compatibility
+    btn.onmouseenter = () => updateMusicUI(track);
+    btn.onmouseleave = () => updateMusicUI(currentlyPlayingTrack);
+    btn.onclick = () => {
       currentlyPlayingTrack = track;
       setMusicSource(track);
-      musicTrackList.querySelectorAll(".music-track-item").forEach((entry) => {
-        entry.classList.toggle("is-active", entry === btn);
-      });
-      playSelectedMusic();
-    });
-
-    // Hover preview logic
-    btn.addEventListener("mouseenter", () => {
-      updateMusicUI(track);
-    });
-
-    btn.addEventListener("mouseleave", () => {
-      updateMusicUI(currentlyPlayingTrack);
-    });
-
-    musicTrackList.appendChild(btn);
+      Array.from(list.children).forEach(child => child.classList.remove("is-active"));
+      btn.classList.add("is-active");
+    };
+    
+    list.appendChild(btn);
   });
 }
 
@@ -1775,19 +1780,19 @@ function playSelectedMusic() {
   if (isMuted) {
     return;
   }
-  
+
   // Handle SoundCloud
   if (currentlyPlayingTrack?.type === "soundcloud") {
     const scPlayer = document.querySelector("#sc-player");
     if (scPlayer && window.SC && window.SC.Widget) {
       const widget = window.SC.Widget(scPlayer);
-      widget.bind(window.SC.Widget.Events.READY, function() {
+      widget.bind(window.SC.Widget.Events.READY, function () {
         widget.play();
       });
     }
     return;
   }
-  
+
   // Handle HTML5 audio
   if (!musicAudio || !musicAudio.src) {
     return;
@@ -2082,11 +2087,11 @@ function renderGameDetail(gameId) {
     const devlogEntries = game.devlog.length
       ? game.devlog
       : [
-          {
-            title: "No devlog entries yet",
-            body: "This panel is ready. Add entries in the `gameDetails` object later and they will appear here for this game.",
-          },
-        ];
+        {
+          title: "No devlog entries yet",
+          body: "This panel is ready. Add entries in the `gameDetails` object later and they will appear here for this game.",
+        },
+      ];
 
     devlogEntries.forEach((entry, index) => {
       const item = document.createElement("article");
@@ -2513,53 +2518,53 @@ function renderTaskbarTabs() {
   taskbarTabs.innerHTML = "";
 
   visibleWindows.forEach((windowEl) => {
-      const tabButton = document.createElement("button");
-      const iconImage = document.createElement("img");
-      const labelSpan = document.createElement("span");
+    const tabButton = document.createElement("button");
+    const iconImage = document.createElement("img");
+    const labelSpan = document.createElement("span");
 
-      tabButton.type = "button";
-      tabButton.className = "taskbar-tab";
-      tabButton.dataset.taskbarTarget = windowEl.dataset.windowId;
-      tabButton.classList.toggle("is-active", windowEl === activeWindowEl);
-      iconImage.className = "taskbar-tab-icon";
-      iconImage.src = getWindowIcon(windowEl);
-      iconImage.alt = "";
-      iconImage.setAttribute("aria-hidden", "true");
-      labelSpan.textContent = getWindowLabel(windowEl);
-      tabButton.append(iconImage, labelSpan);
+    tabButton.type = "button";
+    tabButton.className = "taskbar-tab";
+    tabButton.dataset.taskbarTarget = windowEl.dataset.windowId;
+    tabButton.classList.toggle("is-active", windowEl === activeWindowEl);
+    iconImage.className = "taskbar-tab-icon";
+    iconImage.src = getWindowIcon(windowEl);
+    iconImage.alt = "";
+    iconImage.setAttribute("aria-hidden", "true");
+    labelSpan.textContent = getWindowLabel(windowEl);
+    tabButton.append(iconImage, labelSpan);
 
-      tabButton.addEventListener("pointerdown", (event) => {
-        if (event.button !== 0 || !taskbarTabs || !finePointerQuery.matches) {
-          return;
-        }
+    tabButton.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || !taskbarTabs || !finePointerQuery.matches) {
+        return;
+      }
 
-        activeTaskbarDrag = {
-          pointerId: event.pointerId,
-          startX: event.clientX,
-          currentX: event.clientX,
-          moved: false,
-          windowEl,
-          tabButton,
-          placeholder: null,
-        };
+      activeTaskbarDrag = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        currentX: event.clientX,
+        moved: false,
+        windowEl,
+        tabButton,
+        placeholder: null,
+      };
 
-        tabButton.setPointerCapture?.(event.pointerId);
-      });
+      tabButton.setPointerCapture?.(event.pointerId);
+    });
 
-      tabButton.addEventListener("click", () => {
-        if (activeTaskbarDrag?.windowEl === windowEl && activeTaskbarDrag.moved) {
-          return;
-        }
+    tabButton.addEventListener("click", () => {
+      if (activeTaskbarDrag?.windowEl === windowEl && activeTaskbarDrag.moved) {
+        return;
+      }
 
-        if (tabButton.dataset.suppressClick === "true") {
-          delete tabButton.dataset.suppressClick;
-          return;
-        }
+      if (tabButton.dataset.suppressClick === "true") {
+        delete tabButton.dataset.suppressClick;
+        return;
+      }
 
-        focusWindow(windowEl, { updateRoute: true });
-      });
+      focusWindow(windowEl, { updateRoute: true });
+    });
 
-      taskbarTabs.appendChild(tabButton);
+    taskbarTabs.appendChild(tabButton);
   });
 }
 
@@ -3238,16 +3243,16 @@ musicPanelToggle?.addEventListener("keydown", (event) => {
 musicPlayToggle?.addEventListener("click", () => {
   const hasAudioSrc = musicAudio?.src;
   const hasSoundCloud = currentlyPlayingTrack?.type === "soundcloud";
-  
+
   if (!hasAudioSrc && !hasSoundCloud) {
     return;
   }
-  
+
   if (hasSoundCloud) {
     const scPlayer = document.querySelector("#sc-player");
     if (scPlayer && window.SC && window.SC.Widget) {
       const widget = window.SC.Widget(scPlayer);
-      widget.bind(window.SC.Widget.Events.READY, function() {
+      widget.bind(window.SC.Widget.Events.READY, function () {
         widget.toggle();
         updateMusicPlayLabel();
       });
@@ -3276,7 +3281,7 @@ musicAudio?.addEventListener("timeupdate", () => {
     if (musicProgress) {
       musicProgress.style.width = `${progress}%`;
     }
-    
+
     // Update time display
     if (musicTimeDisplay) {
       const current = formatMusicTime(musicAudio.currentTime);
@@ -3426,10 +3431,6 @@ window.addEventListener("hashchange", () => {
 });
 
 window.addEventListener("load", () => {
-  populateMusicTracks();
-  if (MUSIC_TRACKS.length > 0) {
-    // Leave currentlyPlayingTrack null initially
-  }
   loadMusicManifest();
   if (musicAudio && musicVolume) {
     musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
