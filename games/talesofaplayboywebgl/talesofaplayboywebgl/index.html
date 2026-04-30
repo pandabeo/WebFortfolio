@@ -69,6 +69,42 @@
         showBanner: unityShowBanner,
       };
 
+      window.__portfolioAudioContexts = [];
+      var NativeAudioContext = window.AudioContext || window.webkitAudioContext;
+      if (NativeAudioContext) {
+        function PortfolioAudioContext() {
+          var context = new NativeAudioContext(...arguments);
+          window.__portfolioAudioContexts.push(context);
+          return context;
+        }
+        PortfolioAudioContext.prototype = NativeAudioContext.prototype;
+        Object.setPrototypeOf(PortfolioAudioContext, NativeAudioContext);
+        window.AudioContext = PortfolioAudioContext;
+        if (window.webkitAudioContext) {
+          window.webkitAudioContext = PortfolioAudioContext;
+        }
+      }
+
+      window.setGameAudioEnabled = function (enabled) {
+        window.__portfolioAudioEnabled = Boolean(enabled);
+        window.__portfolioAudioContexts.forEach(function (context) {
+          if (!context) {
+            return;
+          }
+          if (enabled && context.state === "suspended") {
+            context.resume && context.resume().catch(function () {});
+          } else if (!enabled && context.state !== "closed") {
+            context.suspend && context.suspend().catch(function () {});
+          }
+        });
+      };
+
+      window.addEventListener("message", function (event) {
+        if (event.data && event.data.type === "portfolio-game-audio") {
+          window.setGameAudioEnabled(event.data.enabled);
+        }
+      });
+
       // By default, Unity keeps WebGL canvas render target size matched with
       // the DOM size of the canvas element (scaled by window.devicePixelRatio)
       // Set this to false if you want to decouple this synchronization from
@@ -115,7 +151,9 @@
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
               }).then((unityInstance) => {
+                window.unityInstance = unityInstance;
                 loadingBar.style.display = "none";
+                window.setGameAudioEnabled(window.__portfolioAudioEnabled === true);
                 fullscreenButton.onclick = () => {
                   unityInstance.SetFullscreen(1);
                 };

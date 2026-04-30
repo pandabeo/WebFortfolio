@@ -1075,7 +1075,7 @@ function enableAutoplayForVideos(root = document) {
     videoEl.setAttribute("playsinline", "");
 
     const startPlayback = () => {
-      if (isMediaInHiddenWindow(videoEl)) {
+      if (!isMediaInActiveWindow(videoEl)) {
         return;
       }
 
@@ -1131,7 +1131,9 @@ function setupHoverTrailerPreviews() {
       }
 
       videoEl.dataset.trailerSoundActive = "true";
-      forceVideoAudible(videoEl);
+      if (isMediaInActiveWindow(videoEl)) {
+        forceVideoAudible(videoEl);
+      }
     };
 
     const scheduleTrailerSound = () => {
@@ -1272,9 +1274,49 @@ function bindMediaMuteEnforcement(mediaEl) {
   mediaEl.dataset.muteBound = "true";
 }
 
-function isMediaInHiddenWindow(mediaEl) {
-  const windowEl = mediaEl?.closest(".window");
-  return Boolean(windowEl?.classList.contains("is-hidden") || windowEl?.classList.contains("is-closing"));
+function getMediaWindow(mediaEl) {
+  return mediaEl?.closest(".window") || null;
+}
+
+function isMediaInActiveWindow(mediaEl) {
+  const windowEl = getMediaWindow(mediaEl);
+
+  if (!windowEl) {
+    return false;
+  }
+
+  return windowEl === getTopVisibleWindow();
+}
+
+function pauseAndMuteMedia(mediaEl, { reset = false } = {}) {
+  if (!mediaEl) {
+    return;
+  }
+
+  const shouldResumeOnActive = !reset && Boolean(getMediaWindow(mediaEl)) && !mediaEl.paused;
+
+  if (shouldResumeOnActive) {
+    mediaEl.dataset.resumeOnActive = "true";
+  } else if (reset) {
+    delete mediaEl.dataset.resumeOnActive;
+  }
+
+  if (mediaEl.tagName === "VIDEO") {
+    delete mediaEl.dataset.trailerSoundActive;
+    forceVideoMuted(mediaEl);
+  } else if (isMuted || !isMediaInActiveWindow(mediaEl)) {
+    mediaEl.muted = true;
+  }
+
+  mediaEl.pause();
+
+  if (reset) {
+    try {
+      mediaEl.currentTime = 0;
+    } catch {
+      // Some media sources may not be seekable yet.
+    }
+  }
 }
 
 function pauseWindowMedia(windowEl, { reset = false } = {}) {
@@ -1283,19 +1325,26 @@ function pauseWindowMedia(windowEl, { reset = false } = {}) {
   }
 
   windowEl.querySelectorAll("audio, video").forEach((mediaEl) => {
-    if (mediaEl.tagName === "VIDEO") {
-      delete mediaEl.dataset.trailerSoundActive;
-      forceVideoMuted(mediaEl);
+    pauseAndMuteMedia(mediaEl, { reset });
+  });
+}
+
+function syncEmbeddedFrameAudioState() {
+  const topWindow = getTopVisibleWindow();
+
+  document.querySelectorAll("iframe.game-player-frame").forEach((frameEl) => {
+    const frameWindow = frameEl.closest(".window");
+    const audioEnabled = !isMuted && frameWindow === topWindow;
+
+    if (!frameEl.contentWindow) {
+      return;
     }
 
-    mediaEl.pause();
-
-    if (reset) {
-      try {
-        mediaEl.currentTime = 0;
-      } catch {
-        // Some media sources may not be seekable yet.
-      }
+    try {
+      frameEl.contentWindow.setGameAudioEnabled?.(audioEnabled);
+      frameEl.contentWindow.postMessage({ type: "portfolio-game-audio", enabled: audioEnabled }, "*");
+    } catch {
+      // Cross-document access can fail while an iframe is navigating.
     }
   });
 }
@@ -1306,8 +1355,8 @@ function syncVisibleMediaPlayback(root = document) {
       return;
     }
 
-    if (isMediaInHiddenWindow(videoEl)) {
-      videoEl.pause();
+    if (!isMediaInActiveWindow(videoEl)) {
+      pauseAndMuteMedia(videoEl);
       return;
     }
 
@@ -1317,12 +1366,34 @@ function syncVisibleMediaPlayback(root = document) {
       });
     }
   });
+
+  root.querySelectorAll("audio, video").forEach((mediaEl) => {
+    if (mediaEl.dataset.hoverPreview === "true" || mediaEl.dataset.resumeOnActive !== "true") {
+      return;
+    }
+
+    if (!isMediaInActiveWindow(mediaEl) || isMuted) {
+      return;
+    }
+
+    delete mediaEl.dataset.resumeOnActive;
+    mediaEl.play().catch(() => {
+      // User-agent autoplay rules can still prevent resuming audio.
+    });
+  });
 }
 
 function syncMediaMutedState() {
+  syncEmbeddedFrameAudioState();
+
   document.querySelectorAll("audio, video").forEach((mediaEl) => {
+    if (!isMediaInActiveWindow(mediaEl)) {
+      pauseAndMuteMedia(mediaEl);
+      return;
+    }
+
     if (mediaEl.dataset.hoverPreview === "true") {
-      if (mediaEl.dataset.trailerSoundActive === "true" && !isMuted && !isMediaInHiddenWindow(mediaEl)) {
+      if (mediaEl.dataset.trailerSoundActive === "true" && !isMuted) {
         forceVideoAudible(mediaEl);
       } else {
         forceVideoMuted(mediaEl);
@@ -1676,6 +1747,17 @@ function bringToFront(windowEl) {
   renderTaskbarTabs();
 }
 
+function bringWindowToFrontAndSyncRoute(windowEl, options = {}) {
+  bringToFront(windowEl);
+  syncMediaMutedState();
+
+  if (!windowEl?.dataset.windowId || windowEl.classList.contains("is-hidden") || windowEl.classList.contains("is-closing")) {
+    return;
+  }
+
+  syncHistoryRoute(getRouteForWindow(windowEl), { replace: options.replaceRoute !== false });
+}
+
 function flashWindow(windowEl) {
   if (windowEl.classList.contains("collection-window")) {
     return;
@@ -1845,6 +1927,7 @@ function hideWindow(windowEl, options = {}) {
   syncFullscreenState();
   renderTaskbarTabs();
   syncRouteWithVisibleWindows({ replace: options.replaceRoute !== false });
+  syncMediaMutedState();
 
   const hideTimer = window.setTimeout(() => {
     windowEl.classList.add("is-hidden");
@@ -1852,6 +1935,7 @@ function hideWindow(windowEl, options = {}) {
     pendingHideTimers.delete(windowEl);
     syncFullscreenState();
     renderTaskbarTabs();
+    syncMediaMutedState();
   }, WINDOW_CLOSE_ANIMATION_MS);
 
   pendingHideTimers.set(windowEl, hideTimer);
@@ -2463,7 +2547,7 @@ draggableWindows.forEach((windowEl) => {
 
   windowEl.addEventListener("pointerdown", () => {
     if (desktopModeQuery.matches) {
-      bringToFront(windowEl);
+      bringWindowToFrontAndSyncRoute(windowEl);
     }
   });
 
