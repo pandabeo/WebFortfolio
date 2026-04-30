@@ -102,7 +102,10 @@ const gameDetails = {
       src: "assets/game-trailers/thrifting-101-trailer.mp4",
       title: "Thrifting 101 trailer",
     },
-    webPlayable: false,
+    player: {
+      src: "https://html-classic.itch.zone/html/15508562/ThriftingShopWebGL/index.html",
+      title: "Thrifting 101",
+    },
     devlog: [
       {
         title: "Rule-based outfit evaluation",
@@ -137,7 +140,10 @@ const gameDetails = {
       src: "assets/game-trailers/tales-of-a-playboy-trailer.mp4",
       title: "Tales Of A Playboy trailer",
     },
-    webPlayable: false,
+    player: {
+      src: "https://html-classic.itch.zone/html/14736783/TalesOfAPlayboyWebGL/index.html",
+      title: "Tales Of A Playboy",
+    },
     devlog: [],
   },
   "ame-no-naka": {
@@ -165,7 +171,10 @@ const gameDetails = {
       src: "assets/game-trailers/ame-no-naka-trailer.mp4",
       title: "Ame no Naka trailer",
     },
-    webPlayable: false,
+    player: {
+      src: "https://html-classic.itch.zone/html/10798705/Web/Amen%20no%20Naka%20Mac/index.html",
+      title: "Ame no Naka",
+    },
     devlog: [
       {
         title: "Visual scripting workflow",
@@ -223,7 +232,10 @@ const gameDetails = {
       src: "assets/game-trailers/coy-commute-trailer.mp4",
       title: "Coy Commute trailer",
     },
-    webPlayable: false,
+    player: {
+      src: "https://html-classic.itch.zone/html/15019683/CoyCommuteWebGLVer1.0/index.html",
+      title: "Coy Commute",
+    },
     devlog: [
       {
         title: "Emotion-state feedback loop",
@@ -268,6 +280,10 @@ const gameDetails = {
         download: "equilibrium.zip",
       },
     ],
+    player: {
+      src: "https://html-classic.itch.zone/html/14234523/index.html",
+      title: "Equilibrium",
+    },
     devlog: [],
   },
   "d-fishy-finals": {
@@ -406,7 +422,10 @@ const gameDetails = {
       src: "assets/game-trailers/a-game-about-me-trailer.mp4",
       title: "A Game About Me trailer",
     },
-    webPlayable: false,
+    player: {
+      src: "https://html-classic.itch.zone/html/12053420/A%20game%20about%20me%20WebGL%20V2/index.html",
+      title: "A Game About Me",
+    },
     devlog: [],
   },
 };
