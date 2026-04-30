@@ -124,6 +124,7 @@
       </div>
     </main>
 
+    <script src="assets/pdf-previews/manifest.js"></script>
     <script src="assets/pdfjs/pdf.min.js"></script>
     <script>
       const params = new URLSearchParams(window.location.search);
@@ -154,7 +155,7 @@
       async function renderPdf() {
         const pdfPath = getSafePdfPath(requestedFile);
 
-        if (!pdfPath || !window.pdfjsLib) {
+        if (!pdfPath) {
           showStatus("This PDF cannot be loaded.");
           return;
         }
@@ -163,6 +164,34 @@
         titleEl.textContent = pdfPath.split("/").pop();
         downloadLink.href = pdfUrl;
         downloadLink.setAttribute("download", pdfPath.split("/").pop());
+
+        const imagePages = window.pdfPreviewManifest?.[pdfPath];
+
+        if (Array.isArray(imagePages) && imagePages.length > 0) {
+          pagesEl.innerHTML = "";
+
+          imagePages.forEach((pageSrc, index) => {
+            const image = document.createElement("img");
+            image.className = "viewer-page";
+            image.src = pageSrc;
+            image.alt = `PDF page ${index + 1}`;
+            image.loading = index < 2 ? "eager" : "lazy";
+            pagesEl.appendChild(image);
+          });
+
+          return;
+        }
+
+        if (window.pdfPreviewErrors?.[pdfPath]) {
+          showStatus(window.pdfPreviewErrors[pdfPath]);
+          return;
+        }
+
+        if (!window.pdfjsLib) {
+          showStatus("This PDF cannot be loaded.");
+          return;
+        }
+
         pdfjsLib.GlobalWorkerOptions.workerSrc = "assets/pdfjs/pdf.worker.min.js";
 
         try {

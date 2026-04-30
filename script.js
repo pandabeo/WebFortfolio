@@ -1551,7 +1551,7 @@ function renderPdfIframeFallback(viewerEl, src) {
   fallback.className = "pdf-preview-fallback";
 
   const message = document.createElement("p");
-  message.textContent = "PDF preview is unavailable in this browser.";
+  message.textContent = window.pdfPreviewErrors?.[src] || "PDF preview is unavailable in this browser.";
 
   const link = document.createElement("a");
   link.className = "contact-button";
@@ -1564,6 +1564,28 @@ function renderPdfIframeFallback(viewerEl, src) {
   viewerEl.appendChild(fallback);
 }
 
+function renderPdfImagePreview(viewerEl, src) {
+  const pages = window.pdfPreviewManifest?.[src];
+
+  if (!Array.isArray(pages) || pages.length === 0) {
+    return false;
+  }
+
+  viewerEl.innerHTML = "";
+
+  pages.forEach((pageSrc, index) => {
+    const image = document.createElement("img");
+    image.className = "pdf-preview-page";
+    image.src = pageSrc;
+    image.alt = `PDF page ${index + 1}`;
+    image.loading = index < 2 ? "eager" : "lazy";
+    viewerEl.appendChild(image);
+  });
+
+  viewerEl.dataset.pdfRendered = "true";
+  return true;
+}
+
 async function renderPdfPreview(viewerEl) {
   if (!viewerEl || viewerEl.dataset.pdfRendered === "true" || viewerEl.dataset.pdfRendered === "pending") {
     return;
@@ -1572,6 +1594,15 @@ async function renderPdfPreview(viewerEl) {
   const src = viewerEl.dataset.pdfSrc;
 
   if (!src) {
+    return;
+  }
+
+  if (renderPdfImagePreview(viewerEl, src)) {
+    return;
+  }
+
+  if (window.pdfPreviewErrors?.[src]) {
+    renderPdfIframeFallback(viewerEl, src);
     return;
   }
 
@@ -1613,7 +1644,7 @@ async function renderPdfPreview(viewerEl) {
 
     viewerEl.dataset.pdfRendered = "true";
   } catch (error) {
-    renderPdfIframeFallback(viewerEl, pdfSrc);
+    renderPdfIframeFallback(viewerEl, src);
     console.error(error);
   }
 }
