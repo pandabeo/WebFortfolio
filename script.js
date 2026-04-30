@@ -496,6 +496,7 @@ const PANEL_SEARCH_STEP = 18;
 const PANEL_POSITION_STORAGE_KEY = "webportfolio.panel-positions.v1";
 const WALLPAPER_STORAGE_KEY = "webportfolio.wallpaper.v1";
 const TASKBAR_DRAG_THRESHOLD = 6;
+const DEFAULT_DOCUMENT_TARGET = "doc-analysis";
 
 let activeTaskbarDrag = null;
 
@@ -1907,7 +1908,7 @@ function getTopVisibleWindow() {
 }
 
 function getActiveDocumentTarget() {
-  return document.querySelector(".document-item.is-active")?.dataset.docTarget || "doc-concept";
+  return document.querySelector(".document-item.is-active")?.dataset.docTarget || DEFAULT_DOCUMENT_TARGET;
 }
 
 function setActiveDocumentTarget(targetId) {
@@ -1928,7 +1929,7 @@ function setActiveDocumentTarget(targetId) {
   });
 
   if (!hasMatch) {
-    setActiveDocumentTarget("doc-concept");
+    setActiveDocumentTarget(DEFAULT_DOCUMENT_TARGET);
     return;
   }
 
@@ -2371,7 +2372,7 @@ function applyRouteFromLocation() {
   }
 
   if (activeRoute === "/work/documents" || activeRoute === "/documents" || documentMatch || legacyDocumentMatch) {
-    const targetId = documentMatch?.[1] || legacyDocumentMatch?.[1] || "doc-concept";
+    const targetId = documentMatch?.[1] || legacyDocumentMatch?.[1] || DEFAULT_DOCUMENT_TARGET;
 
     if (documentItems.length && documentPreviews.length) {
       setActiveDocumentTarget(targetId);
