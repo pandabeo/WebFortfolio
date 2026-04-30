@@ -1539,6 +1539,10 @@ function getNormalizedPdfSrc(src) {
   return encodeURI(src);
 }
 
+function getPdfViewerHref(src) {
+  return `pdf-viewer.html?file=${encodeURIComponent(src)}`;
+}
+
 function renderPdfIframeFallback(viewerEl, src) {
   viewerEl.dataset.pdfRendered = "fallback";
   viewerEl.innerHTML = "";
@@ -1551,7 +1555,7 @@ function renderPdfIframeFallback(viewerEl, src) {
 
   const link = document.createElement("a");
   link.className = "contact-button";
-  link.href = src;
+  link.href = getPdfViewerHref(src);
   link.target = "_blank";
   link.rel = "noreferrer";
   link.textContent = "Open PDF";

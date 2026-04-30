@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Viewer</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --chrome: #ece9d8;
+        --chrome-dark: #245edc;
+        --chrome-light: #3f8cff;
+        --border-dark: #7b765f;
+        --text: #222;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #b7b7b7;
+        color: var(--text);
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+      }
+
+      .viewer-shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .viewer-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-bottom: 1px solid var(--border-dark);
+        background: linear-gradient(180deg, var(--chrome-light), var(--chrome-dark));
+        color: #fff;
+      }
+
+      .viewer-title {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.92rem;
+        font-weight: 700;
+      }
+
+      .viewer-button {
+        flex: 0 0 auto;
+        padding: 7px 12px;
+        border: 1px solid #003c74;
+        border-radius: 3px;
+        background: linear-gradient(180deg, #fff 0%, #ece9d8 100%);
+        color: #111;
+        font: inherit;
+        text-decoration: none;
+      }
+
+      .viewer-body {
+        overflow: auto;
+        padding: 18px;
+      }
+
+      .viewer-pages {
+        display: grid;
+        gap: 18px;
+        justify-items: center;
+      }
+
+      .viewer-page {
+        width: min(100%, 980px);
+        height: auto;
+        border: 1px solid #6f6f6f;
+        background: #fff;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+      }
+
+      .viewer-status {
+        margin: 48px auto;
+        max-width: 520px;
+        padding: 22px;
+        border: 1px solid #9f9886;
+        background: #fff;
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 640px) {
+        .viewer-toolbar {
+          flex-wrap: wrap;
+        }
+
+        .viewer-title {
+          flex-basis: 100%;
+        }
+
+        .viewer-body {
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="viewer-shell">
+      <div class="viewer-toolbar">
+        <div class="viewer-title" id="viewer-title">Loading PDF...</div>
+        <a class="viewer-button" id="download-link" href="#" download>Download</a>
+        <a class="viewer-button" href="index.html">Back</a>
+      </div>
+      <div class="viewer-body">
+        <div class="viewer-pages" id="viewer-pages">
+          <div class="viewer-status">Loading PDF...</div>
+        </div>
+      </div>
+    </main>
+
+    <script src="assets/pdfjs/pdf.min.js"></script>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const requestedFile = params.get("file") || "";
+      const allowedPrefix = "documents/";
+      const titleEl = document.querySelector("#viewer-title");
+      const pagesEl = document.querySelector("#viewer-pages");
+      const downloadLink = document.querySelector("#download-link");
+
+      function showStatus(message) {
+        pagesEl.innerHTML = "";
+        const status = document.createElement("div");
+        status.className = "viewer-status";
+        status.textContent = message;
+        pagesEl.appendChild(status);
+      }
+
+      function getSafePdfPath(path) {
+        const normalizedPath = path.replace(/\\/g, "/");
+
+        if (!normalizedPath.startsWith(allowedPrefix) || normalizedPath.includes("..") || !normalizedPath.endsWith(".pdf")) {
+          return "";
+        }
+
+        return normalizedPath;
+      }
+
+      async function renderPdf() {
+        const pdfPath = getSafePdfPath(requestedFile);
+
+        if (!pdfPath || !window.pdfjsLib) {
+          showStatus("This PDF cannot be loaded.");
+          return;
+        }
+
+        const pdfUrl = encodeURI(pdfPath);
+        titleEl.textContent = pdfPath.split("/").pop();
+        downloadLink.href = pdfUrl;
+        downloadLink.setAttribute("download", pdfPath.split("/").pop());
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "assets/pdfjs/pdf.worker.min.js";
+
+        try {
+          const loadingTask = pdfjsLib.getDocument({
+            url: pdfUrl,
+            disableRange: true,
+            disableStream: true,
+          });
+          const pdf = await loadingTask.promise;
+          pagesEl.innerHTML = "";
+
+          for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+            const page = await pdf.getPage(pageNumber);
+            const baseViewport = page.getViewport({ scale: 1 });
+            const targetWidth = Math.min(window.innerWidth - 36, 980);
+            const scale = Math.max(targetWidth / baseViewport.width, 0.35);
+            const viewport = page.getViewport({ scale });
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+
+            canvas.className = "viewer-page";
+            canvas.width = Math.ceil(viewport.width);
+            canvas.height = Math.ceil(viewport.height);
+
+            await page.render({
+              canvasContext: context,
+              viewport,
+            }).promise;
+
+            pagesEl.appendChild(canvas);
+          }
+        } catch (error) {
+          console.error(error);
+          showStatus("PDF preview failed. Use the Download button to open the file locally.");
+        }
+      }
+
+      renderPdf();
+    </script>
+  </body>
+</html>
