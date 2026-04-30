@@ -26,6 +26,7 @@
       content="Portfolio for PandaBeo04 with featured games, projects, and contact links."
     />
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://w.soundcloud.com/player/api.js"></script>
   </head>
   <body class="crt-disabled">
     <div class="desktop">
@@ -61,10 +62,11 @@
             <nav class="music-sidebar" id="music-track-list" aria-label="Available music tracks">
             </nav>
             <div class="music-main">
-              <div class="music-now">
-                <div class="music-visualizer" aria-hidden="true">
+              <div class="music-now" id="music-now-container">
+                <div class="music-visualizer" aria-hidden="true" id="music-visualizer">
                   <span></span><span></span><span></span><span></span>
                 </div>
+                <iframe id="sc-player" style="display:none;" width="100%" height="244px" scrolling="no" frameborder="no" allow="autoplay"></iframe>
               </div>
             </div>
           </div>

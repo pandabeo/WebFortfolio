@@ -1,0 +1,15 @@
+{
+  "playlists": [
+    {
+      "id": "main",
+      "name": "Main Playlist",
+      "tracks": [
+        {
+          "label": "Indigo",
+          "file": "indigo.mp3",
+          "cover": "indigo-cover.jpg"
+        }
+      ]
+    }
+  ]
+}

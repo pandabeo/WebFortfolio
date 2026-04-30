@@ -70,6 +70,11 @@ const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.
 const MUSIC_TRACKS = [
   // Add background tracks here after placing the audio files in `sounds/`.
   // Example: { label: "Track Name", src: "sounds/track-name.mp3" },
+  {
+    label: "Indigo",
+    soundcloudUrl: "https://soundcloud.com/magnolianmusic/indigo",
+    type: "soundcloud"
+  }
 ];
 const pendingHideTimers = new WeakMap();
 const pendingOpenTimers = new WeakMap();
@@ -1568,16 +1573,41 @@ function toggleMusicPanel() {
   setMusicPanelExpanded(musicPanel?.classList.contains("is-collapsed"));
 }
 
-function setMusicSource(src) {
+function setMusicSource(track) {
   if (!musicAudio) {
     return;
   }
 
   const selectedLabel = selectedMusicTrack?.label || "";
-  musicAudio.pause();
-  musicAudio.src = src || "";
-  musicAudio.load();
-  updateMusicTrackTitle(src ? selectedLabel : "");
+  const musicVisualizer = document.getElementById("music-visualizer");
+  const scPlayer = document.getElementById("sc-player");
+  
+  // Handle SoundCloud
+  if (track.type === "soundcloud" && track.soundcloudUrl) {
+    musicAudio.pause();
+    musicAudio.src = "";
+    
+    if (musicVisualizer) musicVisualizer.style.display = "none";
+    if (scPlayer) {
+      const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(track.soundcloudUrl)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
+      scPlayer.src = embedUrl;
+      scPlayer.style.display = "block";
+    }
+    // Hide transport controls for SoundCloud
+    if (musicPanel) musicPanel.classList.add("has-soundcloud");
+  } else if (track.src) {
+    // Handle HTML5 audio
+    if (scPlayer) scPlayer.style.display = "none";
+    if (musicVisualizer) musicVisualizer.style.display = "block";
+    
+    musicAudio.pause();
+    musicAudio.src = track.src || "";
+    musicAudio.load();
+    // Show transport controls for regular audio
+    if (musicPanel) musicPanel.classList.remove("has-soundcloud");
+  }
+  
+  updateMusicTrackTitle(track ? selectedLabel : "");
   updateMusicPlayLabel();
 }
 
@@ -1589,7 +1619,8 @@ function populateMusicTracks() {
   musicTrackList.innerHTML = "";
 
   MUSIC_TRACKS.forEach((track) => {
-    if (!track.src || !track.label) {
+    // Support both src and soundcloudUrl
+    if ((!track.src && !track.soundcloudUrl) || !track.label) {
       return;
     }
 
@@ -1602,7 +1633,7 @@ function populateMusicTracks() {
       musicTrackList.querySelectorAll(".music-track-item").forEach((entry) => {
         entry.classList.toggle("is-active", entry === button);
       });
-      setMusicSource(track.src);
+      setMusicSource(track);
       playSelectedMusic();
     });
     musicTrackList.appendChild(button);
@@ -1610,7 +1641,24 @@ function populateMusicTracks() {
 }
 
 function playSelectedMusic() {
-  if (!musicAudio || isMuted || !musicAudio.src) {
+  if (isMuted) {
+    return;
+  }
+  
+  // Handle SoundCloud
+  if (selectedMusicTrack?.type === "soundcloud") {
+    const scPlayer = document.querySelector("#sc-player");
+    if (scPlayer && window.SC && window.SC.Widget) {
+      const widget = window.SC.Widget(scPlayer);
+      widget.bind(window.SC.Widget.Events.READY, function() {
+        widget.play();
+      });
+    }
+    return;
+  }
+  
+  // Handle HTML5 audio
+  if (!musicAudio || !musicAudio.src) {
     return;
   }
 
@@ -3060,17 +3108,30 @@ musicPanelToggle?.addEventListener("keydown", (event) => {
 });
 
 musicPlayToggle?.addEventListener("click", () => {
-  if (!musicAudio?.src) {
+  const hasAudioSrc = musicAudio?.src;
+  const hasSoundCloud = selectedMusicTrack?.type === "soundcloud";
+  
+  if (!hasAudioSrc && !hasSoundCloud) {
     return;
   }
-
-  if (musicAudio.paused) {
-    playSelectedMusic();
+  
+  if (hasSoundCloud) {
+    const scPlayer = document.querySelector("#sc-player");
+    if (scPlayer && window.SC && window.SC.Widget) {
+      const widget = window.SC.Widget(scPlayer);
+      widget.bind(window.SC.Widget.Events.READY, function() {
+        widget.toggle();
+        updateMusicPlayLabel();
+      });
+    }
   } else {
-    musicAudio.pause();
+    if (musicAudio.paused) {
+      playSelectedMusic();
+    } else {
+      musicAudio.pause();
+    }
+    updateMusicPlayLabel();
   }
-
-  updateMusicPlayLabel();
 });
 
 musicVolume?.addEventListener("input", () => {
