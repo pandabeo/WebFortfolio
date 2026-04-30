@@ -52,10 +52,11 @@
           <img class="utility-icon-image utility-icon-sound" src="assets/xp-icons/sound.ico" alt="" aria-hidden="true" />
         </button>
 
-        <div class="music-panel" id="music-panel" aria-label="Music player">
-          <div class="music-titlebar">
+        <div class="music-panel is-collapsed" id="music-panel" aria-label="Music player">
+          <div class="music-titlebar" id="music-panel-toggle" role="button" tabindex="0" aria-expanded="false">
             <span>Now Playing</span>
-            <span class="music-window-buttons" aria-hidden="true">_ □ ×</span>
+            <span class="music-track-title" id="music-track-title">No track selected</span>
+            <span class="music-window-buttons" aria-hidden="true">_ [] x</span>
           </div>
           <div class="music-shell">
             <nav class="music-sidebar" aria-label="Music sections">
@@ -67,7 +68,6 @@
             </nav>
             <div class="music-main">
               <div class="music-now">
-                <div class="music-track-title" id="music-track-title">No track selected</div>
                 <div class="music-visualizer" aria-hidden="true">
                   <span></span><span></span><span></span><span></span>
                 </div>
@@ -81,7 +81,7 @@
             </div>
           </div>
           <div class="music-transport">
-            <button class="music-round-button" id="music-play-toggle" type="button" aria-label="Play music">▶</button>
+            <button class="music-round-button" id="music-play-toggle" type="button" aria-label="Play music">Play</button>
             <label class="music-file-button" for="music-file-input">Choose</label>
             <input id="music-file-input" class="music-file-input" type="file" accept="audio/*" />
             <div class="music-progress" aria-hidden="true"><span></span></div>

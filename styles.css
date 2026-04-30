@@ -443,13 +443,14 @@ body.is-dark .wallpaper-toggle:focus-visible {
   left: 50%;
   width: min(580px, calc(100vw - 250px));
   transform: translateX(-50%);
-  border: 1px solid #31579a;
-  border-radius: 12px 12px 18px 18px;
-  background: linear-gradient(180deg, rgba(219, 232, 255, 0.98) 0%, rgba(133, 166, 224, 0.96) 48%, rgba(79, 108, 179, 0.98) 100%);
+  border: 1px solid #0f3ca8;
+  outline: 2px solid #245edb;
+  border-radius: 0;
+  background: var(--panel);
   color: #10234f;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -1px 0 rgba(15, 41, 112, 0.55),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.75),
+    inset -1px -1px 0 rgba(15, 60, 168, 0.75),
     0 10px 26px rgba(0, 0, 0, 0.22);
   overflow: hidden;
   z-index: 12;
@@ -459,13 +460,29 @@ body.is-dark .wallpaper-toggle:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 24px;
-  padding: 0 10px;
-  background: linear-gradient(180deg, #edf5ff 0%, #b7cff8 46%, #7fa1df 100%);
-  border-bottom: 1px solid rgba(38, 69, 139, 0.65);
-  color: #10234f;
+  gap: 10px;
+  min-height: 30px;
+  padding: 0 8px 0 10px;
+  background: linear-gradient(180deg, #4fa3ff 0%, #2a7bf6 18%, #245edb 52%, #173ea9 100%);
+  color: #fff;
   font-size: 0.72rem;
   font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  cursor: none;
+}
+
+.music-titlebar .music-track-title {
+  flex: 1;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  color: #fff;
+  font-size: 0.76rem;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .music-window-buttons {
@@ -478,6 +495,19 @@ body.is-dark .wallpaper-toggle:focus-visible {
   grid-template-columns: 82px 1fr;
   min-height: 172px;
   padding: 8px 8px 0;
+}
+
+.music-panel.is-collapsed {
+  width: min(560px, calc(100vw - 250px));
+}
+
+.music-panel.is-collapsed .music-titlebar {
+  min-height: 28px;
+}
+
+.music-panel.is-collapsed .music-shell,
+.music-panel.is-collapsed .music-transport {
+  display: none;
 }
 
 .music-sidebar {
@@ -515,15 +545,10 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-track-title {
-  height: 25px;
-  padding: 4px 6px;
-  overflow: hidden;
   background: #111;
   color: #fff;
   font-size: 0.78rem;
   font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .music-visualizer {
@@ -799,8 +824,9 @@ body.is-dark .utility-button {
 }
 
 body.is-dark .music-panel {
-  border-color: #1f1f1f;
-  background: linear-gradient(180deg, rgba(84, 84, 84, 0.96) 0%, rgba(48, 48, 48, 0.96) 52%, rgba(26, 26, 26, 0.98) 100%);
+  border-color: #3f3f3f;
+  outline-color: #5a5a5a;
+  background: #2a2a2a;
   color: #f1f1f1;
 }
 
@@ -815,7 +841,10 @@ body.is-dark .music-round-button {
   color: #f1f1f1;
 }
 
-body.is-dark .music-titlebar,
+body.is-dark .music-titlebar {
+  background: linear-gradient(180deg, #4e4e4e 0%, #363636 42%, #222 100%);
+}
+
 body.is-dark .music-transport,
 body.is-dark .music-sidebar {
   background: linear-gradient(180deg, #5b5b5b 0%, #383838 100%);
@@ -3226,6 +3255,10 @@ body.is-dark .card-badge {
     width: min(680px, calc(100vw - 28px));
     transform: none;
     margin: 82px auto 0;
+  }
+
+  .music-panel.is-collapsed {
+    width: min(680px, calc(100vw - 28px));
   }
 
   .music-shell {

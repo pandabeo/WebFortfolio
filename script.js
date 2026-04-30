@@ -35,6 +35,8 @@ const musicPlayToggle = document.querySelector("#music-play-toggle");
 const musicVolume = document.querySelector("#music-volume");
 const musicAudio = document.querySelector("#music-audio");
 const musicTrackTitle = document.querySelector("#music-track-title");
+const musicPanel = document.querySelector("#music-panel");
+const musicPanelToggle = document.querySelector("#music-panel-toggle");
 const crtToggleButton = document.querySelector("#crt-toggle");
 const wallpaperToggleButton = document.querySelector("#wallpaper-toggle");
 const startButton = document.querySelector("#start-button");
@@ -1541,7 +1543,7 @@ function updateMusicPlayLabel() {
   }
 
   const isPlaying = !musicAudio.paused && !musicAudio.ended;
-  musicPlayToggle.textContent = isPlaying ? "❚❚" : "▶";
+  musicPlayToggle.textContent = isPlaying ? "Pause" : "Play";
   musicPlayToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
 }
 
@@ -1551,6 +1553,19 @@ function updateMusicTrackTitle(label = "") {
   }
 
   musicTrackTitle.textContent = label || "No track selected";
+}
+
+function setMusicPanelExpanded(isExpanded) {
+  if (!musicPanel) {
+    return;
+  }
+
+  musicPanel.classList.toggle("is-collapsed", !isExpanded);
+  musicPanelToggle?.setAttribute("aria-expanded", String(isExpanded));
+}
+
+function toggleMusicPanel() {
+  setMusicPanelExpanded(musicPanel?.classList.contains("is-collapsed"));
 }
 
 function setMusicSource(src) {
@@ -3017,6 +3032,20 @@ soundToggleButton?.addEventListener("click", () => {
   syncMediaMutedState();
   updateSoundToggleLabel();
   updateMusicPlayLabel();
+});
+
+musicPanelToggle?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleMusicPanel();
+});
+
+musicPanelToggle?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+
+  event.preventDefault();
+  toggleMusicPanel();
 });
 
 musicSelect?.addEventListener("change", () => {
