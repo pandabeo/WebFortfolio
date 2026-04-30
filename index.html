@@ -53,14 +53,38 @@
         </button>
 
         <div class="music-panel" id="music-panel" aria-label="Music player">
-          <div class="music-panel-title">music</div>
-          <div class="music-panel-controls">
-            <select class="music-select" id="music-select" aria-label="Choose music">
-              <option value="">No music</option>
-            </select>
+          <div class="music-titlebar">
+            <span>Now Playing</span>
+            <span class="music-window-buttons" aria-hidden="true">_ □ ×</span>
+          </div>
+          <div class="music-shell">
+            <nav class="music-sidebar" aria-label="Music sections">
+              <span class="is-active">Now Playing</span>
+              <span>Media Guide</span>
+              <span>Library</span>
+              <span>Radio Tuner</span>
+              <label for="music-file-input">Open File</label>
+            </nav>
+            <div class="music-main">
+              <div class="music-now">
+                <div class="music-track-title" id="music-track-title">No track selected</div>
+                <div class="music-visualizer" aria-hidden="true">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              <div class="music-playlist">
+                <div class="music-album-art" aria-hidden="true">Panda<br />Tunes</div>
+                <select class="music-select" id="music-select" aria-label="Choose music">
+                  <option value="">No music</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="music-transport">
+            <button class="music-round-button" id="music-play-toggle" type="button" aria-label="Play music">▶</button>
             <label class="music-file-button" for="music-file-input">Choose</label>
             <input id="music-file-input" class="music-file-input" type="file" accept="audio/*" />
-            <button class="music-play-button" id="music-play-toggle" type="button" aria-label="Play music">Play</button>
+            <div class="music-progress" aria-hidden="true"><span></span></div>
             <input class="music-volume" id="music-volume" type="range" min="0" max="1" step="0.05" value="0.45" aria-label="Music volume" />
           </div>
           <audio id="music-audio" preload="metadata" loop></audio>

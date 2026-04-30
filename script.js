@@ -34,6 +34,7 @@ const musicFileInput = document.querySelector("#music-file-input");
 const musicPlayToggle = document.querySelector("#music-play-toggle");
 const musicVolume = document.querySelector("#music-volume");
 const musicAudio = document.querySelector("#music-audio");
+const musicTrackTitle = document.querySelector("#music-track-title");
 const crtToggleButton = document.querySelector("#crt-toggle");
 const wallpaperToggleButton = document.querySelector("#wallpaper-toggle");
 const startButton = document.querySelector("#start-button");
@@ -1540,8 +1541,16 @@ function updateMusicPlayLabel() {
   }
 
   const isPlaying = !musicAudio.paused && !musicAudio.ended;
-  musicPlayToggle.textContent = isPlaying ? "Pause" : "Play";
+  musicPlayToggle.textContent = isPlaying ? "❚❚" : "▶";
   musicPlayToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
+}
+
+function updateMusicTrackTitle(label = "") {
+  if (!musicTrackTitle) {
+    return;
+  }
+
+  musicTrackTitle.textContent = label || "No track selected";
 }
 
 function setMusicSource(src) {
@@ -1549,9 +1558,11 @@ function setMusicSource(src) {
     return;
   }
 
+  const selectedLabel = musicSelect?.selectedOptions?.[0]?.textContent?.trim() || "";
   musicAudio.pause();
   musicAudio.src = src || "";
   musicAudio.load();
+  updateMusicTrackTitle(src ? selectedLabel : "");
   updateMusicPlayLabel();
 }
 
@@ -3186,6 +3197,7 @@ window.addEventListener("load", () => {
   if (musicAudio && musicVolume) {
     musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
   }
+  updateMusicTrackTitle();
   updateMusicPlayLabel();
   renderCatMedia();
   setupCursorEffect();
