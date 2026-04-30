@@ -29,6 +29,11 @@ const catMediaGrid = document.querySelector("#cat-media-grid");
 const resetLayoutButton = document.querySelector(".reset-layout-button");
 const themeToggleButton = document.querySelector("#theme-toggle");
 const soundToggleButton = document.querySelector("#sound-toggle");
+const musicSelect = document.querySelector("#music-select");
+const musicFileInput = document.querySelector("#music-file-input");
+const musicPlayToggle = document.querySelector("#music-play-toggle");
+const musicVolume = document.querySelector("#music-volume");
+const musicAudio = document.querySelector("#music-audio");
 const crtToggleButton = document.querySelector("#crt-toggle");
 const wallpaperToggleButton = document.querySelector("#wallpaper-toggle");
 const startButton = document.querySelector("#start-button");
@@ -60,6 +65,10 @@ const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const TRAILER_SOUND_DELAY_MS = 900;
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
+const MUSIC_TRACKS = [
+  // Add background tracks here after placing the audio files in `sounds/`.
+  // Example: { label: "Track Name", src: "sounds/track-name.mp3" },
+];
 const pendingHideTimers = new WeakMap();
 const pendingOpenTimers = new WeakMap();
 const windowRouteMap = {
@@ -1525,6 +1534,54 @@ function updateSoundToggleLabel() {
   soundToggleButton.setAttribute("aria-label", label);
 }
 
+function updateMusicPlayLabel() {
+  if (!musicPlayToggle || !musicAudio) {
+    return;
+  }
+
+  const isPlaying = !musicAudio.paused && !musicAudio.ended;
+  musicPlayToggle.textContent = isPlaying ? "Pause" : "Play";
+  musicPlayToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
+}
+
+function setMusicSource(src) {
+  if (!musicAudio) {
+    return;
+  }
+
+  musicAudio.pause();
+  musicAudio.src = src || "";
+  musicAudio.load();
+  updateMusicPlayLabel();
+}
+
+function populateMusicTracks() {
+  if (!musicSelect) {
+    return;
+  }
+
+  MUSIC_TRACKS.forEach((track) => {
+    if (!track.src || !track.label) {
+      return;
+    }
+
+    const option = document.createElement("option");
+    option.value = track.src;
+    option.textContent = track.label;
+    musicSelect.appendChild(option);
+  });
+}
+
+function playSelectedMusic() {
+  if (!musicAudio || isMuted || !musicAudio.src) {
+    return;
+  }
+
+  musicAudio.play().catch(() => {
+    updateMusicPlayLabel();
+  });
+}
+
 async function ensurePdfJs() {
   if (window.pdfjsLib) {
     return window.pdfjsLib;
@@ -2943,9 +3000,70 @@ document.addEventListener(
 soundToggleButton?.addEventListener("click", () => {
   isMuted = !isMuted;
   document.body.classList.toggle("is-muted", isMuted);
+  if (isMuted) {
+    musicAudio?.pause();
+  }
   syncMediaMutedState();
   updateSoundToggleLabel();
+  updateMusicPlayLabel();
 });
+
+musicSelect?.addEventListener("change", () => {
+  setMusicSource(musicSelect.value);
+  playSelectedMusic();
+});
+
+musicFileInput?.addEventListener("change", () => {
+  const file = musicFileInput.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  const fileUrl = URL.createObjectURL(file);
+  const option = document.createElement("option");
+  option.value = fileUrl;
+  option.textContent = file.name.replace(/\.[^.]+$/, "");
+  option.dataset.localFile = "true";
+
+  musicSelect?.querySelectorAll("option[data-local-file='true']").forEach((entry) => {
+    if (entry.value.startsWith("blob:")) {
+      URL.revokeObjectURL(entry.value);
+    }
+    entry.remove();
+  });
+
+  musicSelect?.appendChild(option);
+  if (musicSelect) {
+    musicSelect.value = fileUrl;
+  }
+  setMusicSource(fileUrl);
+  playSelectedMusic();
+});
+
+musicPlayToggle?.addEventListener("click", () => {
+  if (!musicAudio?.src) {
+    musicFileInput?.click();
+    return;
+  }
+
+  if (musicAudio.paused) {
+    playSelectedMusic();
+  } else {
+    musicAudio.pause();
+  }
+
+  updateMusicPlayLabel();
+});
+
+musicVolume?.addEventListener("input", () => {
+  if (musicAudio) {
+    musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
+  }
+});
+
+musicAudio?.addEventListener("play", updateMusicPlayLabel);
+musicAudio?.addEventListener("pause", updateMusicPlayLabel);
 
 documentItems.forEach((item) => {
   item.addEventListener("click", () => {
@@ -3064,6 +3182,11 @@ window.addEventListener("hashchange", () => {
 });
 
 window.addEventListener("load", () => {
+  populateMusicTracks();
+  if (musicAudio && musicVolume) {
+    musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
+  }
+  updateMusicPlayLabel();
   renderCatMedia();
   setupCursorEffect();
   setupHoverTrailerPreviews();

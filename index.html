@@ -52,6 +52,20 @@
           <img class="utility-icon-image utility-icon-sound" src="assets/xp-icons/sound.ico" alt="" aria-hidden="true" />
         </button>
 
+        <div class="music-panel" id="music-panel" aria-label="Music player">
+          <div class="music-panel-title">music</div>
+          <div class="music-panel-controls">
+            <select class="music-select" id="music-select" aria-label="Choose music">
+              <option value="">No music</option>
+            </select>
+            <label class="music-file-button" for="music-file-input">Choose</label>
+            <input id="music-file-input" class="music-file-input" type="file" accept="audio/*" />
+            <button class="music-play-button" id="music-play-toggle" type="button" aria-label="Play music">Play</button>
+            <input class="music-volume" id="music-volume" type="range" min="0" max="1" step="0.05" value="0.45" aria-label="Music volume" />
+          </div>
+          <audio id="music-audio" preload="metadata" loop></audio>
+        </div>
+
       <button class="desktop-shortcut desktop-shortcut-left has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="thrifting-101" data-hover-trailer-card="true">
           <span class="desktop-shortcut-media">
             <img class="action-icon-image thrifting-shortcut-image" src="assets/mkzmwz.png" alt="" aria-hidden="true" />
