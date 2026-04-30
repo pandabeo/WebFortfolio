@@ -1508,16 +1508,29 @@ async function ensurePdfJs() {
   throw new Error("PDF.js is not available.");
 }
 
+function getNormalizedPdfSrc(src) {
+  return encodeURI(src);
+}
+
 function renderPdfIframeFallback(viewerEl, src) {
   viewerEl.dataset.pdfRendered = "fallback";
-  viewerEl.innerHTML = `
-    <iframe
-      class="pdf-preview-fallback"
-      src="${src}#toolbar=0&navpanes=0&scrollbar=1"
-      title="PDF preview"
-      loading="lazy"
-    ></iframe>
-  `;
+  viewerEl.innerHTML = "";
+
+  const fallback = document.createElement("div");
+  fallback.className = "pdf-preview-fallback";
+
+  const message = document.createElement("p");
+  message.textContent = "PDF preview is unavailable in this browser.";
+
+  const link = document.createElement("a");
+  link.className = "contact-button";
+  link.href = src;
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.textContent = "Open PDF";
+
+  fallback.append(message, link);
+  viewerEl.appendChild(fallback);
 }
 
 async function renderPdfPreview(viewerEl) {
@@ -1531,12 +1544,17 @@ async function renderPdfPreview(viewerEl) {
     return;
   }
 
+  const pdfSrc = getNormalizedPdfSrc(src);
   viewerEl.dataset.pdfRendered = "pending";
   viewerEl.innerHTML = '<div class="pdf-preview-loading">Loading PDF preview...</div>';
 
   try {
     const pdfjsLib = await ensurePdfJs();
-    const loadingTask = pdfjsLib.getDocument(src);
+    const loadingTask = pdfjsLib.getDocument({
+      url: pdfSrc,
+      disableRange: true,
+      disableStream: true,
+    });
     const pdf = await loadingTask.promise;
     const containerWidth = Math.max(viewerEl.clientWidth - 24, 320);
 
@@ -1564,7 +1582,7 @@ async function renderPdfPreview(viewerEl) {
 
     viewerEl.dataset.pdfRendered = "true";
   } catch (error) {
-    renderPdfIframeFallback(viewerEl, src);
+    renderPdfIframeFallback(viewerEl, pdfSrc);
     console.error(error);
   }
 }

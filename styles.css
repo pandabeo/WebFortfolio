@@ -1714,10 +1714,20 @@ body.is-dark .contact-inline-copy-status {
 }
 
 .pdf-preview-fallback {
-  width: 100%;
-  min-height: 460px;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  min-height: 220px;
+  padding: 24px;
   border: 1px solid #9f9886;
   background: #fff;
+  text-align: center;
+  color: #575757;
+}
+
+.pdf-preview-fallback p {
+  margin: 0;
+  font-size: 0.86rem;
 }
 
 .document-preview iframe {
@@ -1924,6 +1934,8 @@ body.is-dark .pdf-preview-page {
 
 body.is-dark .pdf-preview-fallback {
   border-color: #0f0f0f;
+  background: #2a2a2a;
+  color: #d8d2c7;
 }
 
 body.is-dark .game-player-frame {
