@@ -92,7 +92,7 @@ const gameDetails = {
       { label: "Open In New Tab", href: "games/thriftingshopwebgl/index.html" },
       {
         label: "Download Game",
-        href: "games/downloads/thrifting-101.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/ThriftingShopWin.zip",
         download: "thrifting-101.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/thrifting-101" },
@@ -131,7 +131,7 @@ const gameDetails = {
       { label: "Open In New Tab", href: "games/talesofaplayboywebgl/talesofaplayboywebgl/index.html" },
       {
         label: "Download Game",
-        href: "games/downloads/tales-of-a-playboy.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/TalesOfAPlayboyWebGL.zip",
         download: "tales-of-a-playboy.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/tales-of-a-playboy" },
@@ -162,7 +162,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/ame-no-naka.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/Ame%20no%20Naka%20Win.zip",
         download: "ame-no-naka.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/ame-no-naka" },
@@ -197,7 +197,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/homeward.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/Bui%20Truong%20Thinh_S3975580_Ass1_Homeward_Unity%20Build%20Project.zip",
         download: "homeward.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/homeward" },
@@ -221,7 +221,7 @@ const gameDetails = {
       { label: "Open In New Tab", href: "games/coycommutewebglver1.0/index.html" },
       {
         label: "Download Game",
-        href: "games/downloads/coy-commute.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/CoyCommuteWebGLVer1.0.zip",
         download: "coy-commute.zip",
       },
     ],
@@ -272,7 +272,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/equilibrium.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/equilibrium.zip",
         download: "equilibrium.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/equilibrium" },
@@ -293,7 +293,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/d-fishy-finals.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/D%27%20F%C3%ADshy%20Fin%C3%A0l.zip",
         download: "d-fishy-finals.zip",
       },
       { label: "Open itch.io", href: "https://quyen-cvrix-nguyen.itch.io/d-fishy-finals" },
@@ -333,7 +333,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/hours-before-blue.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/GameJam_nuhuh.zip",
         download: "hours-before-blue.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/hours" },
@@ -354,7 +354,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/chaotet.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/ChaoTet!FixUI.zip",
         download: "chaotet.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/chaostet" },
@@ -380,7 +380,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/into-the-dungeon.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/IntoTheDungeonFinalOfFinal.zip",
         download: "into-the-dungeon.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/generatedungeontest" },
@@ -406,7 +406,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "games/downloads/a-game-about-me.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/A%20game%20about%20me%20V2.zip",
         download: "a-game-about-me.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/a-game-about-me" },
