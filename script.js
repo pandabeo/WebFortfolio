@@ -2809,7 +2809,7 @@ window.addEventListener("load", () => {
   syncFullscreenState();
   updateThemeToggleLabel();
   applyWallpaperMode(getStoredWallpaperMode());
-  applyCrtEffectState(true);
+  applyCrtEffectState(false);
   updateSoundToggleLabel();
   initializeVideoMuteDefaults();
   enableAutoplayForVideos();
