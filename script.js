@@ -59,6 +59,7 @@ const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]")
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const TRAILER_SOUND_DELAY_MS = 900;
+const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
 const pendingHideTimers = new WeakMap();
 const pendingOpenTimers = new WeakMap();
 const windowRouteMap = {
@@ -484,6 +485,7 @@ let cursorPressTimeout = null;
 let pointerX = 0;
 let pointerY = 0;
 let isMuted = false;
+let buttonClickAudio = null;
 let taskbarOrderSeed = 0;
 const mediaVolumeMemory = new WeakMap();
 
@@ -525,6 +527,23 @@ function clamp(value, min, max) {
 
 function canDragWindows() {
   return desktopModeQuery.matches && finePointerQuery.matches;
+}
+
+function playButtonClickSound() {
+  if (isMuted) {
+    return;
+  }
+
+  if (!buttonClickAudio) {
+    buttonClickAudio = new Audio(BUTTON_CLICK_SOUND_SRC);
+    buttonClickAudio.preload = "auto";
+    buttonClickAudio.volume = 0.45;
+  }
+
+  buttonClickAudio.currentTime = 0;
+  buttonClickAudio.play().catch(() => {
+    // Browsers can reject audio until the first trusted interaction is complete.
+  });
 }
 
 function getPanelStorageId(windowEl) {
@@ -2861,6 +2880,20 @@ wallpaperToggleButton?.addEventListener("click", () => {
   const nextMode = document.body.classList.contains("wallpaper-kojima") ? "normal" : "kojima";
   applyWallpaperMode(nextMode, { save: true });
 });
+
+document.addEventListener(
+  "click",
+  (event) => {
+    const button = event.target.closest?.("button");
+
+    if (!button || button.disabled || button.getAttribute("aria-disabled") === "true") {
+      return;
+    }
+
+    playButtonClickSound();
+  },
+  true
+);
 
 soundToggleButton?.addEventListener("click", () => {
   isMuted = !isMuted;
