@@ -439,9 +439,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-panel {
   position: absolute;
-  top: 18px;
+  top: 16px;
   left: 50%;
-  width: min(580px, calc(100vw - 250px));
+  width: min(520px, calc(100vw - 250px));
   transform: translateX(-50%);
   border: 1px solid #0f3ca8;
   outline: 2px solid #245edb;
@@ -457,11 +457,11 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-titlebar {
-  display: flex;
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 62px;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-height: 30px;
+  gap: 8px;
+  min-height: 28px;
   padding: 0 8px 0 10px;
   background: linear-gradient(180deg, #4fa3ff 0%, #2a7bf6 18%, #245edb 52%, #173ea9 100%);
   color: #fff;
@@ -472,7 +472,6 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-titlebar .music-track-title {
-  flex: 1;
   min-width: 0;
   height: auto;
   padding: 0;
@@ -488,17 +487,19 @@ body.is-dark .wallpaper-toggle:focus-visible {
 .music-window-buttons {
   font-size: 0.68rem;
   letter-spacing: 2px;
+  text-align: right;
 }
 
 .music-shell {
   display: grid;
-  grid-template-columns: 82px 1fr;
-  min-height: 172px;
-  padding: 8px 8px 0;
+  grid-template-columns: 88px 1fr;
+  height: 174px;
+  padding: 8px;
+  background: #ece9d8;
 }
 
 .music-panel.is-collapsed {
-  width: min(560px, calc(100vw - 250px));
+  width: min(540px, calc(100vw - 250px));
 }
 
 .music-panel.is-collapsed .music-titlebar {
@@ -513,8 +514,8 @@ body.is-dark .wallpaper-toggle:focus-visible {
 .music-sidebar {
   display: grid;
   align-content: start;
-  gap: 4px;
-  padding: 6px 5px;
+  gap: 3px;
+  padding: 7px 6px;
   border-right: 1px solid rgba(17, 39, 93, 0.45);
   background: linear-gradient(180deg, #edf5ff 0%, #b8c8ee 100%);
   font-size: 0.62rem;
@@ -523,8 +524,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-sidebar span,
 .music-sidebar label {
-  padding: 4px 5px;
-  border-radius: 2px;
+  padding: 4px 6px;
   color: #18335f;
   cursor: none;
 }
@@ -535,8 +535,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 132px;
-  gap: 7px;
+  grid-template-columns: minmax(0, 1fr) 124px;
+  gap: 8px;
+  min-width: 0;
   padding-left: 8px;
 }
 
@@ -553,7 +554,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-visualizer {
   position: relative;
-  height: 130px;
+  height: 156px;
   overflow: hidden;
   border: 2px solid #111;
   background:
@@ -597,8 +598,8 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-playlist {
   display: grid;
-  grid-template-rows: 72px 1fr;
-  gap: 6px;
+  grid-template-rows: 72px 76px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -616,10 +617,11 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-transport {
   display: grid;
-  grid-template-columns: 32px auto minmax(130px, 1fr) minmax(92px, 0.35fr);
-  gap: 7px;
+  grid-template-columns: 58px 72px minmax(120px, 1fr) 110px;
+  gap: 8px;
   align-items: center;
-  padding: 7px 10px 9px;
+  min-height: 40px;
+  padding: 6px 10px 8px;
   background: linear-gradient(180deg, #f8fbff 0%, #d9e5fa 55%, #9db8e8 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.85);
 }
@@ -652,13 +654,14 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-round-button {
-  width: 28px;
-  height: 28px;
+  width: 58px;
+  height: 26px;
   border: 1px solid #7f98c9;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff 0 18%, #dfefff 45%, #7da0dd 100%);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff 0%, #dfefff 48%, #7da0dd 100%);
   color: #143a82;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  font-weight: 700;
   line-height: 1;
   cursor: none;
 }
@@ -843,6 +846,10 @@ body.is-dark .music-round-button {
 
 body.is-dark .music-titlebar {
   background: linear-gradient(180deg, #4e4e4e 0%, #363636 42%, #222 100%);
+}
+
+body.is-dark .music-shell {
+  background: #2f2f2f;
 }
 
 body.is-dark .music-transport,
@@ -3261,8 +3268,13 @@ body.is-dark .card-badge {
     width: min(680px, calc(100vw - 28px));
   }
 
+  .music-titlebar {
+    grid-template-columns: 92px minmax(0, 1fr) 48px;
+  }
+
   .music-shell {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .music-sidebar {
@@ -3274,6 +3286,10 @@ body.is-dark .card-badge {
     padding-left: 0;
   }
 
+  .music-visualizer {
+    height: 128px;
+  }
+
   .music-playlist {
     grid-template-rows: auto;
   }
@@ -3283,7 +3299,7 @@ body.is-dark .card-badge {
   }
 
   .music-transport {
-    grid-template-columns: 32px auto minmax(0, 1fr);
+    grid-template-columns: 58px 72px minmax(0, 1fr);
   }
 
   .music-volume {
