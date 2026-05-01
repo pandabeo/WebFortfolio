@@ -478,6 +478,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-titlebar .music-track-title {
+  position: relative;
   min-width: 0;
   height: auto;
   padding: 0;
@@ -488,6 +489,31 @@ body.is-dark .wallpaper-toggle:focus-visible {
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.music-panel.is-playing .music-titlebar .music-track-title {
+  color: transparent;
+  text-overflow: clip;
+}
+
+.music-panel.is-playing .music-titlebar .music-track-title::after {
+  content: attr(data-title);
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #fff;
+  white-space: nowrap;
+  animation: music-title-run-right 8s linear infinite;
+}
+
+@keyframes music-title-run-right {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }
 
 .music-shell {
@@ -939,7 +965,7 @@ body.is-dark .collection-card:focus-visible {
 .home-window {
   position: absolute;
   left: 50%;
-  top: calc((100vh - var(--taskbar-height)) / 2 + 10px);
+  top: 50%;
   transform: translate(-50%, -50%);
   width: min(800px, calc(100vw - 56px));
   margin: 0;

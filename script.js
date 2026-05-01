@@ -106,18 +106,32 @@ let MUSIC_TRACKS = [
 
 let currentlyPlayingTrack = null;
 
+function normalizeMusicAssetPath(src) {
+  return (src || "")
+    .replaceAll("CÃ¡ Há»“i Hoang - 2004", "Cá Hồi Hoang - 2004")
+    .replaceAll("PHÃ™NG KHÃNH LINH â€“ EM ÄAU", "PHÙNG KHÁNH LINH – EM ĐAU")
+    .replaceAll("ThÃ nh Luke - CÃ¹ng", "Thành Luke - Cùng")
+    .replaceAll("ThÃ nh Luke - Cáº£nh Tiáº¿p Theo", "Thành Luke - Cảnh Tiếp Theo");
+}
+
+MUSIC_TRACKS = MUSIC_TRACKS.map((track) => ({
+  ...track,
+  src: normalizeMusicAssetPath(track.src),
+  cover: normalizeMusicAssetPath(track.cover),
+}));
+
 // Load music tracks from manifest.json
 async function loadMusicManifest() {
   try {
-    const response = await fetch("playlists/manifest.json");
+    const response = await fetch(`playlists/manifest.json?v=${Date.now()}`, { cache: "no-store" });
     if (!response.ok) {
       throw new Error(`Music manifest returned ${response.status}`);
     }
     const data = await response.json();
     if (data.playlists && data.playlists.length > 0) {
       MUSIC_TRACKS = data.playlists[0].tracks.map(track => {
-        let src = track.file || track.src || "";
-        let cover = track.cover || "";
+        let src = normalizeMusicAssetPath(track.file || track.src || "");
+        let cover = normalizeMusicAssetPath(track.cover || "");
         let label = track.label;
 
         // Fix paths if they are missing the playlists/ prefix
@@ -141,6 +155,7 @@ async function loadMusicManifest() {
           label: label,
           src: src,
           cover: cover,
+          duration: track.duration || "",
           type: track.type || "audio",
           soundcloudUrl: track.soundcloudUrl
         };
@@ -1630,6 +1645,7 @@ function updateMusicPlayLabel() {
   const isPlaying = !musicAudio.paused && !musicAudio.ended;
   musicPlayToggle.textContent = isPlaying ? "Pause" : "Play";
   musicPlayToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
+  musicPanel?.classList.toggle("is-playing", isPlaying);
 }
 
 function updateMusicTrackTitle(label = "") {
@@ -1637,7 +1653,26 @@ function updateMusicTrackTitle(label = "") {
     return;
   }
 
-  musicTrackTitle.textContent = label || "No track selected";
+  const title = label || "No track selected";
+  musicTrackTitle.textContent = title;
+  musicTrackTitle.dataset.title = title;
+}
+
+function updateMusicDurationDisplay(duration) {
+  const durationInfo = document.getElementById("music-info-duration");
+  const nextDuration = duration || "-";
+
+  if (durationInfo) {
+    durationInfo.textContent = nextDuration;
+  }
+}
+
+function getMediaAssetUrl(src) {
+  if (!src || src.startsWith("http")) {
+    return src || "";
+  }
+
+  return encodeURI(src);
 }
 
 function setMusicPanelExpanded(isExpanded) {
@@ -1672,7 +1707,7 @@ function updateMusicUI(track) {
   // Update Cover Art
   if (musicCoverArt) {
     if (track.cover) {
-      musicCoverArt.src = track.cover;
+      musicCoverArt.src = getMediaAssetUrl(track.cover);
       musicCoverArt.style.display = "block";
       if (musicVisualizer) musicVisualizer.style.display = "none";
     } else {
@@ -1694,7 +1729,7 @@ function updateMusicUI(track) {
   }
 
   if (durationInfo) {
-    durationInfo.textContent = track.duration || "-";
+    updateMusicDurationDisplay(track.duration);
   }
 }
 
@@ -1727,7 +1762,7 @@ function setMusicSource(track) {
     if (musicAudio) {
       musicAudio.pause();
       musicAudio.currentTime = 0;
-      musicAudio.src = encodeURI(track.src);
+      musicAudio.src = getMediaAssetUrl(track.src);
       musicAudio.load();
       musicAudio.muted = false;
       isMuted = false;
@@ -3275,6 +3310,23 @@ musicVolume?.addEventListener("input", () => {
 
 musicAudio?.addEventListener("play", updateMusicPlayLabel);
 musicAudio?.addEventListener("pause", updateMusicPlayLabel);
+musicAudio?.addEventListener("loadedmetadata", () => {
+  if (!musicAudio.duration || Number.isNaN(musicAudio.duration)) {
+    return;
+  }
+
+  const duration = formatMusicTime(musicAudio.duration);
+
+  if (currentlyPlayingTrack) {
+    currentlyPlayingTrack.duration = duration;
+  }
+
+  updateMusicDurationDisplay(duration);
+
+  if (musicTimeDisplay) {
+    musicTimeDisplay.textContent = `0:00 / ${duration}`;
+  }
+});
 musicAudio?.addEventListener("timeupdate", () => {
   if (musicAudio.duration) {
     const progress = (musicAudio.currentTime / musicAudio.duration) * 100;
@@ -3441,7 +3493,6 @@ window.addEventListener("load", () => {
   renderCatMedia();
   setupCursorEffect();
   setupHoverTrailerPreviews();
-  restoreStoredPanelPosition(homeWindow);
   arrangeVisiblePanels();
   syncFullscreenState();
   updateThemeToggleLabel();
