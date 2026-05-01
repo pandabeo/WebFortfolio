@@ -69,6 +69,7 @@ const gameDetailCover = document.querySelector(".game-detail-cover");
 const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]");
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
+const START_PANEL_CLOSE_ANIMATION_MS = 180;
 const TRAILER_SOUND_DELAY_MS = 900;
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
 let MUSIC_TRACKS = [
@@ -105,6 +106,7 @@ let MUSIC_TRACKS = [
 ];
 
 let currentlyPlayingTrack = null;
+let startPanelCloseTimer = null;
 
 function normalizeMusicAssetPath(src) {
   return (src || "")
@@ -1684,6 +1686,10 @@ function setMusicPanelExpanded(isExpanded) {
   musicPanelToggle?.setAttribute("aria-expanded", String(isExpanded));
 }
 
+function closeMusicPanel() {
+  setMusicPanelExpanded(false);
+}
+
 function toggleMusicPanel() {
   setMusicPanelExpanded(musicPanel?.classList.contains("is-collapsed"));
 }
@@ -2794,8 +2800,28 @@ function beginPageTransition(callback) {
 }
 
 function closeStartPanel() {
-  startPanel?.classList.add("is-hidden");
+  if (!startPanel) {
+    return;
+  }
+
+  if (startPanel.classList.contains("is-hidden")) {
+    startButton?.setAttribute("aria-expanded", "false");
+    return;
+  }
+
+  if (startPanelCloseTimer) {
+    window.clearTimeout(startPanelCloseTimer);
+  }
+
+  startPanel.classList.remove("is-opening");
+  startPanel.classList.add("is-closing");
   startButton?.setAttribute("aria-expanded", "false");
+
+  startPanelCloseTimer = window.setTimeout(() => {
+    startPanel.classList.add("is-hidden");
+    startPanel.classList.remove("is-closing");
+    startPanelCloseTimer = null;
+  }, START_PANEL_CLOSE_ANIMATION_MS);
 }
 
 function toggleStartPanel() {
@@ -2804,7 +2830,20 @@ function toggleStartPanel() {
   }
 
   const willOpen = startPanel.classList.contains("is-hidden");
-  startPanel.classList.toggle("is-hidden", !willOpen);
+
+  if (startPanelCloseTimer) {
+    window.clearTimeout(startPanelCloseTimer);
+    startPanelCloseTimer = null;
+  }
+
+  if (willOpen) {
+    startPanel.classList.remove("is-hidden", "is-closing", "is-opening");
+    void startPanel.offsetWidth;
+    startPanel.classList.add("is-opening");
+  } else {
+    closeStartPanel();
+  }
+
   startButton.setAttribute("aria-expanded", String(willOpen));
 
   if (willOpen) {
@@ -3468,6 +3507,18 @@ document.addEventListener("pointerdown", (event) => {
   }
 
   closeStartPanel();
+});
+
+document.addEventListener("pointerdown", (event) => {
+  if (!musicPanel || musicPanel.classList.contains("is-collapsed")) {
+    return;
+  }
+
+  if (musicPanel.contains(event.target)) {
+    return;
+  }
+
+  closeMusicPanel();
 });
 
 window.addEventListener("pageshow", () => {

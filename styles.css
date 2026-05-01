@@ -449,6 +449,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
   left: 50%;
   transform: translateX(-50%);
   width: min(660px, calc(100vw - 40px));
+  max-height: 380px;
   border: 1px solid #0f3ca8;
   outline: 2px solid #245edb;
   border-radius: 0;
@@ -460,6 +461,14 @@ body.is-dark .wallpaper-toggle:focus-visible {
     0 10px 26px rgba(0, 0, 0, 0.22);
   overflow: hidden;
   z-index: 9999;
+  transform-origin: top center;
+  transition:
+    max-height 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.music-panel:not(.is-collapsed) {
+  animation: music-panel-expand 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .music-titlebar {
@@ -475,6 +484,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
   font-weight: 700;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
   cursor: none;
+  transition: min-height 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .music-titlebar .music-track-title {
@@ -516,16 +526,43 @@ body.is-dark .wallpaper-toggle:focus-visible {
   }
 }
 
+@keyframes music-panel-expand {
+  0% {
+    opacity: 0.92;
+    scale: 0.985 0.82;
+  }
+
+  70% {
+    opacity: 1;
+    scale: 1.01 1.015;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
 .music-shell {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   height: 260px;
   background: #ece9d8;
   border-bottom: 1px solid #919b9c;
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 180ms ease,
+    translate 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .music-panel.is-collapsed {
   width: min(660px, calc(100vw - 40px));
+  max-height: 30px;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.75),
+    inset -1px -1px 0 rgba(15, 60, 168, 0.75),
+    0 5px 16px rgba(0, 0, 0, 0.18);
 }
 
 .music-panel.is-collapsed .music-titlebar {
@@ -534,7 +571,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-panel.is-collapsed .music-shell,
 .music-panel.is-collapsed .music-transport {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  translate: 0 -10px;
 }
 
 .music-sidebar {
@@ -699,20 +738,26 @@ body.is-dark .music-info-value {
 
 .music-transport {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 16px;
+  grid-template-columns: 66px minmax(180px, 1fr) 66px 128px;
+  gap: 14px;
   align-items: center;
   min-height: 52px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   background: linear-gradient(180deg, #f0f0f0 0%, #e0e0e0 100%);
   box-shadow: inset 0 1px 0 #fff;
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 180ms ease,
+    translate 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .music-progress-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 2px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 74px;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .music-time {
@@ -725,13 +770,11 @@ body.is-dark .music-info-value {
 }
 
 .music-controls-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display: contents;
 }
 
 .music-loop-button {
-  min-width: 64px;
+  width: 66px;
 }
 
 .music-loop-button.is-active {
@@ -741,7 +784,7 @@ body.is-dark .music-info-value {
 }
 
 .music-round-button {
-  width: 58px;
+  width: 66px;
   height: 26px;
   border: 1px solid #7f98c9;
   border-radius: 14px;
@@ -770,7 +813,7 @@ body.is-dark .music-info-value {
 
 .music-volume {
   width: 100%;
-  min-width: 80px;
+  min-width: 0;
 }
 
 .utility-button {
@@ -2675,6 +2718,15 @@ body.is-dark .game-detail-devlog-heading span {
     box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.start-panel.is-opening {
+  animation: start-panel-pop-open 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.start-panel.is-closing {
+  pointer-events: none;
+  animation: start-panel-pop-close 180ms cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+
 .start-panel.is-hidden {
   opacity: 0;
   visibility: hidden;
@@ -2682,6 +2734,40 @@ body.is-dark .game-detail-devlog-heading span {
   scale: 0.965;
   translate: 0 18px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+}
+
+@keyframes start-panel-pop-open {
+  0% {
+    opacity: 0;
+    scale: 0.94;
+    translate: 0 18px;
+  }
+
+  72% {
+    opacity: 1;
+    scale: 1.015;
+    translate: 0 -2px;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes start-panel-pop-close {
+  0% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 0.965;
+    translate: 0 18px;
+  }
 }
 
 .start-panel-header {
@@ -3070,6 +3156,9 @@ body.is-dark .game-detail-devlog-heading span {
 @media (prefers-reduced-motion: reduce) {
   .window,
   .start-panel,
+  .music-panel,
+  .music-shell,
+  .music-transport,
   .reveal,
   body,
   a,
@@ -3092,7 +3181,9 @@ body.is-dark .game-detail-devlog-heading span {
   .window,
   .window.is-hidden,
   .start-panel,
-  .start-panel.is-hidden {
+  .start-panel.is-hidden,
+  .music-panel,
+  .music-panel.is-collapsed {
     scale: 1;
     translate: 0 0;
   }
@@ -3379,11 +3470,12 @@ body.is-dark .card-badge {
   }
 
   .music-transport {
-    grid-template-columns: 58px minmax(0, 1fr);
+    grid-template-columns: 66px minmax(0, 1fr) 66px;
+    gap: 10px;
   }
 
   .music-volume {
-    grid-column: 1 / -1;
+    grid-column: 2 / -1;
   }
 
   .home-window {
