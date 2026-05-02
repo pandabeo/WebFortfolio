@@ -17,6 +17,9 @@
   --parallax-x: 0px;
   --parallax-y: 0px;
   --taskbar-height: 42px;
+  --utility-button-size: 48px;
+  --utility-control-top: 18px;
+  --fullscreen-window-top: 80px;
 }
 
 * {
@@ -387,20 +390,20 @@ body.crt-disabled .crt-overlay {
 
 .utility-toggles-left {
   position: absolute;
-  top: 26px;
+  top: var(--utility-control-top);
   left: 22px;
   display: flex;
   gap: 12px;
-  z-index: 100;
+  z-index: 10030;
 }
 
 .utility-toggles {
   position: absolute;
-  top: 26px;
+  top: var(--utility-control-top);
   right: 22px;
   display: flex;
   gap: 12px;
-  z-index: 100;
+  z-index: 10030;
 }
 
 .wallpaper-toggle {
@@ -445,7 +448,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-panel {
   position: absolute;
-  top: 16px;
+  top: calc(var(--utility-control-top) + 0px);
   left: 50%;
   transform: translateX(-50%);
   width: min(660px, calc(100vw - 40px));
@@ -460,7 +463,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
     inset -1px -1px 0 rgba(15, 60, 168, 0.75),
     0 10px 26px rgba(0, 0, 0, 0.22);
   overflow: hidden;
-  z-index: 9999;
+  z-index: 10030;
   transform-origin: top center;
   transition:
     max-height 260ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -480,7 +483,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
   padding: 0 8px 0 10px;
   background: linear-gradient(180deg, #4fa3ff 0%, #2a7bf6 18%, #245edb 52%, #173ea9 100%);
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
   cursor: none;
@@ -495,7 +498,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
   overflow: hidden;
   background: transparent;
   color: #fff;
-  font-size: 0.76rem;
+  font-size: 0.86rem;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -517,12 +520,24 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 @keyframes music-title-run-right {
-  from {
+  0% {
+    left: 0;
+    opacity: 0;
     transform: translateX(-100%);
   }
 
-  to {
-    transform: translateX(100%);
+  8% {
+    opacity: 1;
+  }
+
+  92% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 100%;
+    opacity: 0;
+    transform: translateX(0);
   }
 }
 
@@ -558,7 +573,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-panel.is-collapsed {
   width: min(660px, calc(100vw - 40px));
-  max-height: 30px;
+  max-height: var(--utility-button-size);
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.75),
     inset -1px -1px 0 rgba(15, 60, 168, 0.75),
@@ -566,7 +581,7 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-panel.is-collapsed .music-titlebar {
-  min-height: 28px;
+  min-height: calc(var(--utility-button-size) - 2px);
 }
 
 .music-panel.is-collapsed .music-shell,
@@ -817,8 +832,8 @@ body.is-dark .music-info-value {
 }
 
 .utility-button {
-  width: 48px;
-  height: 48px;
+  width: var(--utility-button-size);
+  height: var(--utility-button-size);
   border-top: 1px solid #ffffff;
   border-left: 1px solid #ffffff;
   border-right: 1px solid #173b8c;
@@ -1139,11 +1154,11 @@ body.is-dark .collection-card:focus-visible {
 .window.is-fullscreen,
 .collection-window.is-fullscreen {
   position: fixed;
-  inset: 8px 8px calc(var(--taskbar-height) + 8px) 8px;
+  inset: var(--fullscreen-window-top) 8px calc(var(--taskbar-height) + 8px) 8px;
   width: auto;
   max-height: none;
   transform: none;
-  z-index: 9500;
+  z-index: 10020;
 }
 
 .window.is-fullscreen .xp-window-body,
@@ -3585,6 +3600,10 @@ body.is-dark .card-badge {
 }
 
 @media (max-width: 640px) {
+  :root {
+    --utility-button-size: 40px;
+  }
+
   html {
     font-size: 15px;
   }
@@ -3657,8 +3676,6 @@ body.is-dark .card-badge {
   }
 
   .utility-button {
-    width: 40px;
-    height: 40px;
     padding: 0;
   }
 

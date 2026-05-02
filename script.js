@@ -70,7 +70,8 @@ const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]")
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const START_PANEL_CLOSE_ANIMATION_MS = 180;
-const TRAILER_SOUND_DELAY_MS = 900;
+const FULLSCREEN_WINDOW_Z_INDEX = 10020;
+const FULLSCREEN_WINDOW_TOP_OFFSET = "var(--fullscreen-window-top)";
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
 let MUSIC_TRACKS = [
   {
@@ -624,21 +625,13 @@ function forceVideoMuted(videoEl) {
     return;
   }
 
-  videoEl.muted = true;
-  videoEl.defaultMuted = true;
-  videoEl.volume = 0;
-  videoEl.setAttribute("muted", "");
-}
-
-function forceVideoAudible(videoEl) {
-  if (!videoEl || isMuted) {
-    return;
+  if (typeof videoEl.volume === "number" && videoEl.volume > 0) {
+    mediaVolumeMemory.set(videoEl, videoEl.volume);
   }
 
-  videoEl.muted = false;
-  videoEl.defaultMuted = false;
-  videoEl.volume = Math.max(videoEl.volume || 0, 0.7);
-  videoEl.removeAttribute("muted");
+  videoEl.muted = true;
+  videoEl.defaultMuted = true;
+  videoEl.setAttribute("muted", "");
 }
 
 function clamp(value, min, max) {
@@ -1087,6 +1080,7 @@ function toggleWindowFullscreen(windowEl, forceState) {
       transform: windowEl.style.transform,
       position: windowEl.style.position,
       margin: windowEl.style.margin,
+      zIndex: windowEl.style.zIndex,
       dragReady: windowEl.dataset.dragReady || "",
     };
 
@@ -1094,7 +1088,7 @@ function toggleWindowFullscreen(windowEl, forceState) {
     windowEl.classList.add("is-fullscreen");
     windowEl.style.position = "fixed";
     windowEl.style.left = "8px";
-    windowEl.style.top = "8px";
+    windowEl.style.top = FULLSCREEN_WINDOW_TOP_OFFSET;
     windowEl.style.right = "8px";
     windowEl.style.bottom = "calc(var(--taskbar-height) + 8px)";
     windowEl.style.width = "auto";
@@ -1124,6 +1118,7 @@ function toggleWindowFullscreen(windowEl, forceState) {
   windowEl.style.transform = snapshot?.transform || "";
   windowEl.style.position = snapshot?.position || "";
   windowEl.style.margin = snapshot?.margin || "";
+  windowEl.style.zIndex = snapshot?.zIndex || "";
 
   if (snapshot?.dragReady) {
     windowEl.dataset.dragReady = snapshot.dragReady;
@@ -1214,7 +1209,8 @@ function enableAutoplayForVideos(root = document) {
     videoEl.setAttribute("playsinline", "");
 
     const startPlayback = () => {
-      if (!isMediaInActiveWindow(videoEl)) {
+      if (!isMediaInActiveWindow(videoEl) || !isMediaVisibleInPanel(videoEl)) {
+        videoEl.pause();
         return;
       }
 
@@ -1236,7 +1232,6 @@ function setupHoverTrailerPreviews() {
   hoverTrailerCards.forEach((card) => {
     const videoEl = card.querySelector("video[data-hover-preview='true']");
     const previewImage = card.querySelector("img");
-    let trailerSoundTimer = null;
 
     if (!videoEl) {
       return;
@@ -1252,36 +1247,7 @@ function setupHoverTrailerPreviews() {
       }
     };
 
-    const clearTrailerSoundTimer = () => {
-      if (!trailerSoundTimer) {
-        return;
-      }
-
-      window.clearTimeout(trailerSoundTimer);
-      trailerSoundTimer = null;
-    };
-
-    const activateTrailerSound = () => {
-      trailerSoundTimer = null;
-
-      if (!card.matches(":hover") && document.activeElement !== card) {
-        forceVideoMuted(videoEl);
-        return;
-      }
-
-      videoEl.dataset.trailerSoundActive = "true";
-      if (isMediaInActiveWindow(videoEl)) {
-        forceVideoAudible(videoEl);
-      }
-    };
-
-    const scheduleTrailerSound = () => {
-      clearTrailerSoundTimer();
-      trailerSoundTimer = window.setTimeout(activateTrailerSound, TRAILER_SOUND_DELAY_MS);
-    };
-
     const deactivateTrailerSound = () => {
-      clearTrailerSoundTimer();
       delete videoEl.dataset.trailerSoundActive;
       forceVideoMuted(videoEl);
     };
@@ -1306,7 +1272,7 @@ function setupHoverTrailerPreviews() {
 
       videoEl.play().then(() => {
         revealPreview();
-        scheduleTrailerSound();
+        forceVideoMuted(videoEl);
       }).catch(() => {
         // Browser policy can still block playback in rare cases; ignore quietly.
       });
@@ -1431,6 +1397,44 @@ function isMediaInActiveWindow(mediaEl) {
   return windowEl === getTopVisibleWindow();
 }
 
+function getMediaViewportRoot(mediaEl) {
+  return mediaEl?.closest(".xp-window-body") || mediaEl?.closest(".collection-body") || null;
+}
+
+function isMediaVisibleInPanel(mediaEl) {
+  if (!mediaEl) {
+    return false;
+  }
+
+  if (document.fullscreenElement === mediaEl) {
+    return true;
+  }
+
+  const mediaRect = mediaEl.getBoundingClientRect();
+
+  if (mediaRect.width <= 0 || mediaRect.height <= 0) {
+    return false;
+  }
+
+  const root = getMediaViewportRoot(mediaEl);
+  const rootRect = root?.getBoundingClientRect() || {
+    top: 0,
+    left: 0,
+    right: window.innerWidth,
+    bottom: window.innerHeight,
+  };
+
+  const visibleLeft = Math.max(mediaRect.left, rootRect.left, 0);
+  const visibleTop = Math.max(mediaRect.top, rootRect.top, 0);
+  const visibleRight = Math.min(mediaRect.right, rootRect.right, window.innerWidth);
+  const visibleBottom = Math.min(mediaRect.bottom, rootRect.bottom, window.innerHeight);
+  const visibleWidth = Math.max(0, visibleRight - visibleLeft);
+  const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+  const visibleRatio = (visibleWidth * visibleHeight) / (mediaRect.width * mediaRect.height);
+
+  return visibleRatio >= 0.35;
+}
+
 function pauseAndMuteMedia(mediaEl, { reset = false } = {}) {
   if (!mediaEl) {
     return;
@@ -1472,6 +1476,16 @@ function pauseWindowMedia(windowEl, { reset = false } = {}) {
   });
 }
 
+function stopWindowGameFrames(windowEl) {
+  if (!windowEl) {
+    return;
+  }
+
+  windowEl.querySelectorAll("iframe.game-player-frame").forEach((frameEl) => {
+    frameEl.src = "about:blank";
+  });
+}
+
 function syncEmbeddedFrameAudioState() {
   const topWindow = getTopVisibleWindow();
 
@@ -1503,6 +1517,11 @@ function syncVisibleMediaPlayback(root = document) {
       return;
     }
 
+    if (!isMediaVisibleInPanel(videoEl)) {
+      videoEl.pause();
+      return;
+    }
+
     if (videoEl.autoplay || videoEl.hasAttribute("autoplay")) {
       videoEl.play().catch(() => {
         // Ignore autoplay rejections triggered by browser policy or visibility state.
@@ -1515,7 +1534,7 @@ function syncVisibleMediaPlayback(root = document) {
       return;
     }
 
-    if (!isMediaInActiveWindow(mediaEl) || isMuted) {
+    if (!isMediaInActiveWindow(mediaEl) || isMuted || !isMediaVisibleInPanel(mediaEl)) {
       return;
     }
 
@@ -1536,11 +1555,7 @@ function syncMediaMutedState() {
     }
 
     if (mediaEl.dataset.hoverPreview === "true") {
-      if (mediaEl.dataset.trailerSoundActive === "true" && !isMuted) {
-        forceVideoAudible(mediaEl);
-      } else {
-        forceVideoMuted(mediaEl);
-      }
+      forceVideoMuted(mediaEl);
       return;
     }
 
@@ -2113,10 +2128,12 @@ function renderGameDetail(gameId) {
   if (gameDetailFrame && gameDetailPlayerSection) {
     if (game.webPlayable !== false && game.player?.src) {
       gameDetailFrame.src = game.player.src;
+      gameDetailFrame.dataset.playerSrc = game.player.src;
       gameDetailFrame.title = game.player.title || game.title;
       gameDetailPlayerSection.classList.remove("is-hidden");
     } else {
       gameDetailFrame.src = "about:blank";
+      delete gameDetailFrame.dataset.playerSrc;
       gameDetailFrame.title = "";
       gameDetailPlayerSection.classList.add("is-hidden");
     }
@@ -2152,7 +2169,9 @@ function renderGameDetail(gameId) {
 
 function bringToFront(windowEl) {
   zIndexSeed += 1;
-  windowEl.style.zIndex = String(zIndexSeed);
+  windowEl.style.zIndex = windowEl.classList.contains("is-fullscreen")
+    ? String(FULLSCREEN_WINDOW_Z_INDEX)
+    : String(zIndexSeed);
   renderTaskbarTabs();
 }
 
@@ -2332,6 +2351,7 @@ function hideWindow(windowEl, options = {}) {
   windowEl.classList.remove("is-opening");
   windowEl.classList.add("is-closing");
   pauseWindowMedia(windowEl, { reset: true });
+  stopWindowGameFrames(windowEl);
   delete windowEl.dataset.taskbarOrder;
   syncFullscreenState();
   renderTaskbarTabs();
@@ -2645,6 +2665,7 @@ function closeAllWindows() {
     windowEl.classList.add("is-hidden");
     delete windowEl.dataset.taskbarOrder;
     pauseWindowMedia(windowEl, { reset: true });
+    stopWindowGameFrames(windowEl);
   });
 
   syncFullscreenState();
@@ -3414,7 +3435,9 @@ documentItems.forEach((item) => {
 });
 
 videoFullscreenButtons.forEach((button) => {
-  button.addEventListener("click", async () => {
+  button.addEventListener("click", async (event) => {
+    event.stopPropagation();
+
     const card = button.closest(".collection-card");
     const videoEl = card?.querySelector("video");
 
@@ -3422,15 +3445,49 @@ videoFullscreenButtons.forEach((button) => {
       return;
     }
 
+    bindMediaMuteEnforcement(videoEl);
+    videoEl.controls = true;
+    videoEl.dataset.userAudioEnabled = "true";
+
+    if (isMuted) {
+      forceVideoMuted(videoEl);
+    } else {
+      enforceMediaMuteState(videoEl);
+    }
+
     try {
+      await videoEl.play().catch(() => {
+        // Fullscreen still needs to be attempted even if playback is temporarily blocked.
+      });
+
       if (videoEl.requestFullscreen) {
         await videoEl.requestFullscreen();
       }
+
+      await videoEl.play().catch(() => {
+        // Native controls remain available if the browser still blocks playback.
+      });
     } catch {
       // Ignore rejected fullscreen requests triggered by browser policy edge cases.
     }
   });
 });
+
+let mediaVisibilitySyncFrame = 0;
+
+function requestMediaVisibilitySync() {
+  if (mediaVisibilitySyncFrame) {
+    return;
+  }
+
+  mediaVisibilitySyncFrame = window.requestAnimationFrame(() => {
+    mediaVisibilitySyncFrame = 0;
+    syncVisibleMediaPlayback();
+  });
+}
+
+document.addEventListener("scroll", requestMediaVisibilitySync, true);
+window.addEventListener("resize", requestMediaVisibilitySync);
 
 navigableLinks.forEach((link) => {
   link.addEventListener("click", (event) => {
