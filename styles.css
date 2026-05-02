@@ -466,8 +466,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
   z-index: 10030;
   transform-origin: top center;
   transition:
-    max-height 260ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    max-height 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: max-height;
 }
 
 .music-panel:not(.is-collapsed) {
@@ -567,8 +568,8 @@ body.is-dark .wallpaper-toggle:focus-visible {
   opacity: 1;
   translate: 0 0;
   transition:
-    opacity 180ms ease,
-    translate 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 140ms ease,
+    translate 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .music-panel.is-collapsed {
@@ -581,14 +582,16 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-panel.is-collapsed .music-titlebar {
-  min-height: calc(var(--utility-button-size) - 2px);
+  min-height: var(--utility-button-size);
+  border-bottom-color: transparent;
 }
 
 .music-panel.is-collapsed .music-shell,
 .music-panel.is-collapsed .music-transport {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  translate: 0 -10px;
+  translate: 0 -14px;
 }
 
 .music-sidebar {
@@ -679,6 +682,7 @@ body.is-dark .music-info-value {
 
 .music-now {
   min-width: 0;
+  translate: -16px 0;
 }
 
 .music-track-title {
@@ -690,15 +694,18 @@ body.is-dark .music-info-value {
 
 .music-visualizer {
   position: relative;
-  width: 244px;
-  height: 244px;
+  width: min(244px, 100%);
+  aspect-ratio: 1 / 1;
+  height: auto;
   margin: 0 auto;
   overflow: hidden;
   border: 2px solid #111;
   background:
-    radial-gradient(circle at 50% 48%, rgba(45, 11, 42, 0.95) 0 5%, transparent 7%),
-    radial-gradient(ellipse at 48% 48%, rgba(252, 214, 76, 0.85) 0 8%, rgba(243, 77, 168, 0.88) 15%, rgba(21, 13, 47, 0.92) 23%, rgba(243, 77, 168, 0.88) 35%, rgba(20, 12, 42, 0.88) 48%, rgba(247, 96, 182, 0.95) 70%);
-  filter: saturate(1.25) contrast(1.08);
+    radial-gradient(ellipse at 56% 42%, rgba(42, 8, 46, 0.9) 0 5%, transparent 7%),
+    radial-gradient(ellipse at 56% 42%, rgba(255, 216, 72, 0.9) 0 10%, rgba(247, 81, 189, 0.95) 18%, rgba(255, 181, 222, 0.9) 28%, rgba(243, 57, 183, 0.95) 44%, transparent 56%),
+    radial-gradient(ellipse at 60% 35%, rgba(21, 13, 36, 0.92) 0 12%, transparent 22%),
+    radial-gradient(ellipse at 50% 52%, rgba(252, 114, 212, 0.98) 0 36%, rgba(241, 43, 171, 0.95) 58%, rgba(250, 91, 191, 0.95) 100%);
+  filter: saturate(1.35) contrast(1.08) blur(0.2px);
 }
 
 #sc-player {
@@ -707,8 +714,9 @@ body.is-dark .music-info-value {
 
 .music-cover-art {
   display: block;
-  width: 244px;
-  height: 244px;
+  width: min(244px, 100%);
+  aspect-ratio: 1 / 1;
+  height: auto;
   margin: 0 auto;
   object-fit: cover;
   border: 2px solid #111;
@@ -763,8 +771,8 @@ body.is-dark .music-info-value {
   opacity: 1;
   translate: 0 0;
   transition:
-    opacity 180ms ease,
-    translate 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 140ms ease,
+    translate 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .music-progress-group {
@@ -3415,6 +3423,11 @@ body.is-dark .card-badge {
 }
 
 @media (max-width: 980px) {
+  :root {
+    --utility-control-top: 14px;
+    --fullscreen-window-top: 158px;
+  }
+
   html {
     font-size: 16px;
   }
@@ -3428,15 +3441,17 @@ body.is-dark .card-badge {
     min-height: 100vh;
   }
 
-  .utility-toggles {
-    top: 14px;
+  .utility-toggles-left {
+    top: var(--utility-control-top);
     left: 14px;
     gap: 10px;
   }
 
-  .sound-floating-toggle {
-    top: 14px;
+  .utility-toggles {
+    top: var(--utility-control-top);
     right: 14px;
+    left: auto;
+    gap: 10px;
   }
 
   .music-panel {
@@ -3444,12 +3459,17 @@ body.is-dark .card-badge {
     top: auto;
     left: auto;
     width: min(680px, calc(100vw - 28px));
+    max-height: calc(100dvh - var(--taskbar-height) - 76px);
     transform: none;
     margin: 82px auto 0;
+    display: flex;
+    flex-direction: column;
+    contain: layout paint;
   }
 
   .music-panel.is-collapsed {
     width: min(680px, calc(100vw - 28px));
+    max-height: var(--utility-button-size);
   }
 
   .music-titlebar {
@@ -3459,6 +3479,9 @@ body.is-dark .card-badge {
   .music-shell {
     grid-template-columns: 1fr;
     height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
   }
 
   .music-sidebar {
@@ -3473,11 +3496,13 @@ body.is-dark .card-badge {
   }
 
   .music-visualizer {
-    height: 28px;
+    width: min(150px, 100%);
+    height: auto;
   }
 
   .music-cover-art {
-    height: 150px;
+    width: min(150px, 100%);
+    height: auto;
   }
 
   #sc-player {
@@ -3485,12 +3510,43 @@ body.is-dark .card-badge {
   }
 
   .music-transport {
-    grid-template-columns: 66px minmax(0, 1fr) 66px;
-    gap: 10px;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 10px 12px;
+    padding: 10px 12px;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+
+  .music-round-button,
+  .music-loop-button {
+    width: 76px;
+    height: 32px;
+    border-radius: 16px;
+    font-size: 0.78rem;
+  }
+
+  .music-progress-group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .music-time {
+    text-align: left;
+  }
+
+  .music-controls-right {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: 76px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
   }
 
   .music-volume {
-    grid-column: 2 / -1;
+    width: 100%;
+    min-height: 32px;
   }
 
   .home-window {
@@ -3518,16 +3574,16 @@ body.is-dark .card-badge {
   .window,
   .collection-window {
     position: fixed;
-    top: 14px;
+    top: var(--fullscreen-window-top);
     left: 14px;
     right: 14px;
     width: auto;
-    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - var(--fullscreen-window-top) - var(--taskbar-height) - 14px);
     transform: none;
   }
 
   .xp-window-body {
-    max-height: calc(100vh - 62px);
+    max-height: calc(100dvh - var(--fullscreen-window-top) - var(--taskbar-height) - 48px);
     overflow-y: auto;
   }
 
@@ -3602,6 +3658,8 @@ body.is-dark .card-badge {
 @media (max-width: 640px) {
   :root {
     --utility-button-size: 40px;
+    --utility-control-top: 10px;
+    --fullscreen-window-top: 114px;
   }
 
   html {
@@ -3620,7 +3678,7 @@ body.is-dark .card-badge {
   .desktop-stage {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     height: calc(100dvh - var(--taskbar-height));
     min-height: calc(100dvh - var(--taskbar-height));
     padding: 8px 10px 8px;
@@ -3632,7 +3690,7 @@ body.is-dark .card-badge {
     top: auto;
     transform: none;
     width: calc(100vw - 20px);
-    margin: 64px auto 0;
+    margin: 14px auto 0;
   }
 
   .home-actions {
@@ -3660,14 +3718,17 @@ body.is-dark .card-badge {
     font-size: 0.82rem;
   }
 
-  .utility-toggles {
-    top: 10px;
+  .utility-toggles-left {
+    top: var(--utility-control-top);
     left: 10px;
+    gap: 8px;
   }
 
-  .sound-floating-toggle {
-    top: 10px;
+  .utility-toggles {
+    top: var(--utility-control-top);
     right: 10px;
+    left: auto;
+    gap: 8px;
   }
 
   .wallpaper-toggle-icon {
@@ -3677,6 +3738,11 @@ body.is-dark .card-badge {
 
   .utility-button {
     padding: 0;
+  }
+
+  .music-panel {
+    max-height: calc(100dvh - var(--taskbar-height) - 66px);
+    margin: 58px auto 0;
   }
 
   .utility-icon-image {
@@ -3707,17 +3773,17 @@ body.is-dark .card-badge {
 
   .window,
   .collection-window {
-    top: 8px;
+    top: var(--fullscreen-window-top);
     left: 8px;
     right: 8px;
     width: auto;
-    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - var(--fullscreen-window-top) - var(--taskbar-height) - 8px);
     border-width: 1px;
     outline-width: 2px;
   }
 
   .xp-window-body {
-    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - var(--fullscreen-window-top) - var(--taskbar-height) - 42px);
   }
 
   .popup-body,

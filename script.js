@@ -273,7 +273,7 @@ const gameDetails = {
       { label: "Play on itch.io", href: "https://pandabeo04.itch.io/ame-no-naka" },
       {
         label: "Download Game",
-        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/Ame%20no%20Naka%20Win.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/Ame.no.Naka.Win.zip",
         download: "ame-no-naka.zip",
       },
     ],
@@ -310,7 +310,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/Bui%20Truong%20Thinh_S3975580_Ass1_Homeward_Unity%20Build%20Project.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/Bui.Truong.Thinh_S3975580_Ass1_Homeward_Unity.Build.Project.zip",
         download: "homeward.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/homeward" },
@@ -410,7 +410,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/D%27%20F%C3%ADshy%20Fin%C3%A0l.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/D.Fishy.Final.zip",
         download: "d-fishy-finals.zip",
       },
       { label: "Open itch.io", href: "https://quyen-cvrix-nguyen.itch.io/d-fishy-finals" },
@@ -471,7 +471,7 @@ const gameDetails = {
     actions: [
       {
         label: "Download Game",
-        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/ChaoTet!FixUI.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/ChaoTet.FixUI.zip",
         download: "chaotet.zip",
       },
       { label: "Open itch.io", href: "https://pandabeo04.itch.io/chaostet" },
@@ -524,7 +524,7 @@ const gameDetails = {
       { label: "Play on itch.io", href: "https://pandabeo04.itch.io/a-game-about-me" },
       {
         label: "Download Game",
-        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/A%20game%20about%20me%20V2.zip",
+        href: "https://github.com/pandabeo/WebPortfolioPlayFuture/releases/download/game-downloads/A.game.about.me.V2.zip",
         download: "a-game-about-me.zip",
       },
     ],
@@ -1717,7 +1717,9 @@ function updateMusicUI(track) {
   const durationInfo = document.getElementById("music-info-duration");
 
   if (!track) {
-    if (musicCoverArt) musicCoverArt.style.display = "none";
+    if (musicCoverArt) {
+      musicCoverArt.style.display = "none";
+    }
     if (musicVisualizer) musicVisualizer.style.display = "block";
     if (trackInfo) trackInfo.textContent = "No track selected";
     if (artistInfo) artistInfo.textContent = "-";
