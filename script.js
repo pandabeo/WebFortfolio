@@ -73,6 +73,7 @@ const START_PANEL_CLOSE_ANIMATION_MS = 180;
 const FULLSCREEN_WINDOW_Z_INDEX = 10020;
 const FULLSCREEN_WINDOW_TOP_OFFSET = "var(--fullscreen-window-top)";
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
+const DEFAULT_MUSIC_COVER_ART = "assets/wallpaper/kojima-please-hire-me.png";
 let MUSIC_TRACKS = [
   {
     label: "Cá Hồi Hoang - 2004",
@@ -962,21 +963,22 @@ function setupCursorEffect() {
 
   const syncCursorPosition = () => {
     if (cursorDot && cursorRing && cursorIdle) {
-      const cursorTransform = `translate(${pointerX - CURSOR_OFFSET_X}px, ${pointerY - CURSOR_OFFSET_Y}px)`;
+      const cursorTransform = `translate3d(${pointerX - CURSOR_OFFSET_X}px, ${pointerY - CURSOR_OFFSET_Y}px, 0)`;
       cursorDot.style.transform = cursorTransform;
       cursorRing.style.transform = cursorTransform;
       cursorIdle.style.transform = cursorTransform;
     }
+
+    const offsetX = ((pointerX / window.innerWidth) - 0.5) * 18;
+    const offsetY = ((pointerY / window.innerHeight) - 0.5) * 18;
+    document.documentElement.style.setProperty("--parallax-x", `${offsetX}px`);
+    document.documentElement.style.setProperty("--parallax-y", `${offsetY}px`);
   };
 
   window.addEventListener("pointermove", (event) => {
     pointerX = event.clientX;
     pointerY = event.clientY;
     syncCursorPosition();
-    const offsetX = ((event.clientX / window.innerWidth) - 0.5) * 18;
-    const offsetY = ((event.clientY / window.innerHeight) - 0.5) * 18;
-    document.documentElement.style.setProperty("--parallax-x", `${offsetX}px`);
-    document.documentElement.style.setProperty("--parallax-y", `${offsetY}px`);
 
     if (!document.body.classList.contains("has-custom-cursor")) {
       document.body.classList.add("has-custom-cursor");
@@ -1711,16 +1713,15 @@ function toggleMusicPanel() {
 
 function updateMusicUI(track) {
   const musicCoverArt = document.getElementById("music-cover-art");
-  const musicVisualizer = document.getElementById("music-visualizer");
   const trackInfo = document.getElementById("music-info-track");
   const artistInfo = document.getElementById("music-info-artist");
   const durationInfo = document.getElementById("music-info-duration");
 
   if (!track) {
     if (musicCoverArt) {
-      musicCoverArt.style.display = "none";
+      musicCoverArt.src = getMediaAssetUrl(DEFAULT_MUSIC_COVER_ART);
+      musicCoverArt.style.display = "block";
     }
-    if (musicVisualizer) musicVisualizer.style.display = "block";
     if (trackInfo) trackInfo.textContent = "No track selected";
     if (artistInfo) artistInfo.textContent = "-";
     if (durationInfo) durationInfo.textContent = "-";
@@ -1729,14 +1730,8 @@ function updateMusicUI(track) {
 
   // Update Cover Art
   if (musicCoverArt) {
-    if (track.cover) {
-      musicCoverArt.src = getMediaAssetUrl(track.cover);
-      musicCoverArt.style.display = "block";
-      if (musicVisualizer) musicVisualizer.style.display = "none";
-    } else {
-      musicCoverArt.style.display = "none";
-      if (musicVisualizer) musicVisualizer.style.display = "block";
-    }
+    musicCoverArt.src = getMediaAssetUrl(track.cover || DEFAULT_MUSIC_COVER_ART);
+    musicCoverArt.style.display = "block";
   }
 
   // Update Info
@@ -1760,7 +1755,6 @@ function setMusicSource(track) {
   if (!track) return;
 
   const musicCoverArt = document.getElementById("music-cover-art");
-  const musicVisualizer = document.getElementById("music-visualizer");
   const scPlayer = document.getElementById("sc-player");
 
   updateMusicUI(track);
@@ -1770,7 +1764,6 @@ function setMusicSource(track) {
     musicAudio?.pause();
     if (musicAudio) musicAudio.src = "";
 
-    if (musicVisualizer) musicVisualizer.style.display = "none";
     if (musicCoverArt) musicCoverArt.style.display = "none";
     if (scPlayer) {
       const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(track.soundcloudUrl)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
