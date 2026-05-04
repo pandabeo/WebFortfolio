@@ -195,7 +195,7 @@ body.crt-disabled .crt-overlay {
       0deg,
       rgba(0, 0, 0, 0.16) 0 1px,
       rgba(255, 255, 255, 0.08) 1px 2px,
-      transparent 2px 4px
+      transparent 2px 6px
     ),
     linear-gradient(
       90deg,
@@ -203,7 +203,7 @@ body.crt-disabled .crt-overlay {
       rgba(0, 255, 100, 0.03) 50%,
       rgba(20, 60, 255, 0.04)
     );
-  background-size: 4px 100%, 100% 4px, 100% 100%;
+  background-size: 4px 100%, 100% 6px, 100% 100%;
   background-position: 0 0, 0 0, 0 0;
   mix-blend-mode: multiply;
   opacity: 0.46;
@@ -215,16 +215,16 @@ body.crt-disabled .crt-overlay {
     repeating-linear-gradient(
       0deg,
       rgba(255, 255, 255, 0.06) 0 1px,
-      transparent 1px 3px,
-      rgba(0, 0, 0, 0.09) 3px 4px
+      transparent 1px 5px,
+      rgba(0, 0, 0, 0.09) 5px 6px
     ),
     repeating-linear-gradient(
       90deg,
-      transparent 0 11px,
-      rgba(0, 0, 0, 0.08) 11px 12px
+      transparent 0 15px,
+      rgba(0, 0, 0, 0.08) 15px 16px
     );
-  background-size: 100% 100%, 100% 4px, 12px 100%;
-  opacity: 0.22;
+  background-size: 100% 100%, 100% 6px, 16px 100%;
+  opacity: 0.18;
   animation: crt-noise 180ms steps(2, end) infinite, crt-roll 7s linear infinite;
 }
 
@@ -236,7 +236,7 @@ body.crt-disabled .crt-overlay {
   height: 20px;
   background:
     linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.18) 34%, rgba(255, 255, 255, 0.32) 48%, rgba(80, 140, 255, 0.16) 56%, transparent 100%),
-    repeating-linear-gradient(0deg, transparent 0 2px, rgba(255, 255, 255, 0.24) 2px 3px, transparent 3px 5px),
+    repeating-linear-gradient(0deg, transparent 0 4px, rgba(255, 255, 255, 0.2) 4px 5px, transparent 5px 8px),
     repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.22) 0 1px, rgba(0, 255, 70, 0.18) 1px 2px, rgba(35, 80, 255, 0.22) 2px 3px, rgba(0, 0, 0, 0.18) 3px 4px);
   filter: blur(0.7px);
   opacity: 0;
@@ -374,7 +374,7 @@ body.crt-disabled .crt-overlay {
   }
 
   to {
-    background-position: 0 0, 0 36px, 12px 0;
+    background-position: 0 0, 0 54px, 16px 0;
   }
 }
 
@@ -962,6 +962,21 @@ body.is-dark .music-titlebar {
 
 body.is-dark .music-shell {
   background: #2f2f2f;
+}
+
+body.is-dark .music-info {
+  border-left-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, #252b34 0%, #141820 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(0, 0, 0, 0.42);
+}
+
+body.is-dark .music-info-label {
+  color: #9eb8ed;
+}
+
+body.is-dark .music-info-value {
+  color: #f6f1e8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
 }
 
 body.is-dark .music-transport,

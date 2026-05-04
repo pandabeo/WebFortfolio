@@ -541,6 +541,8 @@ const gameDetails = {
   },
 };
 
+const gameCollectionOrder = ["thrifting-101", "coy-commute", "ame-no-naka", "d-fishy-finals"];
+
 function getGameRouteSlug(gameId) {
   if (!gameId || !gameDetails[gameId]) {
     return "";
@@ -1997,6 +1999,23 @@ function renderActiveDocumentPdf() {
   }
 
   renderPdfPreview(activePdfViewer);
+}
+
+function reorderGameCollection() {
+  const collectionGrid = document.querySelector("#game-collection .collection-grid");
+
+  if (!collectionGrid) {
+    return;
+  }
+
+  const cards = Array.from(collectionGrid.querySelectorAll("[data-game-id]"));
+  const cardsByGameId = new Map(cards.map((card) => [card.dataset.gameId, card]));
+  const rankedCards = gameCollectionOrder.map((gameId) => cardsByGameId.get(gameId)).filter(Boolean);
+  const remainingCards = cards.filter((card) => !gameCollectionOrder.includes(card.dataset.gameId));
+
+  [...rankedCards, ...remainingCards].forEach((card) => {
+    collectionGrid.appendChild(card);
+  });
 }
 
 function renderGameDetail(gameId) {
@@ -3594,6 +3613,7 @@ window.addEventListener("load", () => {
   updateMusicTrackTitle();
   updateMusicPlayLabel();
   renderCatMedia();
+  reorderGameCollection();
   setupCursorEffect();
   setupHoverTrailerPreviews();
   arrangeVisiblePanels();
