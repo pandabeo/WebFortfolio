@@ -574,7 +574,9 @@ body.is-dark .wallpaper-toggle:focus-visible {
 
 .music-panel.is-collapsed {
   width: min(680px, calc(100vw - 40px));
-  max-height: var(--utility-button-size);
+  height: var(--utility-button-size, 46px);
+  max-height: var(--utility-button-size, 46px);
+  background: linear-gradient(180deg, #4fa3ff 0%, #2a7bf6 18%, #245edb 52%, #173ea9 100%);
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.75),
     inset -1px -1px 0 rgba(15, 60, 168, 0.75),
@@ -582,12 +584,16 @@ body.is-dark .wallpaper-toggle:focus-visible {
 }
 
 .music-panel.is-collapsed .music-titlebar {
-  min-height: var(--utility-button-size);
+  position: relative;
+  z-index: 2;
+  min-height: var(--utility-button-size, 46px);
+  height: var(--utility-button-size, 46px);
   border-bottom-color: transparent;
 }
 
 .music-panel.is-collapsed .music-shell,
 .music-panel.is-collapsed .music-transport {
+  display: none;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -669,6 +675,15 @@ body.is-dark .wallpaper-toggle:focus-visible {
 .music-track-item:focus-visible,
 .music-track-item.is-active {
   background: #ffffff;
+}
+
+.music-panel.is-keyboard-navigating .music-track-item:hover {
+  background: transparent;
+}
+
+.music-track-item.is-keyboard-active {
+  outline: 2px solid #245edb;
+  outline-offset: -3px;
 }
 
 .music-track-empty {
@@ -1061,6 +1076,14 @@ body.is-dark .music-track-item:hover,
 body.is-dark .music-track-item:focus-visible,
 body.is-dark .music-track-item.is-active {
   background: #242424;
+}
+
+body.is-dark .music-panel.is-keyboard-navigating .music-track-item:hover {
+  background: transparent;
+}
+
+body.is-dark .music-track-item.is-keyboard-active {
+  outline-color: #c7d8ff;
 }
 
 body.is-dark .social-link {
@@ -3649,7 +3672,8 @@ body.is-dark .card-badge {
 
   .music-panel.is-collapsed {
     width: min(680px, calc(100vw - 28px));
-    max-height: var(--utility-button-size);
+    height: var(--utility-button-size, 46px);
+    max-height: var(--utility-button-size, 46px);
   }
 
   .music-titlebar {

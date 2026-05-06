@@ -190,6 +190,7 @@ let currentlyPlayingTrack = null;
 let isMusicShuffleEnabled = false;
 let startPanelCloseTimer = null;
 let startKeyboardActiveIndex = -1;
+let musicKeyboardActiveIndex = -1;
 
 function normalizeMusicAssetPath(src) {
   return (src || "")
@@ -1854,6 +1855,56 @@ function setActiveMusicTrackButton(track) {
   });
 }
 
+function getMusicTrackButtons() {
+  return Array.from(musicTrackList?.querySelectorAll(".music-track-item") || []);
+}
+
+function setKeyboardActiveMusicTrackButton(button, { syncIndex = false } = {}) {
+  const buttons = getMusicTrackButtons();
+
+  buttons.forEach((item) => {
+    item.classList.toggle("is-keyboard-active", item === button);
+  });
+
+  if (syncIndex) {
+    musicKeyboardActiveIndex = button ? buttons.indexOf(button) : -1;
+  }
+
+  if (button) {
+    button.scrollIntoView({ block: "nearest" });
+  }
+}
+
+function moveMusicTrackSelection(direction) {
+  const buttons = getMusicTrackButtons();
+
+  if (!buttons.length) {
+    musicKeyboardActiveIndex = -1;
+    return;
+  }
+
+  const activeButton = musicKeyboardActiveIndex >= 0 ? buttons[musicKeyboardActiveIndex] : null;
+  const currentIndex = buttons.indexOf(activeButton);
+  const nextIndex = currentIndex < 0
+    ? 0
+    : (currentIndex + direction + buttons.length) % buttons.length;
+
+  musicPanel?.classList.add("is-keyboard-navigating");
+  musicKeyboardActiveIndex = nextIndex;
+  setKeyboardActiveMusicTrackButton(buttons[nextIndex]);
+  musicSearchInput?.focus({ preventScroll: true });
+}
+
+function playKeyboardActiveMusicTrack() {
+  const activeButton = getMusicTrackButtons()[musicKeyboardActiveIndex] || getMusicTrackButtons()[0];
+
+  if (!activeButton) {
+    return;
+  }
+
+  activeButton.click();
+}
+
 function playNextMusicTrack() {
   const nextTrack = getNextMusicTrack();
   if (!nextTrack) {
@@ -2000,7 +2051,12 @@ function populateMusicTracks() {
     btn.dataset.trackLabel = track.label;
     
     // Direct event assignment for compatibility
-    btn.onmouseenter = () => updateMusicUI(track);
+    btn.onmouseenter = () => {
+      musicPanel?.classList.remove("is-keyboard-navigating");
+      setKeyboardActiveMusicTrackButton(btn, { syncIndex: true });
+      updateMusicUI(track);
+    };
+    btn.onfocus = () => setKeyboardActiveMusicTrackButton(btn, { syncIndex: true });
     btn.onmouseleave = () => updateMusicUI(currentlyPlayingTrack);
     btn.onclick = () => {
       currentlyPlayingTrack = track;
@@ -2019,6 +2075,7 @@ function populateMusicTracks() {
   }
 
   setActiveMusicTrackButton(currentlyPlayingTrack);
+  setKeyboardActiveMusicTrackButton(getMusicTrackButtons()[0] || null, { syncIndex: true });
 }
 
 function playSelectedMusic() {
@@ -3769,6 +3826,44 @@ function handleStartSearchKeydown(event) {
 }
 
 window.addEventListener("keydown", handleStartSearchKeydown, true);
+
+function handleMusicSearchKeydown(event) {
+  if (!musicPanel || musicPanel.classList.contains("is-collapsed") || event.isComposing) {
+    return;
+  }
+
+  const navigationKey = getStartNavigationKey(event);
+  if (!navigationKey) {
+    return;
+  }
+
+  const eventCameFromMusicPanel = musicPanel.contains(event.target);
+  const targetIsEditable = event.target?.matches?.("input, textarea, select, [contenteditable='true']");
+
+  if (!eventCameFromMusicPanel || (targetIsEditable && event.target !== musicSearchInput)) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation?.();
+
+  if (navigationKey === "down") {
+    moveMusicTrackSelection(1);
+    return;
+  }
+
+  if (navigationKey === "up") {
+    moveMusicTrackSelection(-1);
+    return;
+  }
+
+  if (navigationKey === "enter") {
+    playKeyboardActiveMusicTrack();
+  }
+}
+
+window.addEventListener("keydown", handleMusicSearchKeydown, true);
 
 restartButton?.addEventListener("click", () => {
   closeStartPanel();
