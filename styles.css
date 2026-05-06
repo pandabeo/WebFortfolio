@@ -735,7 +735,7 @@ body.is-dark .music-info-value {
 
 .music-transport {
   display: grid;
-  grid-template-columns: 60px minmax(180px, 1fr) 60px 104px;
+  grid-template-columns: 60px minmax(180px, 1fr) 60px 70px 104px;
   gap: 10px;
   align-items: center;
   min-height: 42px;
@@ -770,11 +770,13 @@ body.is-dark .music-info-value {
   display: contents;
 }
 
-.music-loop-button {
+.music-loop-button,
+.music-shuffle-button {
   width: 60px;
 }
 
-.music-loop-button.is-active {
+.music-loop-button.is-active,
+.music-shuffle-button.is-active {
   background: linear-gradient(180deg, #7da0dd 0%, #dfefff 48%, #fff 100%);
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 1px 0 #fff;
   color: #000;
@@ -3522,7 +3524,8 @@ body.is-dark .card-badge {
   }
 
   .music-round-button,
-  .music-loop-button {
+  .music-loop-button,
+  .music-shuffle-button {
     width: 64px;
     height: 28px;
     border-radius: 14px;

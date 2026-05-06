@@ -40,6 +40,7 @@ const musicProgress = document.querySelector(".music-progress span");
 const musicProgressBar = document.querySelector(".music-progress");
 const musicTimeDisplay = document.querySelector("#music-time");
 const musicLoopToggle = document.querySelector("#music-loop-toggle");
+const musicShuffleToggle = document.querySelector("#music-shuffle-toggle");
 const crtToggleButton = document.querySelector("#crt-toggle");
 const wallpaperToggleButton = document.querySelector("#wallpaper-toggle");
 const startButton = document.querySelector("#start-button");
@@ -107,7 +108,83 @@ let MUSIC_TRACKS = [
   }
 ];
 
+MUSIC_TRACKS = [
+  {
+    label: "Ca Hoi Hoang - 2004",
+    src: "playlists/songs/Cá Hồi Hoang - 2004/2004.mp3",
+    cover: "playlists/songs/Cá Hồi Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
+    duration: "4:15"
+  },
+  {
+    label: "Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS",
+    src: "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/悲しみがとまらないI CAN'T STOP THE LONELINESS.mp3",
+    cover: "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/1900x1900-000000-80-0-0.jpg",
+    duration: ""
+  },
+  {
+    label: "Low Roar - Bones",
+    src: "playlists/songs/Low Roar - Bones/Low Roar - Bones (feat. Jófríõur Ákadóttir) [Official Music Video].mp3",
+    cover: "playlists/songs/Low Roar - Bones/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
+    duration: ""
+  },
+  {
+    label: "Low Roar - Don't Be So Serious",
+    src: "playlists/songs/Low Roar - Don't Be So Serious/Don't Be so Serious.mp3",
+    cover: "playlists/songs/Low Roar - Don't Be So Serious/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
+    duration: ""
+  },
+  {
+    label: "Magnolian - Indigo",
+    src: "playlists/songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
+    cover: "playlists/songs/Magnolian - Indigo/IndigoCoverArt.jpg",
+    duration: "5:07"
+  },
+  {
+    label: "Mariya Takeuchi - Plastic Love",
+    src: "playlists/songs/Mariya Takeuchi - Plastic Love/竹内まりや -  Plastic Love (Official Music Video).mp3",
+    cover: "playlists/songs/Mariya Takeuchi - Plastic Love/r-20684092-1635474559-1118-jpeg.webp",
+    duration: ""
+  },
+  {
+    label: "Meiko Nakahara - Fantasy",
+    src: "playlists/songs/Meiko Nakahara - Fantasy/Meiko Nakahara - Fantasy (1982).mp3",
+    cover: "playlists/songs/Meiko Nakahara - Fantasy/images.jpg",
+    duration: ""
+  },
+  {
+    label: "Phung Khanh Linh - Em Dau",
+    src: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/PHÙNG KHÁNH LINH  EM ĐAU (WITH THÀNH LUKE) (LYRIC VIDEO).mp3",
+    cover: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
+    duration: "4:30"
+  },
+  {
+    label: "Thanh Luke - Canh Tiep Theo",
+    src: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
+    cover: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
+    duration: "4:20"
+  },
+  {
+    label: "Thanh Luke - Cung",
+    src: "playlists/songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
+    cover: "playlists/songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
+    duration: "3:00"
+  },
+  {
+    label: "Vaundy - Odoriko",
+    src: "playlists/songs/Vaundy - Odoriko/Vaundy - Odoriko (踊り子) (Lyrics) (RomEng).mp3",
+    cover: "playlists/songs/Vaundy - Odoriko/Vaundy_-_Odoriko.png",
+    duration: ""
+  },
+  {
+    label: "Yasuha - Flyday Chinatown",
+    src: "playlists/songs/Yasuha - Flyday Chinatown/フライディチャイナタウン 泰葉 Official Lyric Video.mp3",
+    cover: "playlists/songs/Yasuha - Flyday Chinatown/0x1900-000000-80-0-0.jpg",
+    duration: ""
+  }
+];
+
 let currentlyPlayingTrack = null;
+let isMusicShuffleEnabled = false;
 let startPanelCloseTimer = null;
 
 function normalizeMusicAssetPath(src) {
@@ -163,7 +240,7 @@ async function loadMusicManifest() {
           type: track.type || "audio",
           soundcloudUrl: track.soundcloudUrl
         };
-      });
+      }).sort(compareMusicTracksByLabel);
       populateMusicTracks();
     }
   } catch (error) {
@@ -1688,6 +1765,62 @@ function updateMusicDurationDisplay(duration) {
   }
 }
 
+function compareMusicTracksByLabel(a, b) {
+  return (a.label || "").localeCompare(b.label || "", undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+}
+
+function getPlayableMusicTracks() {
+  return MUSIC_TRACKS.filter((track) => (track.src || track.soundcloudUrl) && track.label);
+}
+
+function getNextMusicTrack() {
+  const tracks = getPlayableMusicTracks();
+  if (tracks.length === 0) {
+    return null;
+  }
+
+  if (!currentlyPlayingTrack) {
+    return tracks[0];
+  }
+
+  if (isMusicShuffleEnabled && tracks.length > 1) {
+    const currentIndex = tracks.indexOf(currentlyPlayingTrack);
+    let nextIndex = currentIndex;
+
+    while (nextIndex === currentIndex) {
+      nextIndex = Math.floor(Math.random() * tracks.length);
+    }
+
+    return tracks[nextIndex];
+  }
+
+  const currentIndex = tracks.indexOf(currentlyPlayingTrack);
+  const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % tracks.length;
+  return tracks[nextIndex];
+}
+
+function setActiveMusicTrackButton(track) {
+  const list = document.getElementById("music-track-list");
+  if (!list) return;
+
+  Array.from(list.children).forEach((child) => {
+    child.classList.toggle("is-active", child.dataset.trackLabel === track?.label);
+  });
+}
+
+function playNextMusicTrack() {
+  const nextTrack = getNextMusicTrack();
+  if (!nextTrack) {
+    return;
+  }
+
+  setMusicSource(nextTrack);
+  setActiveMusicTrackButton(nextTrack);
+}
+
 function getMediaAssetUrl(src) {
   if (!src || src.startsWith("http")) {
     return src || "";
@@ -1805,6 +1938,7 @@ function populateMusicTracks() {
   if (!list) return;
 
   list.innerHTML = "";
+  MUSIC_TRACKS = MUSIC_TRACKS.sort(compareMusicTracksByLabel);
   MUSIC_TRACKS.forEach((track) => {
     if ((!track.src && !track.soundcloudUrl) || !track.label) {
       return;
@@ -1814,6 +1948,7 @@ function populateMusicTracks() {
     btn.className = "music-track-item";
     btn.type = "button";
     btn.textContent = track.label;
+    btn.dataset.trackLabel = track.label;
     
     // Direct event assignment for compatibility
     btn.onmouseenter = () => updateMusicUI(track);
@@ -1821,8 +1956,7 @@ function populateMusicTracks() {
     btn.onclick = () => {
       currentlyPlayingTrack = track;
       setMusicSource(track);
-      Array.from(list.children).forEach(child => child.classList.remove("is-active"));
-      btn.classList.add("is-active");
+      setActiveMusicTrackButton(track);
     };
     
     list.appendChild(btn);
@@ -3354,6 +3488,7 @@ musicPlayToggle?.addEventListener("click", () => {
   const hasSoundCloud = currentlyPlayingTrack?.type === "soundcloud";
 
   if (!hasAudioSrc && !hasSoundCloud) {
+    playNextMusicTrack();
     return;
   }
 
@@ -3417,6 +3552,10 @@ musicAudio?.addEventListener("timeupdate", () => {
   }
 });
 
+musicAudio?.addEventListener("ended", () => {
+  playNextMusicTrack();
+});
+
 function formatMusicTime(seconds) {
   if (!seconds || isNaN(seconds)) return "0:00";
   const m = Math.floor(seconds / 60);
@@ -3438,6 +3577,20 @@ musicLoopToggle?.addEventListener("click", () => {
   musicAudio.loop = !musicAudio.loop;
   musicLoopToggle.classList.toggle("is-active", musicAudio.loop);
   musicLoopToggle.title = musicAudio.loop ? "Disable loop" : "Enable loop";
+  musicLoopToggle.setAttribute(
+    "aria-label",
+    musicAudio.loop ? "Disable loop" : "Enable loop"
+  );
+});
+
+musicShuffleToggle?.addEventListener("click", () => {
+  isMusicShuffleEnabled = !isMusicShuffleEnabled;
+  musicShuffleToggle.classList.toggle("is-active", isMusicShuffleEnabled);
+  musicShuffleToggle.title = isMusicShuffleEnabled ? "Disable shuffle" : "Enable shuffle";
+  musicShuffleToggle.setAttribute(
+    "aria-label",
+    isMusicShuffleEnabled ? "Disable shuffle" : "Enable shuffle"
+  );
 });
 
 documentItems.forEach((item) => {

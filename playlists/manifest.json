@@ -11,10 +11,40 @@
           "duration": "4:15"
         },
         {
+          "label": "Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS",
+          "file": "songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/悲しみがとまらないI CAN'T STOP THE LONELINESS.mp3",
+          "cover": "songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/1900x1900-000000-80-0-0.jpg",
+          "duration": ""
+        },
+        {
+          "label": "Low Roar - Bones",
+          "file": "songs/Low Roar - Bones/Low Roar - Bones (feat. Jófríõur Ákadóttir) [Official Music Video].mp3",
+          "cover": "songs/Low Roar - Bones/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
+          "duration": ""
+        },
+        {
+          "label": "Low Roar - Don't Be So Serious",
+          "file": "songs/Low Roar - Don't Be So Serious/Don't Be so Serious.mp3",
+          "cover": "songs/Low Roar - Don't Be So Serious/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
+          "duration": ""
+        },
+        {
           "label": "Magnolian - Indigo",
           "file": "songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
           "cover": "songs/Magnolian - Indigo/IndigoCoverArt.jpg",
           "duration": "5:07"
+        },
+        {
+          "label": "Mariya Takeuchi - Plastic Love",
+          "file": "songs/Mariya Takeuchi - Plastic Love/竹内まりや -  Plastic Love (Official Music Video).mp3",
+          "cover": "songs/Mariya Takeuchi - Plastic Love/r-20684092-1635474559-1118-jpeg.webp",
+          "duration": ""
+        },
+        {
+          "label": "Meiko Nakahara - Fantasy",
+          "file": "songs/Meiko Nakahara - Fantasy/Meiko Nakahara - Fantasy (1982).mp3",
+          "cover": "songs/Meiko Nakahara - Fantasy/images.jpg",
+          "duration": ""
         },
         {
           "label": "Phung Khanh Linh - Em Dau",
@@ -23,16 +53,28 @@
           "duration": "4:30"
         },
         {
+          "label": "Thanh Luke - Canh Tiep Theo",
+          "file": "songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
+          "cover": "songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
+          "duration": "4:20"
+        },
+        {
           "label": "Thanh Luke - Cung",
           "file": "songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
           "cover": "songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
           "duration": "3:00"
         },
         {
-          "label": "Thanh Luke - Canh Tiep Theo",
-          "file": "songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
-          "cover": "songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
-          "duration": "4:20"
+          "label": "Vaundy - Odoriko",
+          "file": "songs/Vaundy - Odoriko/Vaundy - Odoriko (踊り子) (Lyrics) (RomEng).mp3",
+          "cover": "songs/Vaundy - Odoriko/Vaundy_-_Odoriko.png",
+          "duration": ""
+        },
+        {
+          "label": "Yasuha - Flyday Chinatown",
+          "file": "songs/Yasuha - Flyday Chinatown/フライディチャイナタウン 泰葉 Official Lyric Video.mp3",
+          "cover": "songs/Yasuha - Flyday Chinatown/0x1900-000000-80-0-0.jpg",
+          "duration": ""
         }
       ]
     }
