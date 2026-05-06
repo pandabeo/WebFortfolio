@@ -31,7 +31,7 @@
     <link rel="dns-prefetch" href="//github.com" />
     <link rel="dns-prefetch" href="//objects.githubusercontent.com" />
     <link rel="dns-prefetch" href="//html-classic.itch.zone" />
-    <link rel="stylesheet" href="styles.css?v=20260506-music-shuffle-loop" />
+    <link rel="stylesheet" href="styles.css?v=20260506-start-keyboard-index" />
     <script src="https://w.soundcloud.com/player/api.js"></script>
   </head>
   <body class="crt-disabled">
@@ -68,8 +68,14 @@
             <span class="music-track-title" id="music-track-title">No track selected</span>
           </div>
           <div class="music-shell">
-            <nav class="music-sidebar" id="music-track-list" aria-label="Available music tracks">
-            </nav>
+            <aside class="music-sidebar" aria-label="Music library">
+              <label class="music-search" for="music-search-input">
+                <span class="music-search-label">Search</span>
+                <input id="music-search-input" class="music-search-input" type="search" placeholder="Song name..." autocomplete="off" />
+              </label>
+              <nav class="music-track-list" id="music-track-list" aria-label="Available music tracks">
+              </nav>
+            </aside>
             <div class="music-main">
               <div class="music-now" id="music-now-container">
                 <img id="music-cover-art" class="music-cover-art" src="assets/wallpaper/kojima-please-hire-me.png" alt="Album cover" />
@@ -772,6 +778,10 @@
         <div class="start-panel-header">
           <span>thinh</span>
         </div>
+        <label class="start-search" for="start-search-input">
+          <span class="start-search-label">Search</span>
+          <input id="start-search-input" class="start-search-input" type="search" placeholder="Find app..." autocomplete="off" />
+        </label>
         <div class="start-panel-body">
           <button class="start-menu-item" type="button" data-target-window="about-window">
             <img class="start-menu-icon" src="assets/xp-icons/about.ico" alt="" aria-hidden="true" />
@@ -794,6 +804,7 @@
             <span>contact</span>
           </button>
         </div>
+        <div class="start-search-results" id="start-search-results" aria-live="polite"></div>
         <div class="start-panel-footer">
           <button class="start-menu-item start-menu-item-restart" id="restart-button" type="button" aria-label="Restart">
             <img class="start-menu-icon" src="assets/xp-icons/restart.ico" alt="" aria-hidden="true" />
@@ -839,6 +850,6 @@
   }
 </script>
 <script src="assets/pdf-previews/manifest.js"></script>
-<script src="script.js?v=20260506-music-shuffle-loop"></script>
+<script src="script.js?v=20260506-start-keyboard-index"></script>
   </body>
 </html>

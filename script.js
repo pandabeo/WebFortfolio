@@ -30,6 +30,7 @@ const resetLayoutButton = document.querySelector(".reset-layout-button");
 const themeToggleButton = document.querySelector("#theme-toggle");
 const soundToggleButton = document.querySelector("#sound-toggle");
 const musicTrackList = document.querySelector("#music-track-list");
+const musicSearchInput = document.querySelector("#music-search-input");
 const musicPlayToggle = document.querySelector("#music-play-toggle");
 const musicVolume = document.querySelector("#music-volume");
 const musicAudio = document.querySelector("#music-audio");
@@ -46,6 +47,8 @@ const wallpaperToggleButton = document.querySelector("#wallpaper-toggle");
 const startButton = document.querySelector("#start-button");
 const startPanel = document.querySelector("#start-panel");
 const startPanelHeader = document.querySelector(".start-panel-header");
+const startSearchInput = document.querySelector("#start-search-input");
+const startSearchResults = document.querySelector("#start-search-results");
 const restartButton = document.querySelector("#restart-button");
 const taskbarTabs = document.querySelector("#taskbar-tabs");
 const taskbarClock = document.querySelector("#taskbar-clock");
@@ -186,6 +189,7 @@ MUSIC_TRACKS = [
 let currentlyPlayingTrack = null;
 let isMusicShuffleEnabled = false;
 let startPanelCloseTimer = null;
+let startKeyboardActiveIndex = -1;
 
 function normalizeMusicAssetPath(src) {
   return (src || "")
@@ -1776,6 +1780,45 @@ function getPlayableMusicTracks() {
   return MUSIC_TRACKS.filter((track) => (track.src || track.soundcloudUrl) && track.label);
 }
 
+function normalizeMusicSearchText(value = "") {
+  return value
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function getSearchTokens(value = "") {
+  return normalizeMusicSearchText(value).split(/\s+/).filter(Boolean);
+}
+
+function doesSearchTextMatch(searchText, searchQuery) {
+  const tokens = getSearchTokens(searchQuery);
+
+  if (!tokens.length) {
+    return true;
+  }
+
+  const normalizedText = normalizeMusicSearchText(searchText);
+  const textTokens = normalizedText.split(/\s+/).filter(Boolean);
+  const compactText = textTokens.join("");
+
+  return tokens.every((token) => {
+    return textTokens.some((textToken) => textToken.startsWith(token))
+      || (token.length >= 4 && compactText.includes(token));
+  });
+}
+
+function getMusicSearchText(track) {
+  const label = track?.label || "";
+  const [artist = "", title = ""] = label.includes(" - ") ? label.split(" - ") : ["", label];
+  return `${label} ${artist} ${title}`;
+}
+
 function getNextMusicTrack() {
   const tracks = getPlayableMusicTracks();
   if (tracks.length === 0) {
@@ -1937,12 +1980,18 @@ function populateMusicTracks() {
   const list = document.getElementById("music-track-list");
   if (!list) return;
 
+  const searchQuery = normalizeMusicSearchText(musicSearchInput?.value || "");
   list.innerHTML = "";
   MUSIC_TRACKS = MUSIC_TRACKS.sort(compareMusicTracksByLabel);
-  MUSIC_TRACKS.forEach((track) => {
+  const visibleTracks = MUSIC_TRACKS.filter((track) => {
     if ((!track.src && !track.soundcloudUrl) || !track.label) {
-      return;
+      return false;
     }
+
+    return !searchQuery || doesSearchTextMatch(getMusicSearchText(track), searchQuery);
+  });
+
+  visibleTracks.forEach((track) => {
 
     const btn = document.createElement("button");
     btn.className = "music-track-item";
@@ -1961,6 +2010,15 @@ function populateMusicTracks() {
     
     list.appendChild(btn);
   });
+
+  if (visibleTracks.length === 0) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "music-track-empty";
+    emptyState.textContent = searchQuery ? "No matching songs" : "No songs available";
+    list.appendChild(emptyState);
+  }
+
+  setActiveMusicTrackButton(currentlyPlayingTrack);
 }
 
 function playSelectedMusic() {
@@ -2985,12 +3043,18 @@ function closeStartPanel() {
   startPanel.classList.remove("is-opening");
   startPanel.classList.add("is-closing");
   startButton?.setAttribute("aria-expanded", "false");
+  startPanel.classList.remove("is-keyboard-navigating");
+  setActiveStartSearchOption(null, { syncIndex: true });
 
   startPanelCloseTimer = window.setTimeout(() => {
     startPanel.classList.add("is-hidden");
     startPanel.classList.remove("is-closing");
     startPanelCloseTimer = null;
   }, START_PANEL_CLOSE_ANIMATION_MS);
+}
+
+function isStartPanelOpen() {
+  return Boolean(startPanel && !startPanel.classList.contains("is-hidden") && !startPanel.classList.contains("is-closing"));
 }
 
 function toggleStartPanel() {
@@ -3017,7 +3081,232 @@ function toggleStartPanel() {
 
   if (willOpen) {
     restoreStoredPanelPosition(startPanel);
+    startSearchInput?.focus({ preventScroll: true });
+    setActiveStartSearchOption(getStartSearchOptions()[0] || null, { syncIndex: true });
   }
+}
+
+function filterStartMenuItems() {
+  if (!startPanel) {
+    return;
+  }
+
+  const searchQuery = normalizeMusicSearchText(startSearchInput?.value || "");
+  let visibleAppCount = 0;
+
+  startPanel.querySelectorAll(".start-panel-body .start-menu-item").forEach((item) => {
+    const label = normalizeMusicSearchText(item.textContent || "");
+    const isVisible = !searchQuery || label.includes(searchQuery);
+    item.hidden = !isVisible;
+    if (isVisible) {
+      visibleAppCount += 1;
+    }
+  });
+
+  renderStartSearchResults(searchQuery, visibleAppCount);
+  setActiveStartSearchOption(getStartSearchOptions()[0] || null, { syncIndex: true });
+}
+
+function getStartSearchOptions() {
+  if (!startPanel) {
+    return [];
+  }
+
+  return Array.from(startPanel.querySelectorAll(".start-panel-body .start-menu-item:not([hidden]), .start-search-result"));
+}
+
+function setActiveStartSearchOption(option, { syncIndex = false } = {}) {
+  const options = getStartSearchOptions();
+
+  options.forEach((item) => {
+    item.classList.toggle("is-keyboard-active", item === option);
+  });
+
+  if (syncIndex) {
+    startKeyboardActiveIndex = option ? options.indexOf(option) : -1;
+  }
+
+  if (option) {
+    option.scrollIntoView({ block: "nearest" });
+  }
+}
+
+function getActiveStartSearchOption() {
+  return startPanel?.querySelector(".start-menu-item.is-keyboard-active, .start-search-result.is-keyboard-active") || null;
+}
+
+function moveStartSearchSelection(direction) {
+  const options = getStartSearchOptions();
+
+  if (!options.length) {
+    startKeyboardActiveIndex = -1;
+    return;
+  }
+
+  const activeIndex = startKeyboardActiveIndex >= 0
+    ? startKeyboardActiveIndex
+    : options.indexOf(getActiveStartSearchOption());
+  const nextIndex = activeIndex < 0
+    ? 0
+    : (activeIndex + direction + options.length) % options.length;
+
+  startPanel?.classList.add("is-keyboard-navigating");
+  startKeyboardActiveIndex = nextIndex;
+  setActiveStartSearchOption(options[nextIndex]);
+  startSearchInput?.focus({ preventScroll: true });
+}
+
+function getStartNavigationKey(event) {
+  const key = event.key || "";
+  const code = event.code || "";
+  const keyCode = event.keyCode || event.which || 0;
+
+  if (key === "ArrowDown" || key === "Down" || code === "ArrowDown" || keyCode === 40) {
+    return "down";
+  }
+
+  if (key === "ArrowUp" || key === "Up" || code === "ArrowUp" || keyCode === 38) {
+    return "up";
+  }
+
+  if (key === "Enter" || code === "Enter" || code === "NumpadEnter" || keyCode === 13) {
+    return "enter";
+  }
+
+  return "";
+}
+
+function createStartSearchResult({ label, category, icon, onClick }) {
+  const button = document.createElement("button");
+  const iconImage = document.createElement("img");
+  const textGroup = document.createElement("span");
+  const labelText = document.createElement("span");
+  const categoryText = document.createElement("span");
+
+  button.className = "start-search-result";
+  button.type = "button";
+  iconImage.className = "start-menu-icon";
+  iconImage.src = icon;
+  iconImage.alt = "";
+  iconImage.setAttribute("aria-hidden", "true");
+  textGroup.className = "start-search-result-text";
+  labelText.textContent = label;
+  categoryText.className = "start-search-result-category";
+  categoryText.textContent = category;
+
+  textGroup.append(labelText, categoryText);
+  button.append(iconImage, textGroup);
+  button.addEventListener("mouseenter", () => {
+    startPanel?.classList.remove("is-keyboard-navigating");
+    setActiveStartSearchOption(button, { syncIndex: true });
+  });
+  button.addEventListener("focus", () => setActiveStartSearchOption(button, { syncIndex: true }));
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+function getDocumentSearchEntries() {
+  return Array.from(documentItems).map((item) => {
+    const targetId = item.dataset.docTarget;
+    const preview = document.querySelector(`.document-preview[data-doc-preview="${targetId}"]`);
+    const itemText = item.textContent || "";
+    const previewText = preview?.textContent || "";
+    const title = item.querySelector("strong")?.textContent?.trim() || preview?.querySelector("h3")?.textContent?.trim() || itemText.trim();
+
+    return {
+      targetId,
+      title,
+      primarySearchText: `${targetId} ${title} ${itemText}`,
+      deepSearchText: `${targetId} ${title} ${itemText} ${previewText}`,
+    };
+  });
+}
+
+function getGameSearchText(gameId, game, searchQuery) {
+  const primaryText = [
+    gameId,
+    game.routeSlug,
+    game.title,
+  ].join(" ");
+
+  if (normalizeMusicSearchText(searchQuery).length < 3) {
+    return primaryText;
+  }
+
+  return [
+    primaryText,
+    game.shortDescription,
+    game.overview,
+    ...(game.actions || []).map((action) => action.label),
+    ...(game.devlog || []).flatMap((entry) => [entry.title, entry.body]),
+  ].join(" ");
+}
+
+function getDocumentSearchText(entry, searchQuery) {
+  return normalizeMusicSearchText(searchQuery).length < 3
+    ? entry.primarySearchText
+    : entry.deepSearchText;
+}
+
+function renderStartSearchResults(searchQuery, visibleAppCount) {
+  if (!startSearchResults) {
+    return;
+  }
+
+  startSearchResults.innerHTML = "";
+
+  if (!searchQuery) {
+    startSearchResults.hidden = true;
+    return;
+  }
+
+  const gameMatches = Object.entries(gameDetails)
+    .filter(([gameId, game]) => {
+      return doesSearchTextMatch(getGameSearchText(gameId, game, searchQuery), searchQuery);
+    })
+    .slice(0, 6);
+
+  const documentMatches = getDocumentSearchEntries()
+    .filter((entry) => doesSearchTextMatch(getDocumentSearchText(entry, searchQuery), searchQuery))
+    .slice(0, 6);
+
+  gameMatches.forEach(([gameId, game]) => {
+    startSearchResults.appendChild(createStartSearchResult({
+      label: game.title,
+      category: "game",
+      icon: "assets/xp-icons/games.ico",
+      onClick: () => {
+        if (!gameDetailWindow) return;
+        renderGameDetail(gameId);
+        showWindow(gameDetailWindow);
+        closeStartPanel();
+      },
+    }));
+  });
+
+  documentMatches.forEach((entry) => {
+    startSearchResults.appendChild(createStartSearchResult({
+      label: entry.title,
+      category: "document",
+      icon: "assets/xp-icons/documents.ico",
+      onClick: () => {
+        const documentWindow = document.querySelector('[data-window-id="document-collection"]');
+        if (!documentWindow) return;
+        setActiveDocumentTarget(entry.targetId);
+        showWindow(documentWindow);
+        closeStartPanel();
+      },
+    }));
+  });
+
+  if (!visibleAppCount && !gameMatches.length && !documentMatches.length) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "start-search-empty";
+    emptyState.textContent = "No results";
+    startSearchResults.appendChild(emptyState);
+  }
+
+  startSearchResults.hidden = false;
 }
 
 function stopDragging() {
@@ -3421,6 +3710,66 @@ startPanel?.addEventListener("click", (event) => {
   event.stopPropagation();
 });
 
+startPanel?.addEventListener("mouseover", (event) => {
+  const option = event.target.closest(".start-panel-body .start-menu-item:not([hidden]), .start-search-result");
+  if (option) {
+    startPanel.classList.remove("is-keyboard-navigating");
+    setActiveStartSearchOption(option, { syncIndex: true });
+  }
+});
+
+startPanel?.addEventListener("focusin", (event) => {
+  const option = event.target.closest(".start-panel-body .start-menu-item:not([hidden]), .start-search-result");
+  if (option) {
+    setActiveStartSearchOption(option, { syncIndex: true });
+  }
+});
+
+startSearchInput?.addEventListener("input", filterStartMenuItems);
+
+function handleStartSearchKeydown(event) {
+  if (!isStartPanelOpen() || event.isComposing) {
+    return;
+  }
+
+  const navigationKey = getStartNavigationKey(event);
+  if (!navigationKey) {
+    return;
+  }
+
+  const targetIsEditable = event.target?.matches?.("input, textarea, select, [contenteditable='true']");
+  const eventCameFromStart = startPanel.contains(event.target);
+
+  if (targetIsEditable && !eventCameFromStart) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation?.();
+
+  if (navigationKey === "down") {
+    moveStartSearchSelection(1);
+    return;
+  }
+
+  if (navigationKey === "up") {
+    moveStartSearchSelection(-1);
+    return;
+  }
+
+  if (navigationKey === "enter") {
+    const activeOption = getActiveStartSearchOption() || getStartSearchOptions()[0];
+    if (!activeOption) {
+      return;
+    }
+
+    activeOption.click();
+  }
+}
+
+window.addEventListener("keydown", handleStartSearchKeydown, true);
+
 restartButton?.addEventListener("click", () => {
   closeStartPanel();
   clearStoredPanelPositions();
@@ -3744,6 +4093,8 @@ document.addEventListener("pointerdown", (event) => {
 
   closeMusicPanel();
 });
+
+musicSearchInput?.addEventListener("input", populateMusicTracks);
 
 window.addEventListener("pageshow", () => {
   document.body.classList.remove("is-transitioning");
