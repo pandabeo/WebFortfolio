@@ -17,6 +17,7 @@
   --parallax-x: 0px;
   --parallax-y: 0px;
   --taskbar-height: 42px;
+  --mobile-keyboard-inset: 0px;
   --utility-button-size: 48px;
   --utility-control-top: 18px;
   --fullscreen-window-top: 80px;
@@ -2777,7 +2778,7 @@ body.is-dark .game-detail-devlog-heading span {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: var(--mobile-keyboard-inset);
   z-index: 9000;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -2793,7 +2794,7 @@ body.is-dark .game-detail-devlog-heading span {
 .start-panel {
   position: fixed;
   left: 8px;
-  bottom: calc(var(--taskbar-height) + 6px);
+  bottom: calc(var(--mobile-keyboard-inset) + var(--taskbar-height) + 6px);
   z-index: 8999;
   width: min(280px, calc(100vw - 16px));
   border-top: 1px solid #ffffff;
@@ -4188,7 +4189,7 @@ body.is-dark .card-badge {
 
   .start-panel {
     left: 6px;
-    bottom: calc(var(--taskbar-height) + 4px);
+    bottom: calc(var(--mobile-keyboard-inset) + var(--taskbar-height) + 4px);
     width: min(240px, calc(100vw - 12px));
   }
 

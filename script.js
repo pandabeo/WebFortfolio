@@ -727,6 +727,22 @@ function canDragWindows() {
   return desktopModeQuery.matches && finePointerQuery.matches;
 }
 
+function isTouchLikePointer() {
+  return !finePointerQuery.matches;
+}
+
+function getViewportKeyboardInset() {
+  if (!window.visualViewport) {
+    return 0;
+  }
+
+  return Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+}
+
+function syncViewportInsets() {
+  document.documentElement.style.setProperty("--mobile-keyboard-inset", `${Math.round(getViewportKeyboardInset())}px`);
+}
+
 function playButtonClickSound() {
   if (isMuted) {
     return;
@@ -3137,8 +3153,11 @@ function toggleStartPanel() {
   startButton.setAttribute("aria-expanded", String(willOpen));
 
   if (willOpen) {
+    syncViewportInsets();
     restoreStoredPanelPosition(startPanel);
-    startSearchInput?.focus({ preventScroll: true });
+    if (!isTouchLikePointer()) {
+      startSearchInput?.focus({ preventScroll: true });
+    }
     setActiveStartSearchOption(getStartSearchOptions()[0] || null, { syncIndex: true });
   }
 }
@@ -3733,23 +3752,45 @@ desktopModeQuery.addEventListener("change", () => {
 
 finePointerQuery.addEventListener("change", () => {
   stopDragging();
+  syncViewportInsets();
 });
 
-folderShortcuts.forEach((shortcut) => {
-  shortcut.addEventListener("click", (event) => {
-    const targetId = shortcut.dataset.targetWindow;
-    const targetWindow = targetId ? document.querySelector(`[data-window-id="${targetId}"]`) : null;
+function openShortcutWindow(shortcut, event) {
+  const targetId = shortcut.dataset.targetWindow;
+  const targetWindow = targetId ? document.querySelector(`[data-window-id="${targetId}"]`) : null;
 
-    if (!targetWindow) {
+  if (!targetWindow) {
+    return;
+  }
+
+  event?.preventDefault();
+  closeStartPanel();
+  if (shortcut.dataset.gameId) {
+    renderGameDetail(shortcut.dataset.gameId);
+  }
+  showWindow(targetWindow);
+}
+
+folderShortcuts.forEach((shortcut) => {
+  shortcut.addEventListener("pointerup", (event) => {
+    if (event.pointerType === "mouse") {
       return;
     }
 
-    event.preventDefault();
-    closeStartPanel();
-    if (shortcut.dataset.gameId) {
-      renderGameDetail(shortcut.dataset.gameId);
+    shortcut.dataset.touchOpened = "true";
+    window.setTimeout(() => {
+      delete shortcut.dataset.touchOpened;
+    }, 400);
+    openShortcutWindow(shortcut, event);
+  });
+
+  shortcut.addEventListener("click", (event) => {
+    if (shortcut.dataset.touchOpened === "true") {
+      event.preventDefault();
+      return;
     }
-    showWindow(targetWindow);
+
+    openShortcutWindow(shortcut, event);
   });
 });
 
@@ -4188,6 +4229,11 @@ document.addEventListener("pointerdown", (event) => {
 
   closeMusicPanel();
 });
+
+syncViewportInsets();
+window.visualViewport?.addEventListener("resize", syncViewportInsets);
+window.visualViewport?.addEventListener("scroll", syncViewportInsets);
+window.addEventListener("resize", syncViewportInsets);
 
 musicSearchInput?.addEventListener("input", populateMusicTracks);
 
