@@ -137,6 +137,12 @@ MUSIC_TRACKS = [
     duration: ""
   },
   {
+    label: "half alive - Never Been Better",
+    src: "playlists/songs/half·alive - Never Been Better/YTMP3GG_YouTube_half-alive-Never-Been-Better-Audio-ft-Or_Media_gFyn_Dh_fQM_009_128k.mp3",
+    cover: "playlists/songs/half·alive - Never Been Better/images (2).jpg",
+    duration: ""
+  },
+  {
     label: "Magnolian - Indigo",
     src: "playlists/songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
     cover: "playlists/songs/Magnolian - Indigo/IndigoCoverArt.jpg",
