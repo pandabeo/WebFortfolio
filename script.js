@@ -749,6 +749,25 @@ function syncViewportInsets() {
   document.documentElement.style.setProperty("--mobile-keyboard-inset", `${Math.round(getViewportKeyboardInset())}px`);
 }
 
+function isSearchZoomInput(inputEl) {
+  return inputEl === startSearchInput || inputEl === musicSearchInput;
+}
+
+function blurSearchInputOnOutsidePointer(event) {
+  const activeElement = document.activeElement;
+
+  if (!isSearchZoomInput(activeElement) || desktopModeQuery.matches) {
+    return;
+  }
+
+  if (event.target === activeElement || activeElement.contains?.(event.target)) {
+    return;
+  }
+
+  activeElement.blur();
+  window.setTimeout(syncViewportInsets, 0);
+}
+
 function playButtonClickSound() {
   if (isMuted) {
     return;
@@ -3911,6 +3930,8 @@ function handleMusicSearchKeydown(event) {
 }
 
 window.addEventListener("keydown", handleMusicSearchKeydown, true);
+document.addEventListener("pointerdown", blurSearchInputOnOutsidePointer, true);
+document.addEventListener("touchstart", blurSearchInputOnOutsidePointer, true);
 
 restartButton?.addEventListener("click", () => {
   closeStartPanel();
