@@ -244,7 +244,7 @@
                   <strong>itch.io</strong>
                   <span>Published games, prototypes, and playable builds.</span>
                 </a>
-                <a class="quick-link" href="https://www.linkedin.com/in/bui-truong-thinh/" target="_blank" rel="noreferrer">
+                <a class="quick-link" href="https://www.linkedin.com/in/tr%C6%B0%E1%BB%9Dng-th%E1%BB%8Bnh-b%C3%B9i-970433288/" target="_blank" rel="noreferrer">
                   <strong>LinkedIn</strong>
                   <span>Bui Truong Thinh</span>
                 </a>
@@ -349,7 +349,7 @@
               <div class="contact-actions">
                 <a class="contact-button" href="mailto:buitruongthinh2024@gmail.com">Send an Email</a>
                 <a class="contact-button" href="https://pandabeo04.itch.io/" target="_blank" rel="noreferrer">Open itch.io</a>
-                <a class="contact-button" href="https://www.linkedin.com/in/bui-truong-thinh/" target="_blank" rel="noreferrer">Open LinkedIn</a>
+                <a class="contact-button" href="https://www.linkedin.com/in/tr%C6%B0%E1%BB%9Dng-th%E1%BB%8Bnh-b%C3%B9i-970433288/" target="_blank" rel="noreferrer">Open LinkedIn</a>
               </div>
             </div>
           </div>
@@ -436,6 +436,16 @@
             <div class="collection-body xp-content">
               <h3>Game Collection</h3>
               <p>Published work, assignments, and prototypes.</p>
+              <div class="game-filter-bar" role="group" aria-label="Filter games">
+                <button class="game-filter-button is-active" type="button" data-game-filter="all">All</button>
+                <button class="game-filter-button" type="button" data-game-filter="playable">Playable</button>
+                <button class="game-filter-button" type="button" data-game-filter="unity">Unity</button>
+                <button class="game-filter-button" type="button" data-game-filter="2d">2D</button>
+                <button class="game-filter-button" type="button" data-game-filter="3d">3D</button>
+                <button class="game-filter-button" type="button" data-game-filter="narrative">Narrative</button>
+                <button class="game-filter-button" type="button" data-game-filter="downloadable">Downloadable</button>
+              </div>
+              <p class="game-filter-count" data-game-filter-count></p>
               <div class="collection-grid xp-icon-grid">
               <button class="collection-card has-hover-trailer" type="button" data-target-window="game-detail-window" data-game-id="thrifting-101" data-hover-trailer-card="true">
                 <span class="collection-card-media">
@@ -576,6 +586,10 @@
                   <h4>About This Project</h4>
                   <div class="game-detail-meta" data-game-detail-meta></div>
                 </section>
+                <section class="game-detail-section" data-game-detail-case-study-section>
+                  <h4>Case Study</h4>
+                  <div class="game-case-study-grid" data-game-detail-case-study></div>
+                </section>
                 <section class="game-detail-section is-hidden" data-game-detail-trailer-section>
                   <h4>Trailer</h4>
                   <video
@@ -595,15 +609,22 @@
                 </section>
                 <section class="game-detail-section is-hidden" data-game-detail-player-section>
                   <h4>Playable Build</h4>
-                  <iframe
-                    class="game-player-frame"
-                    data-game-detail-frame
-                    src="about:blank"
-                    title=""
-                    loading="lazy"
-                    allow="autoplay; fullscreen *; gamepad; gyroscope; accelerometer; xr-spatial-tracking"
-                    allowfullscreen
-                  ></iframe>
+                  <div class="game-player-shell" data-game-player-shell>
+                    <iframe
+                      class="game-player-frame"
+                      data-game-detail-frame
+                      src="about:blank"
+                      title=""
+                      loading="lazy"
+                      allow="autoplay; fullscreen *; gamepad; gyroscope; accelerometer; xr-spatial-tracking"
+                      allowfullscreen
+                    ></iframe>
+                    <div class="game-player-overlay" data-game-player-overlay>
+                      <strong data-game-player-status>Ready to play</strong>
+                      <span data-game-player-note>Load the browser build when you are ready.</span>
+                      <button class="contact-button game-player-load-button" type="button" data-game-player-load>Play</button>
+                    </div>
+                  </div>
                 </section>
                 <section class="game-detail-section">
                   <div class="game-detail-devlog-heading">
@@ -830,7 +851,7 @@
             <a class="social-link" href="https://www.instagram.com/trngthinh30/" target="_blank" rel="noreferrer" aria-label="Instagram">
               <img class="social-icon" src="assets/old-logos/ins.png" alt="" aria-hidden="true" />
             </a>
-            <a class="social-link" href="https://www.linkedin.com/in/bui-truong-thinh/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+            <a class="social-link" href="https://www.linkedin.com/in/tr%C6%B0%E1%BB%9Dng-th%E1%BB%8Bnh-b%C3%B9i-970433288/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
               <img class="social-icon" src="assets/old-logos/linkedin.png" alt="" aria-hidden="true" />
             </a>
           </div>

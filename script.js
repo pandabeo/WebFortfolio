@@ -62,14 +62,23 @@ const gameDetailTitle = document.querySelector("[data-game-detail-title]");
 const gameDetailDescription = document.querySelector("[data-game-detail-description]");
 const gameDetailMeta = document.querySelector("[data-game-detail-meta]");
 const gameDetailActions = document.querySelector("[data-game-detail-actions]");
+const gameDetailCaseStudySection = document.querySelector("[data-game-detail-case-study-section]");
+const gameDetailCaseStudy = document.querySelector("[data-game-detail-case-study]");
 const gameDetailTrailerSection = document.querySelector("[data-game-detail-trailer-section]");
 const gameDetailTrailer = document.querySelector("[data-game-detail-trailer]");
 const gameDetailStillsSection = document.querySelector("[data-game-detail-stills-section]");
 const gameDetailStills = document.querySelector("[data-game-detail-stills]");
 const gameDetailFrame = document.querySelector("[data-game-detail-frame]");
 const gameDetailPlayerSection = document.querySelector("[data-game-detail-player-section]");
+const gamePlayerShell = document.querySelector("[data-game-player-shell]");
+const gamePlayerOverlay = document.querySelector("[data-game-player-overlay]");
+const gamePlayerStatus = document.querySelector("[data-game-player-status]");
+const gamePlayerNote = document.querySelector("[data-game-player-note]");
+const gamePlayerLoadButton = document.querySelector("[data-game-player-load]");
 const gameDetailDevlog = document.querySelector("[data-game-detail-devlog]");
 const gameDetailCover = document.querySelector(".game-detail-cover");
+const gameFilterButtons = document.querySelectorAll("[data-game-filter]");
+const gameFilterCount = document.querySelector("[data-game-filter-count]");
 const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]");
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
@@ -631,6 +640,75 @@ const gameDetails = {
 
 const gameCollectionOrder = ["thrifting-101", "coy-commute", "ame-no-naka", "d-fishy-finals"];
 
+const gameFilterTags = {
+  "thrifting-101": ["playable", "unity", "2d", "downloadable"],
+  "tales-of-a-playboy": ["playable", "unity", "narrative", "downloadable"],
+  "ame-no-naka": ["playable", "unity", "2d", "narrative", "downloadable"],
+  homeward: ["downloadable", "unity", "2d"],
+  "coy-commute": ["playable", "unity", "2d", "downloadable"],
+  "my-color-is-not-colorfull": ["narrative"],
+  equilibrium: ["playable", "narrative", "downloadable"],
+  "d-fishy-finals": ["downloadable", "narrative"],
+  blocknout: ["3d"],
+  "hours-before-blue": ["downloadable", "narrative"],
+  chaotet: ["downloadable", "3d", "unity"],
+  "into-the-dungeon": ["downloadable", "unity"],
+  "a-game-about-me": ["playable", "narrative", "downloadable"],
+};
+
+const gameCaseStudies = {
+  "thrifting-101": {
+    problem: "Players needed to read messy customer requests and translate unclear taste into outfit choices without turning the loop into a simple checklist.",
+    role: "Designed the request-response loop, outfit scoring logic, customer feedback flow, and Unity UI behavior.",
+    systems: "Weighted preference matching, ScriptableObject-driven outfit data, request constraints, result feedback, and reusable UI state updates.",
+    decisions: "Kept scoring readable through layered feedback: visible customer reactions explain the outcome while still preserving ambiguity in the next request.",
+    result: "A fast browser-playable loop with strong shareability and clear portfolio evidence for gameplay systems work.",
+  },
+  "coy-commute": {
+    problem: "The game needed emotional state changes to affect play without relying on long exposition or heavy tutorial text.",
+    role: "Built and tuned the state-driven gameplay loop, interaction timing, feedback behavior, and Unity implementation.",
+    systems: "Emotion-state parameters, movement response changes, environmental reactions, adaptive ambience, and event-driven feedback hooks.",
+    decisions: "Made emotion legible through feel and pacing: friction, delay, animation, and world response communicate state before UI does.",
+    result: "A polished mentorship project that won 1st Place and People's Choice at Gameloft GameDev Mentorship 2025.",
+  },
+  "ame-no-naka": {
+    problem: "Narrative delivery, exploration, dialogue, and puzzles needed to coexist without constantly taking control away from the player.",
+    role: "Programmed core interaction flows and implemented Unity Visual Scripting graphs for reusable gameplay states.",
+    systems: "Dialogue triggers, interaction graphs, puzzle states, scene transitions, and reusable visual-scripting structures.",
+    decisions: "Used modular graph patterns so narrative beats could be placed and iterated without rewriting the underlying interaction logic.",
+    result: "A complete story-driven platformer project with clearer production structure and reusable implementation patterns.",
+  },
+  "tales-of-a-playboy": {
+    problem: "The browser build needed to present a character-led adventure clearly while leaving room for future production notes.",
+    role: "Prepared the web presentation, playable embed, trailer context, and project metadata for portfolio review.",
+    systems: "Unity WebGL delivery, project actions, trailer preview, and detail-page rendering.",
+    decisions: "Grouped playable access, media, and design notes in one focused view so the project is easy to scan before launching.",
+    result: "A browser-ready project page that can grow into a fuller postmortem as more notes are added.",
+  },
+  equilibrium: {
+    problem: "A branching reading experience needed clear presentation despite having lighter technical systems than the Unity projects.",
+    role: "Positioned the work as a narrative/browser piece and connected the playable build with supporting context.",
+    systems: "Twine branching structure, browser embed, and external release/download links.",
+    decisions: "Focused the case study around reading flow and narrative choice rather than forcing it into an action-game systems frame.",
+    result: "A compact narrative project entry that still communicates format, intent, and access path.",
+  },
+  "a-game-about-me": {
+    problem: "The project needed to communicate a personal narrative format while supporting both browser and Windows access.",
+    role: "Structured the portfolio entry, playable embed, downloadable build link, and trailer media.",
+    systems: "HTML5 build presentation, downloadable release path, and trailer/detail rendering.",
+    decisions: "Kept the page centered on quick access first, then supporting context, so viewers can try the work without extra navigation.",
+    result: "A playable narrative entry with clear platform options and room for future process notes.",
+  },
+};
+
+const defaultGameCaseStudy = {
+  problem: "The project needed a compact portfolio presentation that explains format, contribution, and access path without overwhelming the collection view.",
+  role: "Prepared the project metadata, media, release links, and detail-page structure.",
+  systems: "Project routing, trailer/still rendering, release actions, and reusable game detail UI.",
+  decisions: "Kept the detail page consistent across playable and downloadable projects so each entry remains comparable.",
+  result: "A clearer project page that can be expanded with deeper production notes when more material is available.",
+};
+
 function getGameRouteSlug(gameId) {
   if (!gameId || !gameDetails[gameId]) {
     return "";
@@ -706,8 +784,10 @@ const PANEL_GAP = 18;
 const PANEL_SEARCH_STEP = 18;
 const PANEL_POSITION_STORAGE_KEY = "webportfolio.panel-positions.v1";
 const WALLPAPER_STORAGE_KEY = "webportfolio.wallpaper.v1";
+const MEDIA_VOLUME_STORAGE_KEY = "webportfolio.media-volumes.v1";
 const TASKBAR_DRAG_THRESHOLD = 6;
 const DEFAULT_DOCUMENT_TARGET = "doc-analysis";
+const mediaVolumeBySource = loadStoredMediaVolumes();
 
 let activeTaskbarDrag = null;
 
@@ -716,17 +796,100 @@ function forceVideoMuted(videoEl) {
     return;
   }
 
-  if (typeof videoEl.volume === "number" && videoEl.volume > 0) {
-    mediaVolumeMemory.set(videoEl, videoEl.volume);
+  const rememberedVolume = getRememberedMediaVolume(videoEl);
+
+  if (Number.isFinite(rememberedVolume)) {
+    mediaVolumeMemory.set(videoEl, rememberedVolume);
+  } else if (typeof videoEl.volume === "number" && videoEl.volume > 0) {
+    storeMediaVolume(videoEl, videoEl.volume);
   }
 
+  videoEl.dataset.suppressVolumeMemory = "true";
   videoEl.muted = true;
   videoEl.defaultMuted = true;
   videoEl.setAttribute("muted", "");
+  window.setTimeout(() => {
+    delete videoEl.dataset.suppressVolumeMemory;
+  }, 0);
 }
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function loadStoredMediaVolumes() {
+  try {
+    const storedVolumes = JSON.parse(window.localStorage.getItem(MEDIA_VOLUME_STORAGE_KEY) || "{}");
+
+    return new Map(
+      Object.entries(storedVolumes).filter(([, volume]) => {
+        return Number.isFinite(volume) && volume >= 0 && volume <= 1;
+      })
+    );
+  } catch {
+    return new Map();
+  }
+}
+
+function persistStoredMediaVolumes() {
+  try {
+    window.localStorage.setItem(
+      MEDIA_VOLUME_STORAGE_KEY,
+      JSON.stringify(Object.fromEntries(mediaVolumeBySource))
+    );
+  } catch {
+    // Storage can be unavailable in privacy modes; in-memory volume memory still works.
+  }
+}
+
+function getMediaSourceKey(mediaEl) {
+  if (!mediaEl) {
+    return null;
+  }
+
+  const sourceEl = mediaEl.querySelector?.("source");
+  const source = mediaEl.currentSrc || mediaEl.src || sourceEl?.src || sourceEl?.getAttribute("src") || "";
+
+  if (!source) {
+    return null;
+  }
+
+  try {
+    return new URL(source, document.baseURI).href;
+  } catch {
+    return source;
+  }
+}
+
+function storeMediaVolume(mediaEl, volume) {
+  if (!mediaEl || !Number.isFinite(volume)) {
+    return;
+  }
+
+  const nextVolume = clamp(volume, 0, 1);
+  mediaVolumeMemory.set(mediaEl, nextVolume);
+
+  const sourceKey = getMediaSourceKey(mediaEl);
+
+  if (sourceKey) {
+    mediaVolumeBySource.set(sourceKey, nextVolume);
+    persistStoredMediaVolumes();
+  }
+}
+
+function getRememberedMediaVolume(mediaEl) {
+  if (!mediaEl) {
+    return null;
+  }
+
+  if (mediaVolumeMemory.has(mediaEl)) {
+    return mediaVolumeMemory.get(mediaEl);
+  }
+
+  const sourceKey = getMediaSourceKey(mediaEl);
+  const sourceVolume = sourceKey ? mediaVolumeBySource.get(sourceKey) : undefined;
+
+  return Number.isFinite(sourceVolume) ? sourceVolume : null;
 }
 
 function canDragWindows() {
@@ -1438,7 +1601,9 @@ function rememberMediaVolume(mediaEl) {
     return;
   }
 
-  mediaVolumeMemory.set(mediaEl, typeof mediaEl.volume === "number" ? mediaEl.volume : 1);
+  const rememberedVolume = getRememberedMediaVolume(mediaEl);
+  const fallbackVolume = typeof mediaEl.volume === "number" ? mediaEl.volume : 1;
+  mediaVolumeMemory.set(mediaEl, Number.isFinite(rememberedVolume) ? rememberedVolume : fallbackVolume);
 }
 
 function enforceMediaMuteState(mediaEl) {
@@ -1460,7 +1625,7 @@ function enforceMediaMuteState(mediaEl) {
   }
 
   const storedVolume = Number.parseFloat(mediaEl.dataset.preMuteVolume ?? "");
-  const fallbackVolume = mediaVolumeMemory.get(mediaEl) ?? 1;
+  const fallbackVolume = getRememberedMediaVolume(mediaEl) ?? 1;
   const nextVolume = Number.isFinite(storedVolume) ? storedVolume : fallbackVolume;
 
   mediaEl.muted = false;
@@ -1485,6 +1650,10 @@ function bindMediaMuteEnforcement(mediaEl) {
   });
 
   mediaEl.addEventListener("volumechange", () => {
+    if (mediaEl.dataset.suppressVolumeMemory === "true") {
+      return;
+    }
+
     if (isMuted) {
       if (!mediaEl.muted || mediaEl.volume !== 0) {
         mediaEl.volume = 0;
@@ -1494,12 +1663,22 @@ function bindMediaMuteEnforcement(mediaEl) {
       return;
     }
 
+    if (mediaEl.dataset.hoverPreview === "true") {
+      return;
+    }
+
+    if (mediaEl.tagName === "VIDEO" && (!mediaEl.muted || mediaEl.volume > 0)) {
+      mediaEl.dataset.userAudioEnabled = "true";
+    }
+
+    if (typeof mediaEl.volume === "number") {
+      storeMediaVolume(mediaEl, mediaEl.volume);
+    }
+
     if (!mediaEl.muted && mediaEl.volume > 0) {
       if (mediaEl.tagName === "VIDEO") {
         mediaEl.dataset.userAudioEnabled = "true";
       }
-
-      mediaVolumeMemory.set(mediaEl, mediaEl.volume);
     }
   });
 
@@ -1562,6 +1741,36 @@ function isMediaVisibleInPanel(mediaEl) {
   return visibleRatio >= 0.35;
 }
 
+function isElementVisibleInPanel(elementEl) {
+  if (!elementEl) {
+    return false;
+  }
+
+  const elementRect = elementEl.getBoundingClientRect();
+
+  if (elementRect.width <= 0 || elementRect.height <= 0) {
+    return false;
+  }
+
+  const root = elementEl.closest(".xp-window-body") || elementEl.closest(".collection-body") || null;
+  const rootRect = root?.getBoundingClientRect() || {
+    top: 0,
+    left: 0,
+    right: window.innerWidth,
+    bottom: window.innerHeight,
+  };
+
+  const visibleLeft = Math.max(elementRect.left, rootRect.left, 0);
+  const visibleTop = Math.max(elementRect.top, rootRect.top, 0);
+  const visibleRight = Math.min(elementRect.right, rootRect.right, window.innerWidth);
+  const visibleBottom = Math.min(elementRect.bottom, rootRect.bottom, window.innerHeight);
+  const visibleWidth = Math.max(0, visibleRight - visibleLeft);
+  const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+  const visibleRatio = (visibleWidth * visibleHeight) / (elementRect.width * elementRect.height);
+
+  return visibleRatio >= 0.35;
+}
+
 function pauseAndMuteMedia(mediaEl, { reset = false } = {}) {
   if (!mediaEl) {
     return;
@@ -1609,6 +1818,9 @@ function stopWindowGameFrames(windowEl) {
   }
 
   windowEl.querySelectorAll("iframe.game-player-frame").forEach((frameEl) => {
+    delete frameEl.dataset.frameSuspended;
+    delete frameEl.dataset.gameAudioState;
+    delete frameEl.dataset.playerActivated;
     frameEl.src = "about:blank";
   });
 }
@@ -1618,11 +1830,61 @@ function syncEmbeddedFrameAudioState() {
 
   document.querySelectorAll("iframe.game-player-frame").forEach((frameEl) => {
     const frameWindow = frameEl.closest(".window");
-    const audioEnabled = !isMuted && frameWindow === topWindow;
+    const frameShouldRun = frameWindow === topWindow && isElementVisibleInPanel(frameEl);
+    const isActivated = frameEl.dataset.playerActivated === "true";
+    const frameSrc = frameEl.dataset.playerSrc || frameEl.getAttribute("src") || "";
+
+    if (!frameShouldRun) {
+      if (frameSrc && frameEl.getAttribute("src") !== "about:blank") {
+        frameEl.dataset.playerSrc = frameSrc;
+        frameEl.dataset.frameSuspended = "true";
+        delete frameEl.dataset.gameAudioState;
+        frameEl.src = "about:blank";
+        if (frameEl === gameDetailFrame && isActivated) {
+          setGamePlayerOverlay({
+            state: "paused",
+            title: "Game paused",
+            note: "The build was unloaded while off-screen so audio cannot keep playing.",
+            buttonText: "Resume",
+            showButton: false,
+          });
+        }
+      }
+      return;
+    }
+
+    if (!isActivated) {
+      return;
+    }
+
+    if (frameEl.dataset.frameSuspended === "true" && frameEl.dataset.playerSrc) {
+      delete frameEl.dataset.frameSuspended;
+      delete frameEl.dataset.gameAudioState;
+      if (frameEl === gameDetailFrame) {
+        setGamePlayerOverlay({
+          state: "loading",
+          title: "Reloading game",
+          note: "The game is restoring after being paused off-screen.",
+          buttonText: "Reload",
+          showButton: false,
+        });
+      }
+      frameEl.src = frameEl.dataset.playerSrc;
+      return;
+    }
+
+    const audioEnabled = !isMuted;
+    const audioState = audioEnabled ? "enabled" : "disabled";
 
     if (!frameEl.contentWindow) {
       return;
     }
+
+    if (frameEl.dataset.gameAudioState === audioState) {
+      return;
+    }
+
+    frameEl.dataset.gameAudioState = audioState;
 
     try {
       frameEl.contentWindow.setGameAudioEnabled?.(audioEnabled);
@@ -1630,6 +1892,28 @@ function syncEmbeddedFrameAudioState() {
     } catch {
       // Cross-document access can fail while an iframe is navigating.
     }
+  });
+}
+
+function bindGameFrameAudioSync(root = document) {
+  root.querySelectorAll("iframe.game-player-frame").forEach((frameEl) => {
+    if (frameEl.dataset.audioSyncBound === "true") {
+      return;
+    }
+
+    frameEl.addEventListener("load", () => {
+      delete frameEl.dataset.gameAudioState;
+      if (
+        frameEl === gameDetailFrame &&
+        frameEl.dataset.playerActivated === "true" &&
+        frameEl.getAttribute("src") !== "about:blank"
+      ) {
+        setGamePlayerOverlay({ state: "playing" });
+      }
+      syncEmbeddedFrameAudioState();
+    });
+
+    frameEl.dataset.audioSyncBound = "true";
   });
 }
 
@@ -2291,6 +2575,123 @@ function renderActiveDocumentPdf() {
   renderPdfPreview(activePdfViewer);
 }
 
+function getGameFilters(gameId) {
+  return gameFilterTags[gameId] || [];
+}
+
+function applyGameFilter(filter = "all") {
+  const collectionGrid = document.querySelector("#game-collection .collection-grid");
+
+  if (!collectionGrid) {
+    return;
+  }
+
+  const cards = Array.from(collectionGrid.querySelectorAll("[data-game-id]"));
+  let visibleCount = 0;
+
+  cards.forEach((card) => {
+    const gameId = card.dataset.gameId;
+    const isVisible = filter === "all" || getGameFilters(gameId).includes(filter);
+    card.classList.toggle("is-filtered-out", !isVisible);
+    card.hidden = !isVisible;
+
+    if (isVisible) {
+      visibleCount += 1;
+    }
+  });
+
+  gameFilterButtons.forEach((button) => {
+    const isActive = button.dataset.gameFilter === filter;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  if (gameFilterCount) {
+    const label = visibleCount === 1 ? "project" : "projects";
+    gameFilterCount.textContent = `${visibleCount} ${label} shown`;
+  }
+}
+
+function renderGameCaseStudy(gameId) {
+  if (!gameDetailCaseStudySection || !gameDetailCaseStudy) {
+    return;
+  }
+
+  const caseStudy = gameCaseStudies[gameId] || defaultGameCaseStudy;
+  const sections = [
+    ["Problem", caseStudy.problem],
+    ["My Role", caseStudy.role],
+    ["Systems", caseStudy.systems],
+    ["Design Decisions", caseStudy.decisions],
+    ["Result", caseStudy.result],
+  ];
+
+  gameDetailCaseStudy.innerHTML = "";
+
+  sections.forEach(([label, body]) => {
+    if (!body) {
+      return;
+    }
+
+    const item = document.createElement("article");
+    const title = document.createElement("strong");
+    const text = document.createElement("p");
+
+    item.className = "game-case-study-item";
+    title.textContent = label;
+    text.textContent = body;
+    item.append(title, text);
+    gameDetailCaseStudy.appendChild(item);
+  });
+
+  gameDetailCaseStudySection.classList.toggle("is-hidden", gameDetailCaseStudy.children.length === 0);
+}
+
+function setGamePlayerOverlay({ state = "ready", title = "Ready to play", note = "", buttonText = "Play", showButton = true } = {}) {
+  if (!gamePlayerShell || !gamePlayerOverlay) {
+    return;
+  }
+
+  gamePlayerShell.dataset.playerState = state;
+  gamePlayerOverlay.classList.toggle("is-hidden", state === "playing");
+
+  if (gamePlayerStatus) {
+    gamePlayerStatus.textContent = title;
+  }
+
+  if (gamePlayerNote) {
+    gamePlayerNote.textContent = note;
+  }
+
+  if (gamePlayerLoadButton) {
+    gamePlayerLoadButton.textContent = buttonText;
+    gamePlayerLoadButton.hidden = !showButton;
+  }
+}
+
+function activateGameFrame(frameEl = gameDetailFrame) {
+  if (!frameEl?.dataset.playerSrc) {
+    return;
+  }
+
+  frameEl.dataset.playerActivated = "true";
+  delete frameEl.dataset.frameSuspended;
+  delete frameEl.dataset.gameAudioState;
+  setGamePlayerOverlay({
+    state: "loading",
+    title: "Loading game",
+    note: "The browser build is starting. Audio pauses automatically when you leave this area.",
+    buttonText: "Reload",
+    showButton: false,
+  });
+
+  if (frameEl.getAttribute("src") !== frameEl.dataset.playerSrc) {
+    frameEl.src = frameEl.dataset.playerSrc;
+  }
+
+  syncEmbeddedFrameAudioState();
+}
+
 function reorderGameCollection() {
   const collectionGrid = document.querySelector("#game-collection .collection-grid");
 
@@ -2362,6 +2763,8 @@ function renderGameDetail(gameId) {
     });
   }
 
+  renderGameCaseStudy(gameId);
+
   if (gameDetailActions) {
     gameDetailActions.innerHTML = "";
 
@@ -2431,15 +2834,32 @@ function renderGameDetail(gameId) {
 
   if (gameDetailFrame && gameDetailPlayerSection) {
     if (game.webPlayable !== false && game.player?.src) {
-      gameDetailFrame.src = game.player.src;
+      bindGameFrameAudioSync(gameDetailPlayerSection);
+      delete gameDetailFrame.dataset.frameSuspended;
+      delete gameDetailFrame.dataset.gameAudioState;
+      delete gameDetailFrame.dataset.playerActivated;
+      gameDetailFrame.src = "about:blank";
       gameDetailFrame.dataset.playerSrc = game.player.src;
       gameDetailFrame.title = game.player.title || game.title;
       gameDetailPlayerSection.classList.remove("is-hidden");
+      setGamePlayerOverlay({
+        state: "ready",
+        title: "Ready to play",
+        note: "Load the browser build when you are ready. The build will pause if you scroll away.",
+        buttonText: "Play",
+        showButton: true,
+      });
+      syncEmbeddedFrameAudioState();
     } else {
+      delete gameDetailFrame.dataset.frameSuspended;
+      delete gameDetailFrame.dataset.gameAudioState;
+      delete gameDetailFrame.dataset.playerActivated;
       gameDetailFrame.src = "about:blank";
       delete gameDetailFrame.dataset.playerSrc;
       gameDetailFrame.title = "";
       gameDetailPlayerSection.classList.add("is-hidden");
+      setGamePlayerOverlay();
+      syncEmbeddedFrameAudioState();
     }
   }
 
@@ -2473,6 +2893,9 @@ function renderGameDetail(gameId) {
 
 function bringToFront(windowEl) {
   zIndexSeed += 1;
+  draggableWindows.forEach((candidateWindow) => {
+    candidateWindow.classList.toggle("is-active", candidateWindow === windowEl);
+  });
   windowEl.style.zIndex = windowEl.classList.contains("is-fullscreen")
     ? String(FULLSCREEN_WINDOW_Z_INDEX)
     : String(zIndexSeed);
@@ -2869,6 +3292,7 @@ function renderTaskbarTabs() {
   }
 
   const visibleWindows = getVisibleTaskbarWindows();
+  document.body.classList.toggle("has-open-window", visibleWindows.length > 0);
 
   const activeWindowEl = visibleWindows.reduce((topWindow, windowEl) => {
     if (!topWindow) {
@@ -4113,6 +4537,16 @@ documentItems.forEach((item) => {
   });
 });
 
+gameFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    applyGameFilter(button.dataset.gameFilter || "all");
+  });
+});
+
+gamePlayerLoadButton?.addEventListener("click", () => {
+  activateGameFrame(gameDetailFrame);
+});
+
 videoFullscreenButtons.forEach((button) => {
   button.addEventListener("click", async (event) => {
     event.stopPropagation();
@@ -4161,6 +4595,7 @@ function requestMediaVisibilitySync() {
 
   mediaVisibilitySyncFrame = window.requestAnimationFrame(() => {
     mediaVisibilitySyncFrame = 0;
+    syncEmbeddedFrameAudioState();
     syncVisibleMediaPlayback();
   });
 }
@@ -4286,6 +4721,7 @@ window.addEventListener("load", () => {
   updateMusicPlayLabel();
   renderCatMedia();
   reorderGameCollection();
+  applyGameFilter("all");
   setupCursorEffect();
   setupHoverTrailerPreviews();
   arrangeVisiblePanels();
@@ -4296,6 +4732,7 @@ window.addEventListener("load", () => {
   updateSoundToggleLabel();
   initializeVideoMuteDefaults();
   enableAutoplayForVideos();
+  bindGameFrameAudioSync();
   syncMediaMutedState();
   renderActiveDocumentPdf();
   renderTaskbarTabs();
