@@ -5,10 +5,16 @@
       "name": "Main Playlist",
       "tracks": [
         {
-          "label": "Ca Hoi Hoang - 2004",
+          "label": "Cá Hồi Hoang - 2004",
           "file": "songs/Cá Hồi Hoang - 2004/2004.mp3",
           "cover": "songs/Cá Hồi Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
           "duration": "4:15"
+        },
+        {
+          "label": "half·alive - Never Been Better",
+          "file": "songs/half·alive - Never Been Better/YTMP3GG_YouTube_half-alive-Never-Been-Better-Audio-ft-Or_Media_gFyn_Dh_fQM_009_128k.mp3",
+          "cover": "songs/half·alive - Never Been Better/images (2).jpg",
+          "duration": ""
         },
         {
           "label": "Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS",
@@ -26,12 +32,6 @@
           "label": "Low Roar - Don't Be So Serious",
           "file": "songs/Low Roar - Don't Be So Serious/Don't Be so Serious.mp3",
           "cover": "songs/Low Roar - Don't Be So Serious/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
-          "duration": ""
-        },
-        {
-          "label": "half alive - Never Been Better",
-          "file": "songs/half·alive - Never Been Better/YTMP3GG_YouTube_half-alive-Never-Been-Better-Audio-ft-Or_Media_gFyn_Dh_fQM_009_128k.mp3",
-          "cover": "songs/half·alive - Never Been Better/images (2).jpg",
           "duration": ""
         },
         {
@@ -53,19 +53,19 @@
           "duration": ""
         },
         {
-          "label": "Phung Khanh Linh - Em Dau",
+          "label": "PHÙNG KHÁNH LINH – EM ĐAU",
           "file": "songs/PHÙNG KHÁNH LINH – EM ĐAU/PHÙNG KHÁNH LINH  EM ĐAU (WITH THÀNH LUKE) (LYRIC VIDEO).mp3",
           "cover": "songs/PHÙNG KHÁNH LINH – EM ĐAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
           "duration": "4:30"
         },
         {
-          "label": "Thanh Luke - Canh Tiep Theo",
+          "label": "Thành Luke - Cảnh Tiếp Theo",
           "file": "songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
           "cover": "songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
           "duration": "4:20"
         },
         {
-          "label": "Thanh Luke - Cung",
+          "label": "Thành Luke - Cùng",
           "file": "songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
           "cover": "songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
           "duration": "3:00"

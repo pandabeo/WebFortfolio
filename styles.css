@@ -2775,12 +2775,51 @@ body.is-dark .game-detail-trailer-frame {
   }
 }
 
+.game-detail-trailer-shell {
+  position: relative;
+  margin-top: 0;
+  background: #111;
+}
+
 .game-detail-trailer-frame {
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  margin-top: 0;
   border: 1px solid #9f9886;
   background: #111;
+}
+
+.game-detail-trailer-status {
+  position: absolute;
+  inset: 1px;
+  display: none;
+  place-items: center;
+  padding: 16px;
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.62);
+  pointer-events: none;
+}
+
+[data-game-detail-trailer-section][data-trailer-state="loading"] .game-detail-trailer-status,
+[data-game-detail-trailer-section][data-trailer-state="error"] .game-detail-trailer-status {
+  display: grid;
+}
+
+[data-game-detail-trailer-section][data-trailer-state="loading"] .game-detail-trailer-status::before {
+  content: "";
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: game-loading-spin 900ms linear infinite;
+}
+
+[data-game-detail-trailer-section][data-trailer-state="error"] .game-detail-trailer-status::before {
+  content: none;
 }
 
 .game-detail-stills-heading {
@@ -3620,7 +3659,7 @@ body.is-dark .game-detail-devlog-heading span {
   height: 88px;
   pointer-events: none;
   opacity: 0;
-  z-index: 10000;
+  z-index: 10100;
   object-fit: contain;
   transform-origin: top left;
   will-change: transform, opacity;

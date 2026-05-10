@@ -66,6 +66,7 @@ const gameDetailCaseStudySection = document.querySelector("[data-game-detail-cas
 const gameDetailCaseStudy = document.querySelector("[data-game-detail-case-study]");
 const gameDetailTrailerSection = document.querySelector("[data-game-detail-trailer-section]");
 const gameDetailTrailer = document.querySelector("[data-game-detail-trailer]");
+const gameDetailTrailerStatus = document.querySelector("[data-game-detail-trailer-status]");
 const gameDetailStillsSection = document.querySelector("[data-game-detail-stills-section]");
 const gameDetailStills = document.querySelector("[data-game-detail-stills]");
 const gameDetailFrame = document.querySelector("[data-game-detail-frame]");
@@ -99,115 +100,82 @@ const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.
 const DEFAULT_MUSIC_COVER_ART = "assets/wallpaper/kojima-please-hire-me.png";
 let MUSIC_TRACKS = [
   {
-    label: "CÃ¡ Há»“i Hoang - 2004",
-    src: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/2004.mp3",
-    cover: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
-    duration: "4:15"
+    "label": "Cá Hồi Hoang - 2004",
+    "src": "playlists/songs/Cá Hồi Hoang - 2004/2004.mp3",
+    "cover": "playlists/songs/Cá Hồi Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
+    "duration": "4:15"
   },
   {
-    label: "Magnolian - Indigo",
-    src: "playlists/songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
-    cover: "playlists/songs/Magnolian - Indigo/IndigoCoverArt.jpg",
-    duration: "5:07"
+    "label": "half·alive - Never Been Better",
+    "src": "playlists/songs/half·alive - Never Been Better/YTMP3GG_YouTube_half-alive-Never-Been-Better-Audio-ft-Or_Media_gFyn_Dh_fQM_009_128k.mp3",
+    "cover": "playlists/songs/half·alive - Never Been Better/images (2).jpg",
+    "duration": ""
   },
   {
-    label: "PhÃ¹ng KhÃ¡nh Linh - Em Äau",
-    src: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/PHÃ™NG KHÃNH LINH  EM ÄAU (WITH THÃ€NH LUKE) (LYRIC VIDEO).mp3",
-    cover: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
-    duration: "4:30"
+    "label": "Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS",
+    "src": "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/悲しみがとまらないI CAN'T STOP THE LONELINESS.mp3",
+    "cover": "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/1900x1900-000000-80-0-0.jpg",
+    "duration": ""
   },
   {
-    label: "ThÃ nh Luke - CÃ¹ng",
-    src: "playlists/songs/ThÃ nh Luke - CÃ¹ng/ThÃ nh Luke - CÃ¹ng.mp3",
-    cover: "playlists/songs/ThÃ nh Luke - CÃ¹ng/0x1900-000000-80-0-0.jpg",
-    duration: "3:00"
+    "label": "Low Roar - Bones",
+    "src": "playlists/songs/Low Roar - Bones/Low Roar - Bones (feat. Jófríõur Ákadóttir) [Official Music Video].mp3",
+    "cover": "playlists/songs/Low Roar - Bones/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
+    "duration": ""
   },
   {
-    label: "ThÃ nh Luke - Cáº£nh Tiáº¿p Theo",
-    src: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo (Lyric Video).mp3",
-    cover: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/maxresdefault.jpg",
-    duration: "4:20"
-  }
-];
-
-MUSIC_TRACKS = [
-  {
-    label: "Ca Hoi Hoang - 2004",
-    src: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/2004.mp3",
-    cover: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
-    duration: "4:15"
+    "label": "Low Roar - Don't Be So Serious",
+    "src": "playlists/songs/Low Roar - Don't Be So Serious/Don't Be so Serious.mp3",
+    "cover": "playlists/songs/Low Roar - Don't Be So Serious/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
+    "duration": ""
   },
   {
-    label: "Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS",
-    src: "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/æ‚²ã—ã¿ãŒã¨ã¾ã‚‰ãªã„I CAN'T STOP THE LONELINESS.mp3",
-    cover: "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/1900x1900-000000-80-0-0.jpg",
-    duration: ""
+    "label": "Magnolian - Indigo",
+    "src": "playlists/songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
+    "cover": "playlists/songs/Magnolian - Indigo/IndigoCoverArt.jpg",
+    "duration": "5:07"
   },
   {
-    label: "Low Roar - Bones",
-    src: "playlists/songs/Low Roar - Bones/Low Roar - Bones (feat. JÃ³frÃ­Ãµur ÃkadÃ³ttir) [Official Music Video].mp3",
-    cover: "playlists/songs/Low Roar - Bones/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
-    duration: ""
+    "label": "Mariya Takeuchi - Plastic Love",
+    "src": "playlists/songs/Mariya Takeuchi - Plastic Love/竹内まりや -  Plastic Love (Official Music Video).mp3",
+    "cover": "playlists/songs/Mariya Takeuchi - Plastic Love/r-20684092-1635474559-1118-jpeg.webp",
+    "duration": ""
   },
   {
-    label: "Low Roar - Don't Be So Serious",
-    src: "playlists/songs/Low Roar - Don't Be So Serious/Don't Be so Serious.mp3",
-    cover: "playlists/songs/Low Roar - Don't Be So Serious/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
-    duration: ""
+    "label": "Meiko Nakahara - Fantasy",
+    "src": "playlists/songs/Meiko Nakahara - Fantasy/Meiko Nakahara - Fantasy (1982).mp3",
+    "cover": "playlists/songs/Meiko Nakahara - Fantasy/images.jpg",
+    "duration": ""
   },
   {
-    label: "half alive - Never Been Better",
-    src: "playlists/songs/halfÂ·alive - Never Been Better/YTMP3GG_YouTube_half-alive-Never-Been-Better-Audio-ft-Or_Media_gFyn_Dh_fQM_009_128k.mp3",
-    cover: "playlists/songs/halfÂ·alive - Never Been Better/images (2).jpg",
-    duration: ""
+    "label": "PHÙNG KHÁNH LINH – EM ĐAU",
+    "src": "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/PHÙNG KHÁNH LINH  EM ĐAU (WITH THÀNH LUKE) (LYRIC VIDEO).mp3",
+    "cover": "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
+    "duration": "4:30"
   },
   {
-    label: "Magnolian - Indigo",
-    src: "playlists/songs/Magnolian - Indigo/Magnolian - Indigo (Official Video).mp3",
-    cover: "playlists/songs/Magnolian - Indigo/IndigoCoverArt.jpg",
-    duration: "5:07"
+    "label": "Thành Luke - Cảnh Tiếp Theo",
+    "src": "playlists/songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
+    "cover": "playlists/songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
+    "duration": "4:20"
   },
   {
-    label: "Mariya Takeuchi - Plastic Love",
-    src: "playlists/songs/Mariya Takeuchi - Plastic Love/ç«¹å†…ã¾ã‚Šã‚„ -  Plastic Love (Official Music Video).mp3",
-    cover: "playlists/songs/Mariya Takeuchi - Plastic Love/r-20684092-1635474559-1118-jpeg.webp",
-    duration: ""
+    "label": "Thành Luke - Cùng",
+    "src": "playlists/songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
+    "cover": "playlists/songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
+    "duration": "3:00"
   },
   {
-    label: "Meiko Nakahara - Fantasy",
-    src: "playlists/songs/Meiko Nakahara - Fantasy/Meiko Nakahara - Fantasy (1982).mp3",
-    cover: "playlists/songs/Meiko Nakahara - Fantasy/images.jpg",
-    duration: ""
+    "label": "Vaundy - Odoriko",
+    "src": "playlists/songs/Vaundy - Odoriko/Vaundy - Odoriko (踊り子) (Lyrics) (RomEng).mp3",
+    "cover": "playlists/songs/Vaundy - Odoriko/Vaundy_-_Odoriko.png",
+    "duration": ""
   },
   {
-    label: "Phung Khanh Linh - Em Dau",
-    src: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/PHÃ™NG KHÃNH LINH  EM ÄAU (WITH THÃ€NH LUKE) (LYRIC VIDEO).mp3",
-    cover: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
-    duration: "4:30"
-  },
-  {
-    label: "Thanh Luke - Canh Tiep Theo",
-    src: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo (Lyric Video).mp3",
-    cover: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/maxresdefault.jpg",
-    duration: "4:20"
-  },
-  {
-    label: "Thanh Luke - Cung",
-    src: "playlists/songs/ThÃ nh Luke - CÃ¹ng/ThÃ nh Luke - CÃ¹ng.mp3",
-    cover: "playlists/songs/ThÃ nh Luke - CÃ¹ng/0x1900-000000-80-0-0.jpg",
-    duration: "3:00"
-  },
-  {
-    label: "Vaundy - Odoriko",
-    src: "playlists/songs/Vaundy - Odoriko/Vaundy - Odoriko (è¸Šã‚Šå­) (Lyrics) (RomEng).mp3",
-    cover: "playlists/songs/Vaundy - Odoriko/Vaundy_-_Odoriko.png",
-    duration: ""
-  },
-  {
-    label: "Yasuha - Flyday Chinatown",
-    src: "playlists/songs/Yasuha - Flyday Chinatown/ãƒ•ãƒ©ã‚¤ãƒ‡ã‚£ãƒãƒ£ã‚¤ãƒŠã‚¿ã‚¦ãƒ³ æ³°è‘‰ Official Lyric Video.mp3",
-    cover: "playlists/songs/Yasuha - Flyday Chinatown/0x1900-000000-80-0-0.jpg",
-    duration: ""
+    "label": "Yasuha - Flyday Chinatown",
+    "src": "playlists/songs/Yasuha - Flyday Chinatown/フライディチャイナタウン 泰葉 Official Lyric Video.mp3",
+    "cover": "playlists/songs/Yasuha - Flyday Chinatown/0x1900-000000-80-0-0.jpg",
+    "duration": ""
   }
 ];
 
@@ -218,11 +186,7 @@ let startKeyboardActiveIndex = -1;
 let musicKeyboardActiveIndex = -1;
 
 function normalizeMusicAssetPath(src) {
-  return (src || "")
-    .replaceAll("CÃƒÂ¡ HÃ¡Â»â€œi Hoang - 2004", "CÃ¡ Há»“i Hoang - 2004")
-    .replaceAll("PHÃƒâ„¢NG KHÃƒÂNH LINH Ã¢â‚¬â€œ EM Ã„ÂAU", "PHÃ™NG KHÃNH LINH â€“ EM ÄAU")
-    .replaceAll("ThÃƒÂ nh Luke - CÃƒÂ¹ng", "ThÃ nh Luke - CÃ¹ng")
-    .replaceAll("ThÃƒÂ nh Luke - CÃ¡ÂºÂ£nh TiÃ¡ÂºÂ¿p Theo", "ThÃ nh Luke - Cáº£nh Tiáº¿p Theo");
+  return src || "";
 }
 
 MUSIC_TRACKS = MUSIC_TRACKS.map((track) => ({
@@ -339,8 +303,8 @@ const gameDetails = {
     title: "Tales Of A Playboy",
     routeSlug: "playboy",
     cover: "assets/game-covers/tales-of-a-playboy.png",
-    shortDescription: "Adventure project presented as a browser-playable character-led piece.",
-    overview: "Character-led adventure project with a dedicated space for future design notes and production updates.",
+    shortDescription: "Character-led Unity adventure presented as a browser-playable story project.",
+    overview: "Browser-playable Unity adventure structured around character presentation, scene progression, and a compact story-first play session.",
     meta: [
       "Role: Game designer and developer",
       "Format: Unity WebGL",
@@ -408,8 +372,8 @@ const gameDetails = {
     title: "Homeward",
     routeSlug: "homeward",
     cover: "assets/game-covers/homeward.png",
-    shortDescription: "Action adventure with dungeon and boss-fight energy.",
-    overview: "Action-adventure prototype with a dedicated panel for future combat, level, and polish devlogs.",
+    shortDescription: "Action-adventure prototype built around exploration, combat pacing, and boss encounters.",
+    overview: "Dungeon-style action adventure focused on traversal, encounter pacing, and a clear build path from prototype combat to playable release.",
     meta: [
       "Role: Game designer and developer",
       "Format: Browser release",
@@ -469,8 +433,8 @@ const gameDetails = {
     title: "My Color Is Not Colorfull",
     routeSlug: "color",
     cover: "assets/game-covers/my-color-is-not-colorfull.png",
-    shortDescription: "Adventure game with a visually driven emotional tone.",
-    overview: "Emotion-led adventure project with space for future notes on visual tone, mechanics, and narrative intent.",
+    shortDescription: "Browser adventure using color, mood, and visual contrast to shape the emotional tone.",
+    overview: "Emotion-led browser adventure where color, contrast, and environmental tone carry the mood of the interaction.",
     meta: [
       "Role: Game designer and developer",
       "Format: Browser release",
@@ -483,11 +447,11 @@ const gameDetails = {
     title: "Equilibrium",
     routeSlug: "equilibrium",
     cover: "assets/game-covers/equilibrium.png",
-    shortDescription: "Twine visual novel focused on reading and branching balance.",
-    overview: "Narrative-led project with a dedicated panel ready for future writing and branching-design devlog entries.",
+    shortDescription: "Point-and-click puzzle story about social imbalance, hidden truths, and branching outcomes.",
+    overview: "Pixel-art point-and-click puzzle project about inequality, social imbalance, and choices that affect the ending of the story.",
     meta: [
       "Role: Solo developer",
-      "Format: Twine / browser release",
+      "Format: Point-and-click / browser release",
       "Status: Playable on itch.io",
     ],
     actions: [
@@ -508,8 +472,8 @@ const gameDetails = {
     title: "D' Fishy Finals",
     routeSlug: "fishy",
     cover: "assets/game-covers/d-fishy-finals.jpg",
-    shortDescription: "Adventure game about teenage intrusive thoughts on a collaborator account.",
-    overview: "Collaborative release with room to document team production context and future postmortem-style notes.",
+    shortDescription: "Narrative adventure about teenage intrusive thoughts, school pressure, and inner conflict.",
+    overview: "Collaborative narrative adventure that frames exam pressure and intrusive thoughts through a short browser-playable experience.",
     meta: [
       "Role: Collaborator",
       "Format: Browser release",
@@ -534,8 +498,8 @@ const gameDetails = {
     title: "BlocknOut",
     routeSlug: "blocknout",
     cover: "assets/game-covers/blocknout.png",
-    shortDescription: "Third-person action prototype released for RMIT GDS4 Blockout 01.",
-    overview: "Prototype-focused panel ready for future combat feel notes, mechanic breakdowns, and blockout iteration logs.",
+    shortDescription: "Third-person blockout prototype focused on action readability and level structure.",
+    overview: "RMIT GDS4 blockout prototype focused on readable third-person action, encounter layout, and early level structure.",
     meta: [
       "Role: Game designer and developer",
       "Format: Downloadable build",
@@ -548,8 +512,8 @@ const gameDetails = {
     title: "Hours Before Blue",
     routeSlug: "hours",
     cover: "assets/game-covers/hours-before-blue.png",
-    shortDescription: "Short cozy adventure jam game published on itch.",
-    overview: "Small-scope cozy release with a clean area reserved for future jam reflections and design notes.",
+    shortDescription: "Short cozy jam adventure about quiet exploration before the blue hour arrives.",
+    overview: "Small-scope cozy jam game built around a compact adventure loop, gentle pacing, and downloadable release access.",
     meta: [
       "Role: Game designer and developer",
       "Format: Browser release",
@@ -569,8 +533,8 @@ const gameDetails = {
     title: "ChaoTet!",
     routeSlug: "chaotet",
     cover: "assets/game-covers/chaotet.gif",
-    shortDescription: "Tet-themed 3D survival-simulation release made with collaborators.",
-    overview: "Collaborative festive 3D release with future room for documenting system tweaks and event-driven iteration.",
+    shortDescription: "Tet-themed 3D survival-simulation project built around festive chaos and resource pressure.",
+    overview: "Collaborative 3D survival-simulation release that turns Tet preparation into a playful resource and event-management challenge.",
     meta: [
       "Role: Collaborator",
       "Format: Downloadable build",
@@ -595,8 +559,8 @@ const gameDetails = {
     title: "IntoTheDungeon",
     routeSlug: "dungeon",
     cover: "assets/game-covers/into-the-dungeon.png",
-    shortDescription: "Procedural dungeon experiment released as a downloadable build.",
-    overview: "System-heavy experiment with a panel prepared for future procedural-generation and combat iteration notes.",
+    shortDescription: "Procedural dungeon prototype with generated layouts, combat encounters, and build releases.",
+    overview: "Procedural dungeon experiment focused on generated spaces, repeatable encounters, and a downloadable action prototype loop.",
     meta: [
       "Role: Game designer and developer",
       "Format: Downloadable build",
@@ -621,8 +585,8 @@ const gameDetails = {
     title: "A Game About Me",
     routeSlug: "about-me",
     cover: "assets/game-covers/a-game-about-me.png",
-    shortDescription: "HTML5 and Windows visual-novel style project playable on itch.",
-    overview: "Narrative-led personal project with a structure in place for future process notes and story iteration logs.",
+    shortDescription: "Personal high-school narrative game about mistakes, uncertainty, and choosing game design.",
+    overview: "Personal narrative game about high school, uncertainty about the future, mistakes along the way, and discovering game design as a passion.",
     meta: [
       "Role: Game designer and developer",
       "Format: HTML5 and Windows build",
@@ -695,31 +659,31 @@ const gameCaseStudies = {
     result: "A complete story-driven platformer project with clearer production structure and reusable implementation patterns.",
   },
   "tales-of-a-playboy": {
-    problem: "The browser build needed to present a character-led adventure clearly while leaving room for future production notes.",
+    problem: "The browser build needed to present a character-led adventure clearly in a short playable session.",
     role: "Prepared the web presentation, playable embed, trailer context, and project metadata for portfolio review.",
     tools: "Unity WebGL, itch.io embed hosting, trailer media, portfolio routing.",
     built: "A playable detail page with launch controls, trailer preview, release actions, and expandable process sections.",
     systems: "Unity WebGL delivery, project actions, trailer preview, and detail-page rendering.",
     decisions: "Grouped playable access, media, and design notes in one focused view so the project is easy to scan before launching.",
-    result: "A browser-ready project page that can grow into a fuller postmortem as more notes are added.",
+    result: "A browser-ready project page with direct play access, trailer context, and concise project framing.",
   },
   equilibrium: {
-    problem: "A branching reading experience needed clear presentation despite having lighter technical systems than the Unity projects.",
-    role: "Positioned the work as a narrative/browser piece and connected the playable build with supporting context.",
-    tools: "Twine, browser embed, itch.io release page, downloadable archive.",
-    built: "A compact narrative-project entry with playable access, download action, and project framing.",
-    systems: "Twine branching structure, browser embed, and external release/download links.",
-    decisions: "Focused the case study around reading flow and narrative choice rather than forcing it into an action-game systems frame.",
-    result: "A compact narrative project entry that still communicates format, intent, and access path.",
+    problem: "A point-and-click puzzle story needed clear presentation around its social-imbalance theme and branching outcomes.",
+    role: "Positioned the work as a point-and-click puzzle story and connected the playable build with supporting context.",
+    tools: "Browser build, pixel-art presentation, itch.io release page, downloadable archive.",
+    built: "A compact project entry with playable access, download action, and social-imbalance story framing.",
+    systems: "Point-and-click interaction, puzzle progression, branching story outcomes, and external release/download links.",
+    decisions: "Focused the case study around inequality, puzzle flow, and choice-driven endings rather than generic narrative framing.",
+    result: "A compact puzzle-story entry that communicates format, intent, and access path.",
   },
   "a-game-about-me": {
     problem: "The project needed to communicate a personal narrative format while supporting both browser and Windows access.",
     role: "Structured the portfolio entry, playable embed, downloadable build link, and trailer media.",
     tools: "HTML5/WebGL build, itch.io embed, Windows release archive, trailer media.",
-    built: "A project page that supports browser play, downloadable build access, trailer viewing, and future devlog notes.",
+    built: "A project page that supports browser play, downloadable build access, trailer viewing, and personal narrative framing.",
     systems: "HTML5 build presentation, downloadable release path, and trailer/detail rendering.",
     decisions: "Kept the page centered on quick access first, then supporting context, so viewers can try the work without extra navigation.",
-    result: "A playable narrative entry with clear platform options and room for future process notes.",
+    result: "A playable personal narrative entry with clear platform options and project context.",
   },
 };
 
@@ -727,10 +691,10 @@ const defaultGameCaseStudy = {
   problem: "The project needed a compact portfolio presentation that explains format, contribution, and access path without overwhelming the collection view.",
   role: "Prepared the project metadata, media, release links, and detail-page structure.",
   tools: "Unity, WebGL, itch.io, GitHub release hosting, and the portfolio window system.",
-  built: "A reusable project detail view with release actions, media sections, routing, and room for future production notes.",
+  built: "A reusable project detail view with release actions, media sections, routing, and concise project context.",
   systems: "Project routing, trailer/still rendering, release actions, and reusable game detail UI.",
   decisions: "Kept the detail page consistent across playable and downloadable projects so each entry remains comparable.",
-  result: "A clearer project page that can be expanded with deeper production notes when more material is available.",
+  result: "A clearer project page that explains format, contribution, and access path at a glance.",
 };
 
 function getGameRouteSlug(gameId) {
@@ -794,6 +758,9 @@ let cursorDot = null;
 let cursorRing = null;
 let cursorIdle = null;
 let cursorPressTimeout = null;
+let gameDetailTrailerObserver = null;
+let gameDetailTrailerLoadObserver = null;
+let musicPausedForTrailerAudio = false;
 let pointerX = 0;
 let pointerY = 0;
 let isMuted = false;
@@ -809,6 +776,7 @@ const PANEL_SEARCH_STEP = 18;
 const PANEL_POSITION_STORAGE_KEY = "webportfolio.panel-positions.v1";
 const WALLPAPER_STORAGE_KEY = "webportfolio.wallpaper.v1";
 const MEDIA_VOLUME_STORAGE_KEY = "webportfolio.media-volumes.v1";
+const GAME_TRAILER_AUDIO_SESSION_KEY = "webportfolio.game-trailer-audio-enabled.session";
 const TASKBAR_DRAG_THRESHOLD = 6;
 const DEFAULT_DOCUMENT_TARGET = "doc-analysis";
 const mediaVolumeBySource = loadStoredMediaVolumes();
@@ -906,14 +874,38 @@ function getRememberedMediaVolume(mediaEl) {
     return null;
   }
 
+  const sourceKey = getMediaSourceKey(mediaEl);
+  const sourceVolume = sourceKey ? mediaVolumeBySource.get(sourceKey) : undefined;
+
+  if (Number.isFinite(sourceVolume)) {
+    return sourceVolume;
+  }
+
   if (mediaVolumeMemory.has(mediaEl)) {
     return mediaVolumeMemory.get(mediaEl);
   }
 
-  const sourceKey = getMediaSourceKey(mediaEl);
-  const sourceVolume = sourceKey ? mediaVolumeBySource.get(sourceKey) : undefined;
+  return null;
+}
 
-  return Number.isFinite(sourceVolume) ? sourceVolume : null;
+function isGameTrailerAudioEnabledThisSession() {
+  try {
+    return window.sessionStorage.getItem(GAME_TRAILER_AUDIO_SESSION_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function setGameTrailerAudioEnabledThisSession(isEnabled) {
+  try {
+    if (isEnabled) {
+      window.sessionStorage.setItem(GAME_TRAILER_AUDIO_SESSION_KEY, "true");
+    } else {
+      window.sessionStorage.removeItem(GAME_TRAILER_AUDIO_SESSION_KEY);
+    }
+  } catch {
+    // Session storage can be unavailable; dataset state still works for this page.
+  }
 }
 
 function canDragWindows() {
@@ -1515,6 +1507,12 @@ function enableAutoplayForVideos(root = document) {
       return;
     }
 
+    if (videoEl.dataset.gameDetailTrailer !== undefined) {
+      prepareGameDetailTrailerAutoplay(videoEl);
+      syncGameDetailTrailerPlayback();
+      return;
+    }
+
     if (videoEl.hasAttribute("controls")) {
       forceVideoMuted(videoEl);
       return;
@@ -1546,6 +1544,318 @@ function enableAutoplayForVideos(root = document) {
 
     videoEl.addEventListener("loadedmetadata", startPlayback, { once: true });
   });
+}
+
+function prepareGameDetailTrailerAutoplay(videoEl = gameDetailTrailer) {
+  if (!videoEl) {
+    return;
+  }
+
+  if (isGameTrailerAudioEnabledThisSession()) {
+    videoEl.dataset.userAudioEnabled = "true";
+  }
+
+  videoEl.autoplay = true;
+  videoEl.playsInline = true;
+  videoEl.preload = "metadata";
+  videoEl.setAttribute("autoplay", "");
+  videoEl.setAttribute("playsinline", "");
+
+  const rememberedVolume = getRememberedMediaVolume(videoEl);
+
+  if (Number.isFinite(rememberedVolume)) {
+    videoEl.volume = clamp(rememberedVolume, 0, 1);
+  }
+
+  if (videoEl.dataset.userAudioEnabled !== "true") {
+    forceVideoMuted(videoEl);
+    return;
+  }
+
+  if (!isMuted) {
+    videoEl.muted = false;
+    videoEl.defaultMuted = false;
+    videoEl.removeAttribute("muted");
+  }
+}
+
+function setGameDetailTrailerState(state, message = "") {
+  if (!gameDetailTrailerSection) {
+    return;
+  }
+
+  if (state) {
+    gameDetailTrailerSection.dataset.trailerState = state;
+  } else {
+    delete gameDetailTrailerSection.dataset.trailerState;
+  }
+
+  if (gameDetailTrailerStatus) {
+    gameDetailTrailerStatus.textContent = message;
+  }
+}
+
+function getGameDetailTrailerSrc() {
+  return gameDetailTrailer?.dataset.trailerSrc || "";
+}
+
+function isGameDetailTrailerLoaded() {
+  if (!gameDetailTrailer) {
+    return false;
+  }
+
+  const trailerSrc = getGameDetailTrailerSrc();
+
+  if (!trailerSrc) {
+    return false;
+  }
+
+  return Boolean(gameDetailTrailer.currentSrc || gameDetailTrailer.getAttribute("src"));
+}
+
+function loadGameDetailTrailerSource() {
+  if (!gameDetailTrailer) {
+    return false;
+  }
+
+  const trailerSrc = getGameDetailTrailerSrc();
+
+  if (!trailerSrc) {
+    return false;
+  }
+
+  if (!isGameDetailTrailerLoaded()) {
+    setGameDetailTrailerState("loading", "Loading trailer");
+    gameDetailTrailer.src = trailerSrc;
+    gameDetailTrailer.load();
+  }
+
+  prepareGameDetailTrailerAutoplay(gameDetailTrailer);
+  return true;
+}
+
+function isMediaNearViewportInPanel(mediaEl, margin = 260) {
+  if (!mediaEl) {
+    return false;
+  }
+
+  const mediaRect = mediaEl.getBoundingClientRect();
+
+  if (mediaRect.width <= 0 || mediaRect.height <= 0) {
+    return false;
+  }
+
+  const root = getMediaViewportRoot(mediaEl);
+  const rootRect = root?.getBoundingClientRect() || {
+    top: 0,
+    bottom: window.innerHeight,
+  };
+
+  return mediaRect.bottom >= rootRect.top - margin && mediaRect.top <= rootRect.bottom + margin;
+}
+
+function syncGameDetailTrailerLoading() {
+  if (!gameDetailTrailer || !gameDetailTrailerSection || gameDetailTrailerSection.classList.contains("is-hidden")) {
+    return;
+  }
+
+  if (isMediaNearViewportInPanel(gameDetailTrailer)) {
+    loadGameDetailTrailerSource();
+  }
+}
+
+function pauseBackgroundMusicForTrailerAudio() {
+  if (isMuted) {
+    return;
+  }
+
+  if (musicAudio && !musicAudio.paused) {
+    musicPausedForTrailerAudio = true;
+    musicAudio.pause();
+    updateMusicPlayLabel();
+  }
+
+  if (currentlyPlayingTrack?.type === "soundcloud") {
+    const scPlayer = document.querySelector("#sc-player");
+    if (scPlayer && window.SC && window.SC.Widget) {
+      try {
+        window.SC.Widget(scPlayer).pause();
+        musicPausedForTrailerAudio = true;
+      } catch {
+        // SoundCloud widget state can be unavailable while it is initializing.
+      }
+    }
+  }
+}
+
+function resumeBackgroundMusicAfterTrailerAudio() {
+  if (!musicPausedForTrailerAudio || isMuted) {
+    return;
+  }
+
+  musicPausedForTrailerAudio = false;
+
+  if (musicAudio?.src && musicAudio.paused) {
+    musicAudio.play().catch(() => {
+      updateMusicPlayLabel();
+    });
+  }
+}
+
+function syncBackgroundMusicForTrailerAudio() {
+  if (!gameDetailTrailer) {
+    return;
+  }
+
+  const trailerHasAudio = gameDetailTrailer.dataset.userAudioEnabled === "true" && !gameDetailTrailer.muted && gameDetailTrailer.volume > 0;
+
+  if (trailerHasAudio && !gameDetailTrailer.paused) {
+    pauseBackgroundMusicForTrailerAudio();
+    return;
+  }
+
+  if (!trailerHasAudio || gameDetailTrailer.paused || gameDetailTrailer.ended) {
+    resumeBackgroundMusicAfterTrailerAudio();
+  }
+}
+
+function syncGameDetailTrailerPlayback() {
+  if (!gameDetailTrailer || !gameDetailTrailerSection || gameDetailTrailerSection.classList.contains("is-hidden")) {
+    return;
+  }
+
+  syncGameDetailTrailerLoading();
+
+  if (!isMediaInActiveWindow(gameDetailTrailer) || !isMediaVisibleInPanel(gameDetailTrailer)) {
+    gameDetailTrailer.pause();
+    syncBackgroundMusicForTrailerAudio();
+    return;
+  }
+
+  if (!loadGameDetailTrailerSource()) {
+    return;
+  }
+
+  gameDetailTrailer.play().catch(() => {
+    if (!gameDetailTrailer.muted) {
+      forceVideoMuted(gameDetailTrailer);
+      gameDetailTrailer.play().catch(() => {
+        // Browser policy can still delay playback until media data is ready.
+      });
+    }
+  });
+}
+
+function setupGameDetailTrailerAutoplay() {
+  if (!gameDetailTrailer) {
+    return;
+  }
+
+  prepareGameDetailTrailerAutoplay(gameDetailTrailer);
+
+  if (gameDetailTrailerObserver) {
+    gameDetailTrailerObserver.disconnect();
+  }
+
+  if (gameDetailTrailerLoadObserver) {
+    gameDetailTrailerLoadObserver.disconnect();
+  }
+
+  const trailerRoot = getMediaViewportRoot(gameDetailTrailer);
+
+  gameDetailTrailerLoadObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.target === gameDetailTrailer && entry.isIntersecting) {
+          loadGameDetailTrailerSource();
+        }
+      });
+    },
+    {
+      root: trailerRoot,
+      rootMargin: "260px 0px",
+      threshold: 0.01,
+    }
+  );
+
+  gameDetailTrailerObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.target !== gameDetailTrailer) {
+          return;
+        }
+
+        if (entry.isIntersecting) {
+          syncGameDetailTrailerPlayback();
+        } else {
+          gameDetailTrailer.pause();
+        }
+      });
+    },
+    {
+      root: trailerRoot,
+      threshold: 0.45,
+    }
+  );
+
+  gameDetailTrailerLoadObserver.observe(gameDetailTrailer);
+  gameDetailTrailerObserver.observe(gameDetailTrailer);
+
+  if (gameDetailTrailer.dataset.detailTrailerBound === "true") {
+    return;
+  }
+
+  gameDetailTrailer.addEventListener("loadstart", () => {
+    if (getGameDetailTrailerSrc()) {
+      setGameDetailTrailerState("loading", "Loading trailer");
+    }
+  });
+
+  gameDetailTrailer.addEventListener("loadeddata", () => {
+    setGameDetailTrailerState("", "");
+    syncGameDetailTrailerPlayback();
+  });
+
+  gameDetailTrailer.addEventListener("canplay", () => {
+    setGameDetailTrailerState("", "");
+  });
+
+  gameDetailTrailer.addEventListener("error", () => {
+    setGameDetailTrailerState("error", "Trailer could not be loaded.");
+    syncBackgroundMusicForTrailerAudio();
+  });
+
+  gameDetailTrailer.addEventListener("play", syncBackgroundMusicForTrailerAudio);
+  gameDetailTrailer.addEventListener("pause", syncBackgroundMusicForTrailerAudio);
+  gameDetailTrailer.addEventListener("ended", syncBackgroundMusicForTrailerAudio);
+
+  gameDetailTrailer.addEventListener("volumechange", () => {
+    if (!gameDetailTrailer.muted && gameDetailTrailer.volume > 0) {
+      gameDetailTrailer.dataset.userAudioEnabled = "true";
+      setGameTrailerAudioEnabledThisSession(true);
+    }
+
+    syncBackgroundMusicForTrailerAudio();
+  });
+
+  const trailerRootScrollTarget = getMediaViewportRoot(gameDetailTrailer);
+  if (trailerRootScrollTarget && trailerRootScrollTarget.dataset.trailerScrollBound !== "true") {
+    let trailerScrollFrame = 0;
+    trailerRootScrollTarget.addEventListener("scroll", () => {
+      if (trailerScrollFrame) {
+        return;
+      }
+
+      trailerScrollFrame = window.requestAnimationFrame(() => {
+        trailerScrollFrame = 0;
+        syncGameDetailTrailerLoading();
+        syncGameDetailTrailerPlayback();
+      });
+    }, { passive: true });
+    trailerRootScrollTarget.dataset.trailerScrollBound = "true";
+  }
+
+  gameDetailTrailer.dataset.detailTrailerBound = "true";
 }
 
 function setupHoverTrailerPreviews() {
@@ -1643,6 +1953,11 @@ function enforceMediaMuteState(mediaEl) {
 
   rememberMediaVolume(mediaEl);
 
+  if (mediaEl.dataset.gameDetailTrailer !== undefined && mediaEl.dataset.userAudioEnabled !== "true") {
+    forceVideoMuted(mediaEl);
+    return;
+  }
+
   if (isMuted) {
     if (mediaEl.dataset.preMuteVolume === undefined) {
       mediaEl.dataset.preMuteVolume = String(mediaEl.volume);
@@ -1694,6 +2009,16 @@ function bindMediaMuteEnforcement(mediaEl) {
     }
 
     if (mediaEl.dataset.hoverPreview === "true") {
+      return;
+    }
+
+    if (mediaEl.dataset.gameDetailTrailer !== undefined) {
+      if (!mediaEl.muted && mediaEl.volume > 0) {
+        mediaEl.dataset.userAudioEnabled = "true";
+      }
+      if (typeof mediaEl.volume === "number") {
+        storeMediaVolume(mediaEl, mediaEl.volume);
+      }
       return;
     }
 
@@ -2827,15 +3152,20 @@ function renderGameDetail(gameId) {
 
   if (gameDetailTrailerSection && gameDetailTrailer) {
     if (game.trailer?.src) {
-      gameDetailTrailer.src = game.trailer.src;
+      gameDetailTrailer.dataset.trailerSrc = game.trailer.src;
+      gameDetailTrailer.removeAttribute("src");
       gameDetailTrailer.title = game.trailer.title || `${game.title} trailer`;
-      forceVideoMuted(gameDetailTrailer);
       gameDetailTrailerSection.classList.remove("is-hidden");
-      enableAutoplayForVideos(gameDetailTrailerSection);
+      gameDetailTrailer.load();
+      prepareGameDetailTrailerAutoplay(gameDetailTrailer);
+      setGameDetailTrailerState("", "");
+      syncGameDetailTrailerPlayback();
     } else {
+      delete gameDetailTrailer.dataset.trailerSrc;
       gameDetailTrailer.removeAttribute("src");
       gameDetailTrailer.load();
       gameDetailTrailer.title = "";
+      setGameDetailTrailerState("", "");
       gameDetailTrailerSection.classList.add("is-hidden");
     }
   }
@@ -2907,8 +3237,8 @@ function renderGameDetail(gameId) {
       ? game.devlog
       : [
         {
-          title: "No devlog entries yet",
-          body: "This panel is ready. Add entries in the `gameDetails` object later and they will appear here for this game.",
+          title: "Process notes",
+          body: "Detailed production notes are not available for this entry yet; the sections above summarize the project format, contribution, and access links.",
         },
       ];
 
@@ -3175,6 +3505,7 @@ function showWindow(windowEl, options = {}) {
   syncFullscreenState();
   renderTaskbarTabs();
   syncMediaMutedState();
+  syncGameDetailTrailerPlayback();
 
   if (options.updateRoute !== false) {
     syncHistoryRoute(getRouteForWindow(windowEl), { replace: options.replaceRoute });
@@ -3199,6 +3530,7 @@ function focusWindow(windowEl, options = {}) {
   syncFullscreenState();
   renderTaskbarTabs();
   syncMediaMutedState();
+  syncGameDetailTrailerPlayback();
 
   if (options.updateRoute) {
     syncHistoryRoute(getRouteForWindow(windowEl), { replace: options.replaceRoute !== false });
@@ -4974,6 +5306,7 @@ window.addEventListener("load", () => {
   reorderGameCollection();
   applyGameFilter("all");
   setupCursorEffect();
+  setupGameDetailTrailerAutoplay();
   setupHoverTrailerPreviews();
   arrangeVisiblePanels();
   syncFullscreenState();
