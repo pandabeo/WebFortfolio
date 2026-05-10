@@ -80,6 +80,7 @@ const gameDetailCover = document.querySelector(".game-detail-cover");
 const gameFilterButtons = document.querySelectorAll("[data-game-filter]");
 const gameFilterCount = document.querySelector("[data-game-filter-count]");
 const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]");
+let catMediaRendered = false;
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const START_PANEL_CLOSE_ANIMATION_MS = 180;
@@ -1455,10 +1456,11 @@ function injectWindowControls() {
 }
 
 function renderCatMedia() {
-  if (!catMediaGrid) {
+  if (!catMediaGrid || catMediaRendered) {
     return;
   }
 
+  catMediaRendered = true;
   catMediaGrid.innerHTML = catMedia
     .map((item) => {
       if (item.type === "video") {
@@ -1548,7 +1550,7 @@ function setupHoverTrailerPreviews() {
       videoEl.playsInline = true;
       videoEl.setAttribute("loop", "");
       videoEl.setAttribute("playsinline", "");
-      videoEl.preload = "auto";
+      videoEl.preload = "metadata";
 
       if (videoEl.networkState === HTMLMediaElement.NETWORK_EMPTY) {
         videoEl.load();
@@ -2565,6 +2567,12 @@ async function renderPdfPreview(viewerEl) {
 }
 
 function renderActiveDocumentPdf() {
+  const documentWindow = document.querySelector('[data-window-id="document-collection"]');
+
+  if (!documentWindow || documentWindow.classList.contains("is-hidden") || documentWindow.classList.contains("is-closing")) {
+    return;
+  }
+
   const activePreview = document.querySelector(".document-preview.is-active");
   const activePdfViewer = activePreview?.querySelector(".pdf-preview-viewer[data-pdf-src]");
 
@@ -3128,6 +3136,12 @@ function showWindow(windowEl, options = {}) {
   }
   bringToFront(windowEl);
   flashWindow(windowEl);
+  if (windowEl.dataset.windowId === "cat-collection") {
+    renderCatMedia();
+  }
+  if (windowEl.dataset.windowId === "document-collection") {
+    renderActiveDocumentPdf();
+  }
   enableAutoplayForVideos(windowEl);
   syncFullscreenState();
   renderTaskbarTabs();
@@ -3146,6 +3160,12 @@ function focusWindow(windowEl, options = {}) {
 
   bringToFront(windowEl);
   flashWindow(windowEl);
+  if (windowEl.dataset.windowId === "cat-collection") {
+    renderCatMedia();
+  }
+  if (windowEl.dataset.windowId === "document-collection") {
+    renderActiveDocumentPdf();
+  }
   enableAutoplayForVideos(windowEl);
   syncFullscreenState();
   renderTaskbarTabs();
@@ -4719,7 +4739,6 @@ window.addEventListener("load", () => {
   updateMusicUI(null); // Initial empty state
   updateMusicTrackTitle();
   updateMusicPlayLabel();
-  renderCatMedia();
   reorderGameCollection();
   applyGameFilter("all");
   setupCursorEffect();
@@ -4734,7 +4753,6 @@ window.addEventListener("load", () => {
   enableAutoplayForVideos();
   bindGameFrameAudioSync();
   syncMediaMutedState();
-  renderActiveDocumentPdf();
   renderTaskbarTabs();
   applyRouteFromLocation();
   updateTaskbarClock();
