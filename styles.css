@@ -2796,6 +2796,12 @@ body.is-dark .game-detail-trailer-frame {
   gap: 12px;
 }
 
+.game-detail-still,
+.pdf-preview-page,
+.cat-media-card img {
+  cursor: pointer;
+}
+
 .game-detail-still {
   display: block;
   border: 1px solid #9f9886;
@@ -2934,6 +2940,78 @@ body.is-dark .game-detail-devlog-heading span {
   border: 2px dashed #111;
   border-radius: 0;
   text-align: center;
+}
+
+.media-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10060;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 56px;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.82);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.media-lightbox.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.media-lightbox-frame {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+}
+
+.media-lightbox-frame img {
+  display: block;
+  max-width: min(100%, 1120px);
+  max-height: calc(100dvh - 120px);
+  object-fit: contain;
+  border: 2px solid #ffffff;
+  background: #111111;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.48);
+}
+
+.media-lightbox-frame figcaption {
+  max-width: min(100%, 900px);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.media-lightbox-close,
+.media-lightbox-nav {
+  border: 1px solid #ffffff;
+  background: linear-gradient(180deg, #f8f4ec 0%, #d8cfbd 100%);
+  color: #111111;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-weight: 700;
+  cursor: none;
+}
+
+.media-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 30px;
+}
+
+.media-lightbox-nav {
+  width: 52px;
+  height: 72px;
+  font-size: 2.4rem;
+  line-height: 1;
 }
 
 .taskbar {
@@ -4331,6 +4409,22 @@ body.is-dark .card-badge {
   .cat-media-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .media-lightbox {
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    gap: 6px;
+    padding: 14px 8px;
+  }
+
+  .media-lightbox-frame img {
+    max-height: calc(100dvh - 104px);
+  }
+
+  .media-lightbox-nav {
+    width: 38px;
+    height: 56px;
+    font-size: 1.8rem;
   }
 
   .contact-actions {

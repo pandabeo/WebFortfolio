@@ -1,4 +1,4 @@
-const revealItems = document.querySelectorAll(".reveal");
+﻿const revealItems = document.querySelectorAll(".reveal");
 
 const observer = new IntersectionObserver(
   (entries) => {
@@ -80,7 +80,16 @@ const gameDetailCover = document.querySelector(".game-detail-cover");
 const gameFilterButtons = document.querySelectorAll("[data-game-filter]");
 const gameFilterCount = document.querySelector("[data-game-filter-count]");
 const hoverTrailerCards = document.querySelectorAll("[data-hover-trailer-card]");
+const mediaLightbox = document.querySelector("#media-lightbox");
+const mediaLightboxImage = document.querySelector("#media-lightbox-image");
+const mediaLightboxCaption = document.querySelector("#media-lightbox-caption");
+const mediaLightboxClose = document.querySelector("#media-lightbox-close");
+const mediaLightboxPrev = document.querySelector("#media-lightbox-prev");
+const mediaLightboxNext = document.querySelector("#media-lightbox-next");
+const LIGHTBOX_PLACEHOLDER_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
 let catMediaRendered = false;
+let mediaLightboxItems = [];
+let mediaLightboxIndex = 0;
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const START_PANEL_CLOSE_ANIMATION_MS = 180;
@@ -90,9 +99,9 @@ const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.
 const DEFAULT_MUSIC_COVER_ART = "assets/wallpaper/kojima-please-hire-me.png";
 let MUSIC_TRACKS = [
   {
-    label: "Cá Hồi Hoang - 2004",
-    src: "playlists/songs/Cá Hồi Hoang - 2004/2004.mp3",
-    cover: "playlists/songs/Cá Hồi Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
+    label: "CÃ¡ Há»“i Hoang - 2004",
+    src: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/2004.mp3",
+    cover: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
     duration: "4:15"
   },
   {
@@ -102,21 +111,21 @@ let MUSIC_TRACKS = [
     duration: "5:07"
   },
   {
-    label: "Phùng Khánh Linh - Em Đau",
-    src: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/PHÙNG KHÁNH LINH  EM ĐAU (WITH THÀNH LUKE) (LYRIC VIDEO).mp3",
-    cover: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
+    label: "PhÃ¹ng KhÃ¡nh Linh - Em Äau",
+    src: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/PHÃ™NG KHÃNH LINH  EM ÄAU (WITH THÃ€NH LUKE) (LYRIC VIDEO).mp3",
+    cover: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
     duration: "4:30"
   },
   {
-    label: "Thành Luke - Cùng",
-    src: "playlists/songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
-    cover: "playlists/songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
+    label: "ThÃ nh Luke - CÃ¹ng",
+    src: "playlists/songs/ThÃ nh Luke - CÃ¹ng/ThÃ nh Luke - CÃ¹ng.mp3",
+    cover: "playlists/songs/ThÃ nh Luke - CÃ¹ng/0x1900-000000-80-0-0.jpg",
     duration: "3:00"
   },
   {
-    label: "Thành Luke - Cảnh Tiếp Theo",
-    src: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
-    cover: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
+    label: "ThÃ nh Luke - Cáº£nh Tiáº¿p Theo",
+    src: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo (Lyric Video).mp3",
+    cover: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/maxresdefault.jpg",
     duration: "4:20"
   }
 ];
@@ -124,19 +133,19 @@ let MUSIC_TRACKS = [
 MUSIC_TRACKS = [
   {
     label: "Ca Hoi Hoang - 2004",
-    src: "playlists/songs/Cá Hồi Hoang - 2004/2004.mp3",
-    cover: "playlists/songs/Cá Hồi Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
+    src: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/2004.mp3",
+    cover: "playlists/songs/CÃ¡ Há»“i Hoang - 2004/ab67616d0000b273f3405de7a471d45f4e99e9cb.jpg",
     duration: "4:15"
   },
   {
     label: "Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS",
-    src: "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/悲しみがとまらないI CAN'T STOP THE LONELINESS.mp3",
+    src: "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/æ‚²ã—ã¿ãŒã¨ã¾ã‚‰ãªã„I CAN'T STOP THE LONELINESS.mp3",
     cover: "playlists/songs/Kanashimi ga Tomaranai - I CAN'T STOP THE LONELINESS/1900x1900-000000-80-0-0.jpg",
     duration: ""
   },
   {
     label: "Low Roar - Bones",
-    src: "playlists/songs/Low Roar - Bones/Low Roar - Bones (feat. Jófríõur Ákadóttir) [Official Music Video].mp3",
+    src: "playlists/songs/Low Roar - Bones/Low Roar - Bones (feat. JÃ³frÃ­Ãµur ÃkadÃ³ttir) [Official Music Video].mp3",
     cover: "playlists/songs/Low Roar - Bones/artworks-tCfwh5SHHQj4-0-t500x500.jpg",
     duration: ""
   },
@@ -148,8 +157,8 @@ MUSIC_TRACKS = [
   },
   {
     label: "half alive - Never Been Better",
-    src: "playlists/songs/half·alive - Never Been Better/YTMP3GG_YouTube_half-alive-Never-Been-Better-Audio-ft-Or_Media_gFyn_Dh_fQM_009_128k.mp3",
-    cover: "playlists/songs/half·alive - Never Been Better/images (2).jpg",
+    src: "playlists/songs/halfÂ·alive - Never Been Better/YTMP3GG_YouTube_half-alive-Never-Been-Better-Audio-ft-Or_Media_gFyn_Dh_fQM_009_128k.mp3",
+    cover: "playlists/songs/halfÂ·alive - Never Been Better/images (2).jpg",
     duration: ""
   },
   {
@@ -160,7 +169,7 @@ MUSIC_TRACKS = [
   },
   {
     label: "Mariya Takeuchi - Plastic Love",
-    src: "playlists/songs/Mariya Takeuchi - Plastic Love/竹内まりや -  Plastic Love (Official Music Video).mp3",
+    src: "playlists/songs/Mariya Takeuchi - Plastic Love/ç«¹å†…ã¾ã‚Šã‚„ -  Plastic Love (Official Music Video).mp3",
     cover: "playlists/songs/Mariya Takeuchi - Plastic Love/r-20684092-1635474559-1118-jpeg.webp",
     duration: ""
   },
@@ -172,31 +181,31 @@ MUSIC_TRACKS = [
   },
   {
     label: "Phung Khanh Linh - Em Dau",
-    src: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/PHÙNG KHÁNH LINH  EM ĐAU (WITH THÀNH LUKE) (LYRIC VIDEO).mp3",
-    cover: "playlists/songs/PHÙNG KHÁNH LINH – EM ĐAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
+    src: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/PHÃ™NG KHÃNH LINH  EM ÄAU (WITH THÃ€NH LUKE) (LYRIC VIDEO).mp3",
+    cover: "playlists/songs/PHÃ™NG KHÃNH LINH â€“ EM ÄAU/ab67616d0000b27375e9c9d2259957c823e20af9.jpg",
     duration: "4:30"
   },
   {
     label: "Thanh Luke - Canh Tiep Theo",
-    src: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/Thành Luke - Cảnh Tiếp Theo (Lyric Video).mp3",
-    cover: "playlists/songs/Thành Luke - Cảnh Tiếp Theo/maxresdefault.jpg",
+    src: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo (Lyric Video).mp3",
+    cover: "playlists/songs/ThÃ nh Luke - Cáº£nh Tiáº¿p Theo/maxresdefault.jpg",
     duration: "4:20"
   },
   {
     label: "Thanh Luke - Cung",
-    src: "playlists/songs/Thành Luke - Cùng/Thành Luke - Cùng.mp3",
-    cover: "playlists/songs/Thành Luke - Cùng/0x1900-000000-80-0-0.jpg",
+    src: "playlists/songs/ThÃ nh Luke - CÃ¹ng/ThÃ nh Luke - CÃ¹ng.mp3",
+    cover: "playlists/songs/ThÃ nh Luke - CÃ¹ng/0x1900-000000-80-0-0.jpg",
     duration: "3:00"
   },
   {
     label: "Vaundy - Odoriko",
-    src: "playlists/songs/Vaundy - Odoriko/Vaundy - Odoriko (踊り子) (Lyrics) (RomEng).mp3",
+    src: "playlists/songs/Vaundy - Odoriko/Vaundy - Odoriko (è¸Šã‚Šå­) (Lyrics) (RomEng).mp3",
     cover: "playlists/songs/Vaundy - Odoriko/Vaundy_-_Odoriko.png",
     duration: ""
   },
   {
     label: "Yasuha - Flyday Chinatown",
-    src: "playlists/songs/Yasuha - Flyday Chinatown/フライディチャイナタウン 泰葉 Official Lyric Video.mp3",
+    src: "playlists/songs/Yasuha - Flyday Chinatown/ãƒ•ãƒ©ã‚¤ãƒ‡ã‚£ãƒãƒ£ã‚¤ãƒŠã‚¿ã‚¦ãƒ³ æ³°è‘‰ Official Lyric Video.mp3",
     cover: "playlists/songs/Yasuha - Flyday Chinatown/0x1900-000000-80-0-0.jpg",
     duration: ""
   }
@@ -210,10 +219,10 @@ let musicKeyboardActiveIndex = -1;
 
 function normalizeMusicAssetPath(src) {
   return (src || "")
-    .replaceAll("CÃ¡ Há»“i Hoang - 2004", "Cá Hồi Hoang - 2004")
-    .replaceAll("PHÃ™NG KHÃNH LINH â€“ EM ÄAU", "PHÙNG KHÁNH LINH – EM ĐAU")
-    .replaceAll("ThÃ nh Luke - CÃ¹ng", "Thành Luke - Cùng")
-    .replaceAll("ThÃ nh Luke - Cáº£nh Tiáº¿p Theo", "Thành Luke - Cảnh Tiếp Theo");
+    .replaceAll("CÃƒÂ¡ HÃ¡Â»â€œi Hoang - 2004", "CÃ¡ Há»“i Hoang - 2004")
+    .replaceAll("PHÃƒâ„¢NG KHÃƒÂNH LINH Ã¢â‚¬â€œ EM Ã„ÂAU", "PHÃ™NG KHÃNH LINH â€“ EM ÄAU")
+    .replaceAll("ThÃƒÂ nh Luke - CÃƒÂ¹ng", "ThÃ nh Luke - CÃ¹ng")
+    .replaceAll("ThÃƒÂ nh Luke - CÃ¡ÂºÂ£nh TiÃ¡ÂºÂ¿p Theo", "ThÃ nh Luke - Cáº£nh Tiáº¿p Theo");
 }
 
 MUSIC_TRACKS = MUSIC_TRACKS.map((track) => ({
@@ -661,6 +670,8 @@ const gameCaseStudies = {
   "thrifting-101": {
     problem: "Players needed to read messy customer requests and translate unclear taste into outfit choices without turning the loop into a simple checklist.",
     role: "Designed the request-response loop, outfit scoring logic, customer feedback flow, and Unity UI behavior.",
+    tools: "Unity 2D, C#, ScriptableObjects, Unity Canvas, browser/WebGL build pipeline.",
+    built: "Customer request data, outfit scoring, result feedback, dialogue variations, and UI states for browsing and submitting outfits.",
     systems: "Weighted preference matching, ScriptableObject-driven outfit data, request constraints, result feedback, and reusable UI state updates.",
     decisions: "Kept scoring readable through layered feedback: visible customer reactions explain the outcome while still preserving ambiguity in the next request.",
     result: "A fast browser-playable loop with strong shareability and clear portfolio evidence for gameplay systems work.",
@@ -668,6 +679,8 @@ const gameCaseStudies = {
   "coy-commute": {
     problem: "The game needed emotional state changes to affect play without relying on long exposition or heavy tutorial text.",
     role: "Built and tuned the state-driven gameplay loop, interaction timing, feedback behavior, and Unity implementation.",
+    tools: "Unity 2D, C#, ScriptableObjects, animation tuning, audio/visual feedback hooks.",
+    built: "Emotion-state transitions, movement-response changes, environmental reaction hooks, and the feedback loop connecting state to game feel.",
     systems: "Emotion-state parameters, movement response changes, environmental reactions, adaptive ambience, and event-driven feedback hooks.",
     decisions: "Made emotion legible through feel and pacing: friction, delay, animation, and world response communicate state before UI does.",
     result: "A polished mentorship project that won 1st Place and People's Choice at Gameloft GameDev Mentorship 2025.",
@@ -675,6 +688,8 @@ const gameCaseStudies = {
   "ame-no-naka": {
     problem: "Narrative delivery, exploration, dialogue, and puzzles needed to coexist without constantly taking control away from the player.",
     role: "Programmed core interaction flows and implemented Unity Visual Scripting graphs for reusable gameplay states.",
+    tools: "Unity, Unity Visual Scripting, 2D platforming workflows, scene and dialogue trigger systems.",
+    built: "Reusable interaction graphs, dialogue triggers, puzzle-state transitions, and exploration-to-story flow controls.",
     systems: "Dialogue triggers, interaction graphs, puzzle states, scene transitions, and reusable visual-scripting structures.",
     decisions: "Used modular graph patterns so narrative beats could be placed and iterated without rewriting the underlying interaction logic.",
     result: "A complete story-driven platformer project with clearer production structure and reusable implementation patterns.",
@@ -682,6 +697,8 @@ const gameCaseStudies = {
   "tales-of-a-playboy": {
     problem: "The browser build needed to present a character-led adventure clearly while leaving room for future production notes.",
     role: "Prepared the web presentation, playable embed, trailer context, and project metadata for portfolio review.",
+    tools: "Unity WebGL, itch.io embed hosting, trailer media, portfolio routing.",
+    built: "A playable detail page with launch controls, trailer preview, release actions, and expandable process sections.",
     systems: "Unity WebGL delivery, project actions, trailer preview, and detail-page rendering.",
     decisions: "Grouped playable access, media, and design notes in one focused view so the project is easy to scan before launching.",
     result: "A browser-ready project page that can grow into a fuller postmortem as more notes are added.",
@@ -689,6 +706,8 @@ const gameCaseStudies = {
   equilibrium: {
     problem: "A branching reading experience needed clear presentation despite having lighter technical systems than the Unity projects.",
     role: "Positioned the work as a narrative/browser piece and connected the playable build with supporting context.",
+    tools: "Twine, browser embed, itch.io release page, downloadable archive.",
+    built: "A compact narrative-project entry with playable access, download action, and project framing.",
     systems: "Twine branching structure, browser embed, and external release/download links.",
     decisions: "Focused the case study around reading flow and narrative choice rather than forcing it into an action-game systems frame.",
     result: "A compact narrative project entry that still communicates format, intent, and access path.",
@@ -696,6 +715,8 @@ const gameCaseStudies = {
   "a-game-about-me": {
     problem: "The project needed to communicate a personal narrative format while supporting both browser and Windows access.",
     role: "Structured the portfolio entry, playable embed, downloadable build link, and trailer media.",
+    tools: "HTML5/WebGL build, itch.io embed, Windows release archive, trailer media.",
+    built: "A project page that supports browser play, downloadable build access, trailer viewing, and future devlog notes.",
     systems: "HTML5 build presentation, downloadable release path, and trailer/detail rendering.",
     decisions: "Kept the page centered on quick access first, then supporting context, so viewers can try the work without extra navigation.",
     result: "A playable narrative entry with clear platform options and room for future process notes.",
@@ -705,6 +726,8 @@ const gameCaseStudies = {
 const defaultGameCaseStudy = {
   problem: "The project needed a compact portfolio presentation that explains format, contribution, and access path without overwhelming the collection view.",
   role: "Prepared the project metadata, media, release links, and detail-page structure.",
+  tools: "Unity, WebGL, itch.io, GitHub release hosting, and the portfolio window system.",
+  built: "A reusable project detail view with release actions, media sections, routing, and room for future production notes.",
   systems: "Project routing, trailer/still rendering, release actions, and reusable game detail UI.",
   decisions: "Kept the detail page consistent across playable and downloadable projects so each entry remains comparable.",
   result: "A clearer project page that can be expanded with deeper production notes when more material is available.",
@@ -1492,6 +1515,11 @@ function enableAutoplayForVideos(root = document) {
       return;
     }
 
+    if (videoEl.hasAttribute("controls")) {
+      forceVideoMuted(videoEl);
+      return;
+    }
+
     videoEl.autoplay = true;
     videoEl.loop = true;
     forceVideoMuted(videoEl);
@@ -2113,8 +2141,8 @@ function normalizeMusicSearchText(value = "") {
     .toString()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "d")
+    .replace(/Ä‘/g, "d")
+    .replace(/Ä/g, "d")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
@@ -2627,10 +2655,11 @@ function renderGameCaseStudy(gameId) {
 
   const caseStudy = gameCaseStudies[gameId] || defaultGameCaseStudy;
   const sections = [
-    ["Problem", caseStudy.problem],
-    ["My Role", caseStudy.role],
-    ["Systems", caseStudy.systems],
-    ["Design Decisions", caseStudy.decisions],
+    ["Role", caseStudy.role],
+    ["Tools", caseStudy.tools || caseStudy.systems],
+    ["What I Built", caseStudy.built || caseStudy.systems],
+    ["Design Problem", caseStudy.problem],
+    ["Design Choice", caseStudy.decisions],
     ["Result", caseStudy.result],
   ];
 
@@ -2789,7 +2818,7 @@ function renderGameDetail(gameId) {
         element.download = action.download;
       } else {
         element.target = "_blank";
-        element.rel = "noreferrer";
+        element.rel = "noopener noreferrer";
       }
 
       gameDetailActions.appendChild(element);
@@ -2822,7 +2851,7 @@ function renderGameDetail(gameId) {
         link.className = "game-detail-still";
         link.href = src;
         link.target = "_blank";
-        link.rel = "noreferrer";
+        link.rel = "noopener noreferrer";
         link.setAttribute("aria-label", `${game.title} still ${index + 1}`);
 
         const image = document.createElement("img");
@@ -3631,6 +3660,21 @@ function toggleStartPanel() {
   }
 }
 
+function openQuickLauncher() {
+  if (!startPanel || !startButton) {
+    return;
+  }
+
+  if (!isStartPanelOpen()) {
+    toggleStartPanel();
+  }
+
+  window.setTimeout(() => {
+    startSearchInput?.focus({ preventScroll: true });
+    startSearchInput?.select();
+  }, 0);
+}
+
 function filterStartMenuItems() {
   if (!startPanel) {
     return;
@@ -3663,7 +3707,7 @@ function getStartSearchOptions() {
 function setActiveStartSearchOption(option, { syncIndex = false } = {}) {
   const options = getStartSearchOptions();
 
-  options.forEach((item) => {
+  startPanel?.querySelectorAll(".start-menu-item, .start-search-result").forEach((item) => {
     item.classList.toggle("is-keyboard-active", item === option);
   });
 
@@ -3750,6 +3794,26 @@ function createStartSearchResult({ label, category, icon, onClick }) {
   return button;
 }
 
+function getAppSearchEntries() {
+  return Array.from(startPanel?.querySelectorAll(".start-panel-body .start-menu-item[data-target-window]") || [])
+    .map((item) => {
+      const targetId = item.dataset.targetWindow;
+      const title = item.textContent.trim();
+      const icon = item.querySelector("img")?.getAttribute("src") || "assets/xp-icons/taskbar-folder.ico";
+
+      return {
+        targetId,
+        title,
+        icon,
+        searchText: `${targetId} ${title}`,
+        onClick: () => {
+          item.click();
+          closeStartPanel();
+        },
+      };
+    });
+}
+
 function getDocumentSearchEntries() {
   return Array.from(documentItems).map((item) => {
     const targetId = item.dataset.docTarget;
@@ -3805,6 +3869,10 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
     return;
   }
 
+  const appMatches = getAppSearchEntries()
+    .filter((entry) => doesSearchTextMatch(entry.searchText, searchQuery))
+    .slice(0, 5);
+
   const gameMatches = Object.entries(gameDetails)
     .filter(([gameId, game]) => {
       return doesSearchTextMatch(getGameSearchText(gameId, game, searchQuery), searchQuery);
@@ -3814,6 +3882,15 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
   const documentMatches = getDocumentSearchEntries()
     .filter((entry) => doesSearchTextMatch(getDocumentSearchText(entry, searchQuery), searchQuery))
     .slice(0, 6);
+
+  appMatches.forEach((entry) => {
+    startSearchResults.appendChild(createStartSearchResult({
+      label: entry.title,
+      category: "app",
+      icon: entry.icon,
+      onClick: entry.onClick,
+    }));
+  });
 
   gameMatches.forEach(([gameId, game]) => {
     startSearchResults.appendChild(createStartSearchResult({
@@ -3844,7 +3921,7 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
     }));
   });
 
-  if (!visibleAppCount && !gameMatches.length && !documentMatches.length) {
+  if (!visibleAppCount && !appMatches.length && !gameMatches.length && !documentMatches.length) {
     const emptyState = document.createElement("div");
     emptyState.className = "start-search-empty";
     emptyState.textContent = "No results";
@@ -3852,6 +3929,96 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
   }
 
   startSearchResults.hidden = false;
+}
+
+function getLightboxItemsFromElements(elements) {
+  return elements
+    .map((element) => {
+      const image = element.matches?.("img") ? element : element.querySelector?.("img");
+      const src = image?.currentSrc || image?.src || element.href || "";
+
+      if (!src) {
+        return null;
+      }
+
+      return {
+        src,
+        alt: image?.alt || element.getAttribute?.("aria-label") || "Preview image",
+      };
+    })
+    .filter(Boolean);
+}
+
+function renderMediaLightbox() {
+  if (!mediaLightbox || !mediaLightboxImage || !mediaLightboxItems.length) {
+    return;
+  }
+
+  const item = mediaLightboxItems[mediaLightboxIndex];
+  mediaLightboxImage.src = item.src;
+  mediaLightboxImage.alt = item.alt;
+
+  if (mediaLightboxCaption) {
+    mediaLightboxCaption.textContent = `${item.alt} (${mediaLightboxIndex + 1}/${mediaLightboxItems.length})`;
+  }
+
+  const hasMultipleItems = mediaLightboxItems.length > 1;
+  if (mediaLightboxPrev) mediaLightboxPrev.hidden = !hasMultipleItems;
+  if (mediaLightboxNext) mediaLightboxNext.hidden = !hasMultipleItems;
+}
+
+function openMediaLightbox(items, index = 0) {
+  if (!mediaLightbox || !items.length) {
+    return;
+  }
+
+  mediaLightboxItems = items;
+  mediaLightboxIndex = clamp(index, 0, items.length - 1);
+  renderMediaLightbox();
+  mediaLightbox.classList.remove("is-hidden");
+  mediaLightboxClose?.focus({ preventScroll: true });
+}
+
+function closeMediaLightbox() {
+  if (!mediaLightbox) {
+    return;
+  }
+
+  mediaLightbox.classList.add("is-hidden");
+  if (mediaLightboxImage) {
+    mediaLightboxImage.src = LIGHTBOX_PLACEHOLDER_SRC;
+  }
+}
+
+function moveMediaLightbox(step) {
+  if (!mediaLightboxItems.length) {
+    return;
+  }
+
+  mediaLightboxIndex = (mediaLightboxIndex + step + mediaLightboxItems.length) % mediaLightboxItems.length;
+  renderMediaLightbox();
+}
+
+function getLightboxContextFromTarget(target) {
+  const stillLink = target.closest?.(".game-detail-still");
+  if (stillLink) {
+    const elements = Array.from(stillLink.closest("[data-game-detail-stills]")?.querySelectorAll(".game-detail-still") || []);
+    return { elements, active: stillLink };
+  }
+
+  const pdfPage = target.closest?.(".pdf-preview-page");
+  if (pdfPage?.tagName === "IMG") {
+    const elements = Array.from(pdfPage.closest(".pdf-preview-viewer")?.querySelectorAll("img.pdf-preview-page") || []);
+    return { elements, active: pdfPage };
+  }
+
+  const catImage = target.closest?.(".cat-media-card img");
+  if (catImage) {
+    const elements = Array.from(catImage.closest("#cat-media-grid")?.querySelectorAll(".cat-media-card img") || []);
+    return { elements, active: catImage };
+  }
+
+  return null;
 }
 
 function stopDragging() {
@@ -4294,6 +4461,26 @@ startPanel?.addEventListener("focusin", (event) => {
 
 startSearchInput?.addEventListener("input", filterStartMenuItems);
 
+function handleQuickLauncherKeydown(event) {
+  if (event.isComposing) {
+    return;
+  }
+
+  const targetIsEditable = event.target?.matches?.("input, textarea, select, [contenteditable='true']");
+  const wantsQuickLauncher = (event.ctrlKey || event.metaKey) && event.key?.toLowerCase() === "k";
+  const wantsSlashSearch = event.key === "/" && !targetIsEditable;
+
+  if (!wantsQuickLauncher && !wantsSlashSearch) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  openQuickLauncher();
+}
+
+window.addEventListener("keydown", handleQuickLauncherKeydown, true);
+
 function handleStartSearchKeydown(event) {
   if (!isStartPanelOpen() || event.isComposing) {
     return;
@@ -4336,6 +4523,29 @@ function handleStartSearchKeydown(event) {
 }
 
 window.addEventListener("keydown", handleStartSearchKeydown, true);
+
+window.addEventListener("keydown", (event) => {
+  if (!mediaLightbox || mediaLightbox.classList.contains("is-hidden")) {
+    return;
+  }
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeMediaLightbox();
+    return;
+  }
+
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    moveMediaLightbox(-1);
+    return;
+  }
+
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    moveMediaLightbox(1);
+  }
+}, true);
 
 function handleMusicSearchKeydown(event) {
   if (!musicPanel || musicPanel.classList.contains("is-collapsed") || event.isComposing) {
@@ -4686,6 +4896,28 @@ copyEmailButtons.forEach((button) => {
       }, 1800);
     }
   });
+});
+
+document.addEventListener("click", (event) => {
+  const context = getLightboxContextFromTarget(event.target);
+
+  if (!context?.elements.length) {
+    return;
+  }
+
+  event.preventDefault();
+  const items = getLightboxItemsFromElements(context.elements);
+  const index = context.elements.indexOf(context.active);
+  openMediaLightbox(items, Math.max(index, 0));
+});
+
+mediaLightboxClose?.addEventListener("click", closeMediaLightbox);
+mediaLightboxPrev?.addEventListener("click", () => moveMediaLightbox(-1));
+mediaLightboxNext?.addEventListener("click", () => moveMediaLightbox(1));
+mediaLightbox?.addEventListener("click", (event) => {
+  if (event.target === mediaLightbox) {
+    closeMediaLightbox();
+  }
 });
 
 document.addEventListener("pointerdown", (event) => {

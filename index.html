@@ -725,11 +725,11 @@
                   </button>
                   <button class="document-item" type="button" data-doc-target="doc-gameloop-pdf">
                     <strong>Game Loop Analysis PDF</strong>
-                    <span>PDF â€¢ Assignment 1</span>
+                    <span>PDF - Assignment 1</span>
                   </button>
                   <button class="document-item" type="button" data-doc-target="doc-gamedesign-pdf">
                     <strong>Game Design PDF</strong>
-                    <span>PDF â€¢ COMM2861</span>
+                    <span>PDF - COMM2861</span>
                   </button>
                 </div>
                 <div class="document-preview-pane">
@@ -816,7 +816,7 @@
         </div>
         <label class="start-search" for="start-search-input">
           <span class="start-search-label">Search</span>
-          <input id="start-search-input" class="start-search-input" type="search" placeholder="Find app..." autocomplete="off" />
+          <input id="start-search-input" class="start-search-input" type="search" placeholder="Search apps, games, docs..." autocomplete="off" />
         </label>
         <div class="start-panel-body">
           <button class="start-menu-item" type="button" data-target-window="about-window">
@@ -847,6 +847,16 @@
             <span>restart</span>
           </button>
         </div>
+      </div>
+
+      <div class="media-lightbox is-hidden" id="media-lightbox" aria-modal="true" role="dialog" aria-label="Media preview">
+        <button class="media-lightbox-close" id="media-lightbox-close" type="button" aria-label="Close preview">x</button>
+        <button class="media-lightbox-nav media-lightbox-prev" id="media-lightbox-prev" type="button" aria-label="Previous image">‹</button>
+        <figure class="media-lightbox-frame">
+          <img id="media-lightbox-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=" alt="" />
+          <figcaption id="media-lightbox-caption"></figcaption>
+        </figure>
+        <button class="media-lightbox-nav media-lightbox-next" id="media-lightbox-next" type="button" aria-label="Next image">›</button>
       </div>
 
       <div class="taskbar" aria-label="Open windows">

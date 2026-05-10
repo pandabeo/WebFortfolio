@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting | PandaBeo04 Portfolio</title>
+    <meta name="description" content="Redirect page for PandaBeo04 portfolio routes." />
+    <meta name="robots" content="noindex" />
+    <script>
+      (function () {
+        var path = window.location.pathname || "/";
+        var search = window.location.search || "";
+        var hash = window.location.hash || "";
+        var basePath = "/";
+        var routePath = path;
+
+        if (/\.github\.io$/i.test(window.location.hostname)) {
+          var segments = path.split("/").filter(Boolean);
+          if (segments.length > 0) {
+            basePath = "/" + segments[0] + "/";
+            routePath = "/" + segments.slice(1).join("/");
+          }
+        }
+
+        if (!routePath || routePath === "/") {
+          routePath = "/";
+        }
+
+        var nextHash = hash || (routePath === "/" ? "" : "#" + routePath);
+        window.location.replace(basePath + "index.html" + search + nextHash);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to PandaBeo04 Portfolio...</p>
+  </body>
+</html>
