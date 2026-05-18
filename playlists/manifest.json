@@ -81,6 +81,12 @@
           "file": "songs/Yasuha - Flyday Chinatown/フライディチャイナタウン 泰葉 Official Lyric Video.mp3",
           "cover": "songs/Yasuha - Flyday Chinatown/0x1900-000000-80-0-0.jpg",
           "duration": ""
+        },
+        {
+          "label": "Magnolian - Indigo",
+          "type": "soundcloud",
+          "soundcloudUrl": "https://soundcloud.com/magnolianmusic/indigo",
+          "duration": ""
         }
       ]
     }

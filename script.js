@@ -91,13 +91,21 @@ const LIGHTBOX_PLACEHOLDER_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA
 let catMediaRendered = false;
 let mediaLightboxItems = [];
 let mediaLightboxIndex = 0;
+const nativeFullscreenAutoResumeTimers = new WeakMap();
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const START_PANEL_CLOSE_ANIMATION_MS = 180;
 const FULLSCREEN_WINDOW_Z_INDEX = 10020;
 const FULLSCREEN_WINDOW_TOP_OFFSET = "var(--fullscreen-window-top)";
+const NATIVE_FULLSCREEN_AUTO_RESUME_MS = 500;
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
 const DEFAULT_MUSIC_COVER_ART = "assets/wallpaper/kojima-please-hire-me.png";
+const DEFAULT_SOUNDCLOUD_MUSIC_TRACK = {
+  label: "Magnolian - Indigo",
+  type: "soundcloud",
+  soundcloudUrl: "https://soundcloud.com/magnolianmusic/indigo",
+  duration: "",
+};
 let MUSIC_TRACKS = [
   {
     "label": "Cá Hồi Hoang - 2004",
@@ -231,8 +239,10 @@ async function loadMusicManifest() {
           src: src,
           cover: cover,
           duration: track.duration || "",
-          type: track.type || "audio",
-          soundcloudUrl: track.soundcloudUrl
+          type: track.type || (track.soundcloudUrl ? "soundcloud" : (track.youtubeId || track.youtubeUrl ? "youtube" : "audio")),
+          soundcloudUrl: track.soundcloudUrl || "",
+          youtubeId: track.youtubeId || getYouTubeVideoId(track.youtubeUrl || ""),
+          youtubeUrl: track.youtubeUrl || ""
         };
       }).sort(compareMusicTracksByLabel);
       populateMusicTracks();
@@ -632,69 +642,132 @@ const gameFilterTags = {
 
 const gameCaseStudies = {
   "thrifting-101": {
-    problem: "Players needed to read messy customer requests and translate unclear taste into outfit choices without turning the loop into a simple checklist.",
-    role: "Designed the request-response loop, outfit scoring logic, customer feedback flow, and Unity UI behavior.",
-    tools: "Unity 2D, C#, ScriptableObjects, Unity Canvas, browser/WebGL build pipeline.",
-    built: "Customer request data, outfit scoring, result feedback, dialogue variations, and UI states for browsing and submitting outfits.",
-    systems: "Weighted preference matching, ScriptableObject-driven outfit data, request constraints, result feedback, and reusable UI state updates.",
-    decisions: "Kept scoring readable through layered feedback: visible customer reactions explain the outcome while still preserving ambiguity in the next request.",
-    result: "A fast browser-playable loop with strong shareability and clear portfolio evidence for gameplay systems work.",
+    problem: "The core challenge was making fashion interpretation feel like reading a person, not solving a shopping checklist. Customer requests needed enough ambiguity to be funny and replayable, while the scoring system still had to be understandable so players could improve after each attempt.",
+    role: "I designed and implemented the full request-response loop: customer prompts, outfit item data, scoring rules, submission flow, result feedback, and the Unity UI behavior that connects each step. I also handled the WebGL build and release presentation so the project could be played directly from itch.io.",
+    tools: "Unity 2D, C#, ScriptableObjects, Unity Canvas, modular data classes, event-driven UI logic, WebGL build pipeline, itch.io hosting, and GitHub release packaging.",
+    built: "I built a data-driven outfit system with reusable item definitions, customer request profiles, weighted evaluation rules, feedback states, dialogue variations, and interface states for browsing, choosing, submitting, and reading results. The system supports outcomes that are more nuanced than pass or fail.",
+    systems: "Weighted preference matching, ScriptableObject-driven outfit data, customer constraint parsing, score-to-feedback mapping, result dialogue selection, reusable UI state updates, and a compact browser delivery flow.",
+    decisions: "I kept the scoring readable through layered feedback instead of exposing the full formula. Customer reactions explain whether the outfit matched the request, but the next prompt still preserves enough uncertainty to make interpretation part of the play loop.",
+    result: "The project became a fast, shareable browser game with strong evidence of systems design. Its performance on itch.io, including high views and likes, also showed that the concept was easy to understand and engaging enough for players to pass around.",
   },
   "coy-commute": {
-    problem: "The game needed emotional state changes to affect play without relying on long exposition or heavy tutorial text.",
-    role: "Built and tuned the state-driven gameplay loop, interaction timing, feedback behavior, and Unity implementation.",
-    tools: "Unity 2D, C#, ScriptableObjects, animation tuning, audio/visual feedback hooks.",
-    built: "Emotion-state transitions, movement-response changes, environmental reaction hooks, and the feedback loop connecting state to game feel.",
-    systems: "Emotion-state parameters, movement response changes, environmental reactions, adaptive ambience, and event-driven feedback hooks.",
-    decisions: "Made emotion legible through feel and pacing: friction, delay, animation, and world response communicate state before UI does.",
-    result: "A polished mentorship project that won 1st Place and People's Choice at Gameloft GameDev Mentorship 2025.",
+    problem: "The design problem was communicating emotional pressure through interaction instead of explanation. The player needed to feel state changes in movement, timing, and world response, while still understanding enough to make decisions during a short play session.",
+    role: "I built and tuned the state-driven gameplay loop, including emotional state transitions, control response, interaction timing, feedback behavior, and the Unity implementation that linked player input to world reaction.",
+    tools: "Unity 2D, C#, ScriptableObjects, modular state-machine logic, animation tuning, audio and visual feedback hooks, playtest iteration, and WebGL release tooling.",
+    built: "I built the emotional-state system, movement-response changes, environmental reaction hooks, state feedback, transition timing, and the playable browser release. The implementation connected internal state changes to practical game feel rather than leaving emotion as only narrative text.",
+    systems: "Emotion-state parameters, movement modifiers, interaction-speed changes, environmental triggers, adaptive ambience hooks, animation response, event-driven feedback, and data-driven tuning values.",
+    decisions: "I made emotion legible through pacing and feel first. Friction, delay, responsiveness, animation, and environmental behavior communicate the player's state before UI or dialogue has to explain it.",
+    result: "The final game was polished enough to win 1st Place and People's Choice at Gameloft GameDev Mentorship 2025, and it remains one of the strongest examples in the portfolio of combining system design with emotional game feel.",
   },
   "ame-no-naka": {
-    problem: "Narrative delivery, exploration, dialogue, and puzzles needed to coexist without constantly taking control away from the player.",
-    role: "Programmed core interaction flows and implemented Unity Visual Scripting graphs for reusable gameplay states.",
-    tools: "Unity, Unity Visual Scripting, 2D platforming workflows, scene and dialogue trigger systems.",
-    built: "Reusable interaction graphs, dialogue triggers, puzzle-state transitions, and exploration-to-story flow controls.",
-    systems: "Dialogue triggers, interaction graphs, puzzle states, scene transitions, and reusable visual-scripting structures.",
-    decisions: "Used modular graph patterns so narrative beats could be placed and iterated without rewriting the underlying interaction logic.",
-    result: "A complete story-driven platformer project with clearer production structure and reusable implementation patterns.",
+    problem: "The project had to balance a serious story with exploration, platforming, dialogue, and puzzle-solving. The risk was that narrative scenes could interrupt the player too often, while pure platforming could make the story feel disconnected.",
+    role: "I programmed the core interaction flows and implemented reusable Unity Visual Scripting graphs for dialogue, triggers, puzzle states, scene transitions, and player-facing events across the project.",
+    tools: "Unity, Unity Visual Scripting, 2D platforming workflows, scene trigger logic, reusable graph structures, dialogue-state logic, and iterative scene testing.",
+    built: "I built modular interaction graphs, dialogue triggers, puzzle-state transitions, scene flow controls, and reusable event patterns that let story beats appear inside exploration rather than only between gameplay segments.",
+    systems: "State graphs, trigger volumes, dialogue activation, puzzle state tracking, scene transition control, reusable graph nodes, and interaction gates tied to player progress.",
+    decisions: "I used modular graph patterns so narrative beats could be placed, tested, and revised without rewriting the underlying interaction logic. This kept implementation flexible while the story pacing changed during production.",
+    result: "The finished game became a complete story-driven platformer and a key learning project for building reusable gameplay logic. It also established a clearer production structure for later Unity projects.",
   },
   "tales-of-a-playboy": {
-    problem: "The browser build needed to present a character-led adventure clearly in a short playable session.",
-    role: "Prepared the web presentation, playable embed, trailer context, and project metadata for portfolio review.",
-    tools: "Unity WebGL, itch.io embed hosting, trailer media, portfolio routing.",
-    built: "A playable detail page with launch controls, trailer preview, release actions, and expandable process sections.",
-    systems: "Unity WebGL delivery, project actions, trailer preview, and detail-page rendering.",
-    decisions: "Grouped playable access, media, and design notes in one focused view so the project is easy to scan before launching.",
-    result: "A browser-ready project page with direct play access, trailer context, and concise project framing.",
+    problem: "The project needed to communicate a character-led adventure quickly, because players may only spend a short time sampling a browser game from a portfolio page. The presentation had to make the tone, playable access, and story focus clear before launch.",
+    role: "I prepared the playable WebGL presentation, project metadata, trailer context, release actions, and portfolio routing. I also shaped the detail page so reviewers can understand the work before opening the embedded build.",
+    tools: "Unity WebGL, itch.io embed hosting, trailer capture, portfolio routing, HTML media presentation, release links, and browser-playable deployment.",
+    built: "I built the portfolio entry around direct play access, trailer preview, release actions, cover art, metadata, and supporting process sections. The goal was to reduce friction between discovering the project and trying the build.",
+    systems: "Unity WebGL delivery, project-detail routing, trailer preview, itch.io embed integration, media loading, and reusable project action rendering.",
+    decisions: "I grouped playable access, media, and design notes into one focused view. This keeps the page useful for both quick reviewers who want to launch immediately and deeper reviewers who want context first.",
+    result: "The game now has a browser-ready project page with direct play access, trailer context, and clearer framing around its character-led adventure format.",
+  },
+  homeward: {
+    problem: "Homeward needed to present an action-adventure prototype around exploration, combat pacing, and boss encounters even though the available release is primarily downloadable. The case study had to explain the design intent without relying on an embedded browser build.",
+    role: "I designed and developed the prototype structure, prepared the release package, and positioned the project in the portfolio as a combat-and-exploration study rather than a simple download link.",
+    tools: "Unity, downloadable build packaging, itch.io release hosting, GitHub release storage, level blockout workflows, encounter pacing, and action-adventure prototyping.",
+    built: "I built a project entry that highlights traversal, encounter structure, boss-facing progression, release access, and the prototype's role in testing action readability. The portfolio view makes the downloadable build easier to understand before opening itch.io.",
+    systems: "Exploration flow, encounter layout, boss pacing, downloadable release routing, project metadata, and external release actions.",
+    decisions: "I framed the project around readable action structure instead of only listing it as a published build. That gives the viewer a clearer reason to inspect the prototype and understand what design problem it was exploring.",
+    result: "Homeward now reads as an action-adventure prototype with a clear design focus, release path, and production purpose inside the portfolio.",
+  },
+  "my-color-is-not-colorfull": {
+    problem: "The project uses color and contrast as emotional language, so the portfolio entry needed to explain mood and visual tone without over-describing the experience. The risk was making a quiet, atmospheric game sound too generic.",
+    role: "I framed the project as an emotion-led browser adventure, organized the release access, and wrote the supporting case-study context around color, tone, and player interpretation.",
+    tools: "Browser release workflow, itch.io hosting, visual mood direction, color-contrast design, portfolio metadata, and project-detail presentation.",
+    built: "I built a compact project entry that explains the emotional use of color, gives direct access to the release page, and positions the game as a mood-focused narrative experiment.",
+    systems: "Color-driven mood signaling, environmental tone, browser release access, project metadata, and reusable portfolio detail rendering.",
+    decisions: "I kept the explanation focused on how color and contrast shape player feeling. That is more useful than describing the plot in detail, because the project depends on atmosphere and interpretation.",
+    result: "The entry now communicates the game's emotional design intent more clearly and gives reviewers a stronger reason to open the release page.",
   },
   equilibrium: {
-    problem: "A point-and-click puzzle story needed clear presentation around its social-imbalance theme and branching outcomes.",
-    role: "Positioned the work as a point-and-click puzzle story and connected the playable build with supporting context.",
-    tools: "Browser build, pixel-art presentation, itch.io release page, downloadable archive.",
-    built: "A compact project entry with playable access, download action, and social-imbalance story framing.",
-    systems: "Point-and-click interaction, puzzle progression, branching story outcomes, and external release/download links.",
-    decisions: "Focused the case study around inequality, puzzle flow, and choice-driven endings rather than generic narrative framing.",
-    result: "A compact puzzle-story entry that communicates format, intent, and access path.",
+    problem: "The game combines point-and-click puzzle structure with a story about imbalance and hidden truths. The case study needed to explain both the interaction format and the social theme without making the entry feel like a plot summary.",
+    role: "I positioned the work as a puzzle-story project, connected the playable browser build with download access, and shaped the supporting context around choice, progression, and branching outcomes.",
+    tools: "Browser build, pixel-art presentation, itch.io release page, downloadable archive, point-and-click structure, and portfolio release-link handling.",
+    built: "I built the portfolio entry with playable access, download action, cover presentation, social-imbalance framing, and concise detail sections that explain the design focus before launch.",
+    systems: "Point-and-click interaction, puzzle progression, branching story outcomes, external release links, downloadable archive routing, and project-detail rendering.",
+    decisions: "I focused the case study on inequality, puzzle flow, and choice-driven endings instead of generic narrative framing. This makes the entry more specific and helps the project stand apart from other story games.",
+    result: "The project now communicates format, intent, access path, and theme more clearly, making it easier for viewers to understand why the puzzle structure matters.",
+  },
+  "d-fishy-finals": {
+    problem: "D' Fishy Finals deals with school pressure, intrusive thoughts, and teenage anxiety, so the portfolio needed to present the game carefully without reducing it to only its subject matter. The entry also had to credit that it is hosted on a collaborator account.",
+    role: "I contributed to the collaborative project presentation, release packaging, trailer context, and portfolio framing so the game can be understood as a narrative experience about pressure and inner conflict.",
+    tools: "Narrative adventure workflows, trailer media, downloadable build packaging, collaborator itch.io hosting, GitHub release storage, and portfolio metadata.",
+    built: "I built the portfolio entry with a trailer, downloadable release action, collaborator-hosted itch.io link, and case-study text that explains the emotional design goal and production context.",
+    systems: "Narrative progression, emotional framing, trailer presentation, external hosting links, downloadable release routing, and detail-page media loading.",
+    decisions: "I kept the framing centered on player experience: exam pressure, intrusive thought loops, and inner conflict. That makes the entry more respectful and clearer than presenting it as a generic student narrative game.",
+    result: "The project page now gives the collaborative release a stronger identity, clearer access path, and more specific explanation of its narrative purpose.",
+  },
+  blocknout: {
+    problem: "BlocknOut is a blockout prototype, so its value is not final visual polish but action readability, level structure, and early encounter pacing. The case study needed to make that prototype purpose obvious.",
+    role: "I designed and developed the prototype presentation, organized the external release action, and framed the work around level readability and third-person action testing.",
+    tools: "Unity, third-person prototype workflows, level blockout, encounter layout, itch.io release page, and portfolio detail metadata.",
+    built: "I built a portfolio entry that explains the project as a readable action prototype with level structure, encounter layout, and a direct release path for viewers who want to inspect the build.",
+    systems: "Third-person movement context, blockout layout, encounter pacing, action readability, external release linking, and project-detail rendering.",
+    decisions: "I described the prototype as a design test rather than a finished visual showcase. This makes the roughness intentional and helps reviewers evaluate the correct part of the work.",
+    result: "BlocknOut now reads as a purposeful action-design prototype focused on structure, readability, and iteration.",
+  },
+  "hours-before-blue": {
+    problem: "This small jam project needed to communicate cozy pacing and compact scope without being overshadowed by larger projects. The case study had to make the limited scope feel intentional.",
+    role: "I designed the portfolio framing, release access, and project description around a short, quiet adventure loop built for a constrained jam-style production cycle.",
+    tools: "Jam production workflow, downloadable build packaging, itch.io release hosting, GitHub release storage, and compact portfolio presentation.",
+    built: "I built a project entry with download access, itch.io link, cover presentation, and case-study text that explains the game's gentle pacing and small-scope adventure structure.",
+    systems: "Compact adventure loop, cozy exploration pacing, downloadable release routing, external release links, and project metadata rendering.",
+    decisions: "I framed the small scope as a design constraint: the game is meant to be short, focused, and readable rather than expanded with unnecessary systems.",
+    result: "The entry now presents Hours Before Blue as a complete small-scope work with a clear mood, release path, and production context.",
+  },
+  chaotet: {
+    problem: "ChaoTet! combines 3D survival-simulation structure with festive Tet chaos, so the portfolio entry needed to explain both the cultural theme and the resource-pressure loop. It also had to make a downloadable-only build feel easy to inspect.",
+    role: "I contributed to the collaborative release framing, trailer presentation, download action, and case-study text that explains how the survival-simulation pressure supports the festive premise.",
+    tools: "Unity 3D, survival-simulation design, trailer media, downloadable build packaging, itch.io release hosting, GitHub release storage, and portfolio media rendering.",
+    built: "I built the portfolio entry with trailer support, downloadable release access, external itch.io link, cover media, and detailed context around festive chaos, resource management, and event pressure.",
+    systems: "3D survival-simulation loop, resource pressure, event management, trailer loading, downloadable release routing, and external project actions.",
+    decisions: "I described the game through the tension between celebration and management. That makes the premise clearer than listing mechanics alone and helps the Tet theme feel connected to the systems.",
+    result: "The project now has a fuller case study that explains its collaborative context, playable access limitations, and design identity as a festive survival-simulation game.",
+  },
+  "into-the-dungeon": {
+    problem: "The project explores procedural dungeon generation, but procedural work can sound abstract unless the portfolio explains what the generated spaces are meant to support. The entry needed to connect generation with repeatable play.",
+    role: "I framed the project around generated layouts, combat encounters, downloadable release access, and the prototype value of testing repeatable dungeon structure.",
+    tools: "Unity, procedural dungeon prototyping, encounter design, downloadable build packaging, itch.io release hosting, GitHub release storage, and trailer media.",
+    built: "I built the portfolio entry with trailer support, downloadable build access, release links, and case-study language focused on generated spaces, replayable layouts, and action-prototype goals.",
+    systems: "Procedural layout generation, repeatable encounter structure, action prototype loop, trailer presentation, downloadable release routing, and project-detail rendering.",
+    decisions: "I focused the explanation on why generation matters: it supports replayable spaces and repeatable encounter testing, not just technical novelty.",
+    result: "IntoTheDungeon now reads as a procedural action prototype with clearer technical intent, release access, and design purpose.",
   },
   "a-game-about-me": {
-    problem: "The project needed to communicate a personal narrative format while supporting both browser and Windows access.",
-    role: "Structured the portfolio entry, playable embed, downloadable build link, and trailer media.",
-    tools: "HTML5/WebGL build, itch.io embed, Windows release archive, trailer media.",
-    built: "A project page that supports browser play, downloadable build access, trailer viewing, and personal narrative framing.",
-    systems: "HTML5 build presentation, downloadable release path, and trailer/detail rendering.",
-    decisions: "Kept the page centered on quick access first, then supporting context, so viewers can try the work without extra navigation.",
-    result: "A playable personal narrative entry with clear platform options and project context.",
+    problem: "The project is personal, so the portfolio had to explain the autobiographical focus without making the entry feel too private or unclear. It also needed to support both browser play and Windows download access.",
+    role: "I structured the playable embed, downloadable build link, trailer media, release actions, and case-study framing around the game's high-school narrative and its connection to choosing game design.",
+    tools: "HTML5/WebGL build, itch.io embed hosting, Windows release archive, trailer media, GitHub release storage, and portfolio project routing.",
+    built: "I built a detail page that supports browser play, downloadable build access, trailer viewing, cover presentation, and personal narrative context without adding extra navigation steps.",
+    systems: "HTML5 build presentation, embedded player loading, downloadable release path, trailer media loading, project routing, and reusable detail-page rendering.",
+    decisions: "I kept the page centered on quick access first, then supporting context. Viewers can try the work immediately, but the case study still explains the personal theme behind the project.",
+    result: "The entry now presents A Game About Me as both a playable personal narrative and a milestone project about uncertainty, mistakes, and finding a direction in game design.",
   },
 };
 
 const defaultGameCaseStudy = {
-  problem: "The project needed a compact portfolio presentation that explains format, contribution, and access path without overwhelming the collection view.",
-  role: "Prepared the project metadata, media, release links, and detail-page structure.",
-  tools: "Unity, WebGL, itch.io, GitHub release hosting, and the portfolio window system.",
-  built: "A reusable project detail view with release actions, media sections, routing, and concise project context.",
-  systems: "Project routing, trailer/still rendering, release actions, and reusable game detail UI.",
-  decisions: "Kept the detail page consistent across playable and downloadable projects so each entry remains comparable.",
-  result: "A clearer project page that explains format, contribution, and access path at a glance.",
+  problem: "The project needed a portfolio presentation that explains format, contribution, and access path without overwhelming the collection view or forcing viewers to leave the site before understanding the work.",
+  role: "I prepared the project metadata, media, release links, and detail-page structure so the game can be evaluated quickly from the portfolio.",
+  tools: "Unity, WebGL, itch.io, GitHub release hosting, trailer media, downloadable archives, and the portfolio window system.",
+  built: "I built a reusable project detail view with release actions, media sections, routing, cover presentation, and concise project context.",
+  systems: "Project routing, trailer and still rendering, release actions, embedded players, downloadable links, and reusable game detail UI.",
+  decisions: "I kept the detail page consistent across playable and downloadable projects so each entry remains comparable while still allowing project-specific context.",
+  result: "The project page explains format, contribution, and access path more clearly, giving reviewers enough context before they decide to play, download, or open the external release.",
 };
 
 function getGameRouteSlug(gameId) {
@@ -761,6 +834,13 @@ let cursorPressTimeout = null;
 let gameDetailTrailerObserver = null;
 let gameDetailTrailerLoadObserver = null;
 let musicPausedForTrailerAudio = false;
+let youtubeMusicPlayer = null;
+let youtubeMusicReadyPromise = null;
+let resolveYoutubeMusicReady = null;
+let isYoutubeMusicPlaying = false;
+let soundcloudWidget = null;
+let soundcloudWidgetReadyPromise = null;
+let isSoundCloudMusicPlaying = false;
 let pointerX = 0;
 let pointerY = 0;
 let isMuted = false;
@@ -1551,6 +1631,8 @@ function prepareGameDetailTrailerAutoplay(videoEl = gameDetailTrailer) {
     return;
   }
 
+  bindNativeFullscreenResume(videoEl);
+
   if (isGameTrailerAudioEnabledThisSession()) {
     videoEl.dataset.userAudioEnabled = "true";
   }
@@ -1675,16 +1757,14 @@ function pauseBackgroundMusicForTrailerAudio() {
     updateMusicPlayLabel();
   }
 
-  if (currentlyPlayingTrack?.type === "soundcloud") {
-    const scPlayer = document.querySelector("#sc-player");
-    if (scPlayer && window.SC && window.SC.Widget) {
-      try {
-        window.SC.Widget(scPlayer).pause();
-        musicPausedForTrailerAudio = true;
-      } catch {
-        // SoundCloud widget state can be unavailable while it is initializing.
-      }
-    }
+  if (isYouTubeMusicTrack(currentlyPlayingTrack)) {
+    pauseYouTubeMusic();
+    musicPausedForTrailerAudio = true;
+  }
+
+  if (isSoundCloudMusicTrack(currentlyPlayingTrack)) {
+    pauseSoundCloudMusic();
+    musicPausedForTrailerAudio = true;
   }
 }
 
@@ -1699,6 +1779,10 @@ function resumeBackgroundMusicAfterTrailerAudio() {
     musicAudio.play().catch(() => {
       updateMusicPlayLabel();
     });
+  } else if (isYouTubeMusicTrack(currentlyPlayingTrack)) {
+    playYouTubeMusic();
+  } else if (isSoundCloudMusicTrack(currentlyPlayingTrack)) {
+    toggleSoundCloudMusic();
   }
 }
 
@@ -1787,7 +1871,7 @@ function setupGameDetailTrailerAutoplay() {
 
         if (entry.isIntersecting) {
           syncGameDetailTrailerPlayback();
-        } else {
+        } else if (!isMediaFullscreen(gameDetailTrailer)) {
           gameDetailTrailer.pause();
         }
       });
@@ -2044,8 +2128,109 @@ function getMediaWindow(mediaEl) {
   return mediaEl?.closest(".window") || null;
 }
 
+function isMediaFullscreen(mediaEl) {
+  if (!mediaEl) {
+    return false;
+  }
+
+  const fullscreenEl = document.fullscreenElement;
+  return Boolean(
+    mediaEl.dataset.nativeFullscreenRequested === "true" ||
+      fullscreenEl === mediaEl ||
+      fullscreenEl?.contains?.(mediaEl)
+  );
+}
+
+function armNativeFullscreenAutoResume(videoEl) {
+  if (!videoEl) {
+    return;
+  }
+
+  videoEl.dataset.nativeFullscreenAutoResume = "true";
+  window.clearTimeout(nativeFullscreenAutoResumeTimers.get(videoEl));
+
+  const timer = window.setTimeout(() => {
+    delete videoEl.dataset.nativeFullscreenAutoResume;
+    nativeFullscreenAutoResumeTimers.delete(videoEl);
+  }, NATIVE_FULLSCREEN_AUTO_RESUME_MS);
+
+  nativeFullscreenAutoResumeTimers.set(videoEl, timer);
+}
+
+function resumeNativeFullscreenVideo(videoEl) {
+  if (
+    !videoEl ||
+    videoEl.dataset.nativeFullscreenRequested !== "true" ||
+    videoEl.dataset.nativeFullscreenAutoResume !== "true"
+  ) {
+    return;
+  }
+
+  [0, 120, 360].forEach((delay) => {
+    window.setTimeout(() => {
+      if (
+        videoEl.dataset.nativeFullscreenRequested !== "true" ||
+        videoEl.dataset.nativeFullscreenAutoResume !== "true" ||
+        !videoEl.paused
+      ) {
+        return;
+      }
+
+      videoEl.play().catch(() => {
+        // Native controls remain available if the browser blocks the resume.
+      });
+    }, delay);
+  });
+}
+
+function bindNativeFullscreenResume(videoEl) {
+  if (!videoEl || videoEl.dataset.nativeFullscreenResumeBound === "true") {
+    return;
+  }
+
+  videoEl.addEventListener("pause", () => {
+    if (isMediaFullscreen(videoEl)) {
+      resumeNativeFullscreenVideo(videoEl);
+    }
+  });
+
+  videoEl.addEventListener("webkitbeginfullscreen", () => {
+    videoEl.dataset.nativeFullscreenRequested = "true";
+    armNativeFullscreenAutoResume(videoEl);
+    resumeNativeFullscreenVideo(videoEl);
+  });
+
+  videoEl.addEventListener("webkitendfullscreen", () => {
+    delete videoEl.dataset.nativeFullscreenRequested;
+    delete videoEl.dataset.nativeFullscreenAutoResume;
+    window.clearTimeout(nativeFullscreenAutoResumeTimers.get(videoEl));
+    nativeFullscreenAutoResumeTimers.delete(videoEl);
+    requestMediaVisibilitySync();
+  });
+
+  videoEl.dataset.nativeFullscreenResumeBound = "true";
+}
+
+function getFullscreenVideoElement() {
+  const fullscreenEl = document.fullscreenElement;
+
+  if (!fullscreenEl) {
+    return null;
+  }
+
+  if (fullscreenEl.tagName === "VIDEO") {
+    return fullscreenEl;
+  }
+
+  return fullscreenEl.querySelector?.("video") || null;
+}
+
 function isMediaInActiveWindow(mediaEl) {
   if (mediaEl === musicAudio) {
+    return true;
+  }
+
+  if (isMediaFullscreen(mediaEl)) {
     return true;
   }
 
@@ -2067,7 +2252,7 @@ function isMediaVisibleInPanel(mediaEl) {
     return false;
   }
 
-  if (document.fullscreenElement === mediaEl) {
+  if (isMediaFullscreen(mediaEl)) {
     return true;
   }
 
@@ -2313,6 +2498,10 @@ function syncVisibleMediaPlayback(root = document) {
 
 function syncMediaMutedState() {
   syncEmbeddedFrameAudioState();
+  syncYouTubeMusicMutedState();
+  if (isMuted && isSoundCloudMusicTrack(currentlyPlayingTrack)) {
+    pauseSoundCloudMusic();
+  }
 
   document.querySelectorAll("audio, video").forEach((mediaEl) => {
     if (!isMediaInActiveWindow(mediaEl)) {
@@ -2421,11 +2610,15 @@ function updateSoundToggleLabel() {
 }
 
 function updateMusicPlayLabel() {
-  if (!musicPlayToggle || !musicAudio) {
+  if (!musicPlayToggle) {
     return;
   }
 
-  const isPlaying = !musicAudio.paused && !musicAudio.ended;
+  const isPlaying = isSoundCloudMusicTrack(currentlyPlayingTrack)
+    ? isSoundCloudMusicPlaying
+    : isYouTubeMusicTrack(currentlyPlayingTrack)
+      ? isYoutubeMusicPlaying
+      : Boolean(musicAudio && !musicAudio.paused && !musicAudio.ended);
   musicPlayToggle.textContent = isPlaying ? "Pause" : "Play";
   musicPlayToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
   musicPanel?.classList.toggle("is-playing", isPlaying);
@@ -2458,7 +2651,298 @@ function compareMusicTracksByLabel(a, b) {
 }
 
 function getPlayableMusicTracks() {
-  return MUSIC_TRACKS.filter((track) => (track.src || track.soundcloudUrl) && track.label);
+  return MUSIC_TRACKS.filter((track) => isSoundCloudMusicTrack(track) && track.label);
+}
+
+function getTrackSoundCloudUrl(track) {
+  return track?.soundcloudUrl || "";
+}
+
+function isSoundCloudMusicTrack(track) {
+  return Boolean(track && (track.type === "soundcloud" || getTrackSoundCloudUrl(track)));
+}
+
+function getSoundCloudEmbedUrl(track) {
+  const soundcloudUrl = getTrackSoundCloudUrl(track);
+  if (!soundcloudUrl) {
+    return "";
+  }
+
+  const params = new URLSearchParams({
+    url: soundcloudUrl,
+    color: "#ff5500",
+    auto_play: "false",
+    hide_related: "true",
+    show_comments: "false",
+    show_user: "true",
+    show_reposts: "false",
+    show_teaser: "false",
+    visual: "false",
+  });
+
+  return `https://w.soundcloud.com/player/?${params.toString()}`;
+}
+
+function ensureSoundCloudWidget() {
+  const soundcloudPlayer = document.getElementById("soundcloud-player");
+
+  if (!soundcloudPlayer || !window.SC?.Widget) {
+    return Promise.resolve(null);
+  }
+
+  if (soundcloudWidget) {
+    return Promise.resolve(soundcloudWidget);
+  }
+
+  soundcloudWidget = window.SC.Widget(soundcloudPlayer);
+  soundcloudWidgetReadyPromise = new Promise((resolve) => {
+    soundcloudWidget.bind(window.SC.Widget.Events.READY, () => {
+      setSoundCloudMusicVolume();
+      resolve(soundcloudWidget);
+    });
+    soundcloudWidget.bind(window.SC.Widget.Events.PLAY, () => {
+      isSoundCloudMusicPlaying = true;
+      updateMusicPlayLabel();
+    });
+    soundcloudWidget.bind(window.SC.Widget.Events.PAUSE, () => {
+      isSoundCloudMusicPlaying = false;
+      updateMusicPlayLabel();
+    });
+    soundcloudWidget.bind(window.SC.Widget.Events.FINISH, () => {
+      isSoundCloudMusicPlaying = false;
+      updateMusicPlayLabel();
+    });
+  });
+
+  return soundcloudWidgetReadyPromise;
+}
+
+function loadSoundCloudMusic(track) {
+  const soundcloudPlayer = document.getElementById("soundcloud-player");
+  const embedUrl = getSoundCloudEmbedUrl(track);
+
+  if (!soundcloudPlayer || !embedUrl) {
+    return;
+  }
+
+  isSoundCloudMusicPlaying = false;
+  if (musicProgress) musicProgress.style.width = "0%";
+  soundcloudPlayer.src = embedUrl;
+  soundcloudWidget = null;
+  soundcloudWidgetReadyPromise = null;
+  ensureSoundCloudWidget();
+}
+
+function toggleSoundCloudMusic() {
+  ensureSoundCloudWidget().then((widget) => {
+    widget?.toggle?.();
+  });
+}
+
+function pauseSoundCloudMusic() {
+  soundcloudWidget?.pause?.();
+  isSoundCloudMusicPlaying = false;
+  updateMusicPlayLabel();
+}
+
+function setSoundCloudMusicVolume() {
+  const nextVolume = Math.round(Number.parseFloat(musicVolume?.value || "0.45") * 100);
+
+  try {
+    soundcloudWidget?.setVolume?.(nextVolume);
+  } catch {
+    // The SoundCloud iframe may not be ready yet.
+  }
+}
+
+function getYouTubeVideoId(value = "") {
+  if (!value) {
+    return "";
+  }
+
+  const trimmedValue = value.trim();
+
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  try {
+    const url = new URL(trimmedValue);
+
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.split("/").filter(Boolean)[0] || "";
+    }
+
+    if (url.searchParams.has("v")) {
+      return url.searchParams.get("v") || "";
+    }
+
+    const embedMatch = url.pathname.match(/\/(?:embed|shorts)\/([a-zA-Z0-9_-]{11})/);
+    return embedMatch?.[1] || "";
+  } catch {
+    return "";
+  }
+}
+
+function getYouTubePlaylistId(value = "") {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    const url = new URL(value.trim());
+    return url.searchParams.get("list") || "";
+  } catch {
+    return "";
+  }
+}
+
+function getTrackYouTubeId(track) {
+  return track?.youtubeId || getYouTubeVideoId(track?.youtubeUrl || "");
+}
+
+function getTrackYouTubePlaylistId(track) {
+  return track?.youtubePlaylistId || getYouTubePlaylistId(track?.youtubeUrl || "");
+}
+
+function isYouTubeMusicTrack(track) {
+  return Boolean(track && (track.type === "youtube" || (!track.src && getTrackYouTubeId(track))));
+}
+
+function ensureYouTubeMusicApi() {
+  if (window.YT?.Player) {
+    return Promise.resolve(window.YT);
+  }
+
+  if (youtubeMusicReadyPromise) {
+    return youtubeMusicReadyPromise;
+  }
+
+  youtubeMusicReadyPromise = new Promise((resolve) => {
+    resolveYoutubeMusicReady = resolve;
+    const previousCallback = window.onYouTubeIframeAPIReady;
+
+    window.onYouTubeIframeAPIReady = () => {
+      previousCallback?.();
+      resolve(window.YT);
+      resolveYoutubeMusicReady = null;
+    };
+
+    if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+      const script = document.createElement("script");
+      script.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(script);
+    }
+  });
+
+  return youtubeMusicReadyPromise;
+}
+
+function onYouTubeMusicStateChange(event) {
+  isYoutubeMusicPlaying = event.data === window.YT?.PlayerState?.PLAYING;
+
+  if (event.data === window.YT?.PlayerState?.ENDED) {
+    isYoutubeMusicPlaying = false;
+  }
+
+  updateMusicPlayLabel();
+}
+
+function getYouTubeMusicPlayer(videoId) {
+  return ensureYouTubeMusicApi().then((YT) => {
+    if (resolveYoutubeMusicReady) {
+      resolveYoutubeMusicReady(YT);
+      resolveYoutubeMusicReady = null;
+    }
+
+    if (youtubeMusicPlayer?.loadVideoById) {
+      youtubeMusicPlayer.loadVideoById(videoId);
+      return youtubeMusicPlayer;
+    }
+
+    const playlistId = getTrackYouTubePlaylistId(currentlyPlayingTrack);
+
+    const playerVars = {
+      autoplay: 0,
+      controls: 1,
+      enablejsapi: 1,
+      start_radio: 1,
+      playsinline: 1,
+      rel: 0,
+    };
+
+    if (playlistId) {
+      playerVars.list = playlistId;
+    }
+
+    if (window.location.origin && window.location.origin !== "null") {
+      playerVars.origin = window.location.origin;
+    }
+
+    youtubeMusicPlayer = new YT.Player("yt-player", {
+      videoId,
+      playerVars,
+      events: {
+        onReady: (event) => {
+          event.target.setVolume(Math.round(Number.parseFloat(musicVolume?.value || "0.45") * 100));
+        },
+        onStateChange: onYouTubeMusicStateChange,
+      },
+    });
+
+    return youtubeMusicPlayer;
+  });
+}
+
+function pauseYouTubeMusic() {
+  try {
+    youtubeMusicPlayer?.pauseVideo?.();
+  } catch {
+    // The YouTube iframe may not be ready yet.
+  }
+  isYoutubeMusicPlaying = false;
+  updateMusicPlayLabel();
+}
+
+function stopYouTubeMusic() {
+  try {
+    youtubeMusicPlayer?.stopVideo?.();
+  } catch {
+    // The YouTube iframe may not be ready yet.
+  }
+  isYoutubeMusicPlaying = false;
+}
+
+function playYouTubeMusic() {
+  if (isMuted || !youtubeMusicPlayer?.playVideo) {
+    return;
+  }
+
+  youtubeMusicPlayer.playVideo();
+}
+
+function setYouTubeMusicVolume() {
+  const nextVolume = Math.round(Number.parseFloat(musicVolume?.value || "0.45") * 100);
+
+  try {
+    youtubeMusicPlayer?.setVolume?.(nextVolume);
+  } catch {
+    // The YouTube iframe may not be ready yet.
+  }
+}
+
+function syncYouTubeMusicMutedState() {
+  try {
+    if (isMuted) {
+      youtubeMusicPlayer?.mute?.();
+      pauseYouTubeMusic();
+    } else {
+      youtubeMusicPlayer?.unMute?.();
+      setYouTubeMusicVolume();
+    }
+  } catch {
+    // The YouTube iframe may not be ready yet.
+  }
 }
 
 function normalizeMusicSearchText(value = "") {
@@ -2664,25 +3148,43 @@ function setMusicSource(track) {
   if (!track) return;
 
   const musicCoverArt = document.getElementById("music-cover-art");
-  const scPlayer = document.getElementById("sc-player");
+  const ytPlayer = document.getElementById("yt-player");
+  const soundcloudPlayer = document.getElementById("soundcloud-player");
+  const youtubeId = getTrackYouTubeId(track);
 
   updateMusicUI(track);
   currentlyPlayingTrack = track;
 
-  if (track.type === "soundcloud" && track.soundcloudUrl) {
+  if (isSoundCloudMusicTrack(track)) {
+    musicAudio?.pause();
+    stopYouTubeMusic();
+    if (ytPlayer) ytPlayer.style.display = "none";
+    if (musicCoverArt) musicCoverArt.style.display = "none";
+    if (soundcloudPlayer) {
+      soundcloudPlayer.style.display = "block";
+    }
+    loadSoundCloudMusic(track);
+    if (musicTimeDisplay) musicTimeDisplay.textContent = "SoundCloud";
+  } else if (isYouTubeMusicTrack(track) && youtubeId) {
     musicAudio?.pause();
     if (musicAudio) musicAudio.src = "";
 
     if (musicCoverArt) musicCoverArt.style.display = "none";
-    if (scPlayer) {
-      const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(track.soundcloudUrl)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
-      scPlayer.src = embedUrl;
-      scPlayer.style.display = "block";
-    }
-    // Hide transport controls for SoundCloud
-    if (musicPanel) musicPanel.classList.add("has-soundcloud");
+    if (soundcloudPlayer) soundcloudPlayer.style.display = "none";
+    if (ytPlayer) ytPlayer.style.display = "block";
+
+    getYouTubeMusicPlayer(youtubeId).then((player) => {
+      const playerFrame = document.getElementById("yt-player");
+      if (playerFrame) playerFrame.style.display = "block";
+      setYouTubeMusicVolume();
+      if (!isMuted) {
+        player.playVideo?.();
+      }
+    });
   } else if (track.src) {
-    if (scPlayer) scPlayer.style.display = "none";
+    stopYouTubeMusic();
+    if (ytPlayer) ytPlayer.style.display = "none";
+    if (soundcloudPlayer) soundcloudPlayer.style.display = "none";
 
     if (musicAudio) {
       musicAudio.pause();
@@ -2698,9 +3200,6 @@ function setMusicSource(track) {
       updateSoundToggleLabel();
       playSelectedMusic();
     }
-
-    // Show transport controls
-    if (musicPanel) musicPanel.classList.remove("has-soundcloud");
   }
 
   updateMusicTrackTitle(track ? track.label : "");
@@ -2715,7 +3214,7 @@ function populateMusicTracks() {
   list.innerHTML = "";
   MUSIC_TRACKS = MUSIC_TRACKS.sort(compareMusicTracksByLabel);
   const visibleTracks = MUSIC_TRACKS.filter((track) => {
-    if ((!track.src && !track.soundcloudUrl) || !track.label) {
+    if (!isSoundCloudMusicTrack(track) || !track.label) {
       return false;
     }
 
@@ -2763,15 +3262,13 @@ function playSelectedMusic() {
     return;
   }
 
-  // Handle SoundCloud
-  if (currentlyPlayingTrack?.type === "soundcloud") {
-    const scPlayer = document.querySelector("#sc-player");
-    if (scPlayer && window.SC && window.SC.Widget) {
-      const widget = window.SC.Widget(scPlayer);
-      widget.bind(window.SC.Widget.Events.READY, function () {
-        widget.play();
-      });
-    }
+  if (isSoundCloudMusicTrack(currentlyPlayingTrack)) {
+    toggleSoundCloudMusic();
+    return;
+  }
+
+  if (isYouTubeMusicTrack(currentlyPlayingTrack)) {
+    playYouTubeMusic();
     return;
   }
 
@@ -4983,22 +5480,27 @@ musicPanelToggle?.addEventListener("keydown", (event) => {
 
 musicPlayToggle?.addEventListener("click", () => {
   const hasAudioSrc = musicAudio?.src;
-  const hasSoundCloud = currentlyPlayingTrack?.type === "soundcloud";
+  const hasYouTube = isYouTubeMusicTrack(currentlyPlayingTrack);
+  const hasSoundCloud = isSoundCloudMusicTrack(currentlyPlayingTrack);
 
-  if (!hasAudioSrc && !hasSoundCloud) {
+  if (!hasAudioSrc && !hasYouTube && !hasSoundCloud) {
     playNextMusicTrack();
     return;
   }
 
   if (hasSoundCloud) {
-    const scPlayer = document.querySelector("#sc-player");
-    if (scPlayer && window.SC && window.SC.Widget) {
-      const widget = window.SC.Widget(scPlayer);
-      widget.bind(window.SC.Widget.Events.READY, function () {
-        widget.toggle();
-        updateMusicPlayLabel();
-      });
+    toggleSoundCloudMusic();
+    updateMusicPlayLabel();
+    return;
+  }
+
+  if (hasYouTube) {
+    if (isYoutubeMusicPlaying) {
+      pauseYouTubeMusic();
+    } else {
+      playYouTubeMusic();
     }
+    updateMusicPlayLabel();
   } else {
     if (musicAudio.paused) {
       playSelectedMusic();
@@ -5013,6 +5515,8 @@ musicVolume?.addEventListener("input", () => {
   if (musicAudio) {
     musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
   }
+  setYouTubeMusicVolume();
+  setSoundCloudMusicVolume();
 });
 
 musicAudio?.addEventListener("play", updateMusicPlayLabel);
@@ -5121,6 +5625,7 @@ videoFullscreenButtons.forEach((button) => {
     }
 
     bindMediaMuteEnforcement(videoEl);
+    bindNativeFullscreenResume(videoEl);
     videoEl.controls = true;
     videoEl.dataset.userAudioEnabled = "true";
 
@@ -5131,20 +5636,64 @@ videoFullscreenButtons.forEach((button) => {
     }
 
     try {
-      await videoEl.play().catch(() => {
+      videoEl.dataset.nativeFullscreenRequested = "true";
+      armNativeFullscreenAutoResume(videoEl);
+      const fullscreenTarget = card || videoEl;
+
+      const initialPlay = videoEl.play().catch(() => {
         // Fullscreen still needs to be attempted even if playback is temporarily blocked.
       });
 
-      if (videoEl.requestFullscreen) {
-        await videoEl.requestFullscreen();
+      if (fullscreenTarget.requestFullscreen) {
+        await fullscreenTarget.requestFullscreen();
+      } else if (fullscreenTarget.webkitRequestFullscreen) {
+        fullscreenTarget.webkitRequestFullscreen();
+      } else if (videoEl.webkitEnterFullscreen) {
+        videoEl.webkitEnterFullscreen();
+      } else {
+        delete videoEl.dataset.nativeFullscreenRequested;
       }
 
+      await initialPlay;
       await videoEl.play().catch(() => {
         // Native controls remain available if the browser still blocks playback.
       });
+      resumeNativeFullscreenVideo(videoEl);
     } catch {
+      await videoEl.play().catch(() => {
+        // Native controls remain available if the browser blocks playback.
+      });
+      delete videoEl.dataset.nativeFullscreenRequested;
+      delete videoEl.dataset.nativeFullscreenAutoResume;
+      window.clearTimeout(nativeFullscreenAutoResumeTimers.get(videoEl));
+      nativeFullscreenAutoResumeTimers.delete(videoEl);
       // Ignore rejected fullscreen requests triggered by browser policy edge cases.
     }
+  });
+});
+
+document.addEventListener("fullscreenchange", () => {
+  const fullscreenVideo = getFullscreenVideoElement();
+
+  if (fullscreenVideo) {
+    bindNativeFullscreenResume(fullscreenVideo);
+    fullscreenVideo.dataset.nativeFullscreenRequested = "true";
+    armNativeFullscreenAutoResume(fullscreenVideo);
+    resumeNativeFullscreenVideo(fullscreenVideo);
+  }
+
+  document.querySelectorAll("video[data-native-fullscreen-requested='true']").forEach((videoEl) => {
+    if (document.fullscreenElement === videoEl || document.fullscreenElement?.contains?.(videoEl)) {
+      armNativeFullscreenAutoResume(videoEl);
+      resumeNativeFullscreenVideo(videoEl);
+      return;
+    }
+
+    delete videoEl.dataset.nativeFullscreenRequested;
+    delete videoEl.dataset.nativeFullscreenAutoResume;
+    window.clearTimeout(nativeFullscreenAutoResumeTimers.get(videoEl));
+    nativeFullscreenAutoResumeTimers.delete(videoEl);
+    requestMediaVisibilitySync();
   });
 });
 
@@ -5296,12 +5845,12 @@ window.addEventListener("hashchange", () => {
 });
 
 window.addEventListener("load", () => {
-  loadMusicManifest();
+  MUSIC_TRACKS = [DEFAULT_SOUNDCLOUD_MUSIC_TRACK];
+  populateMusicTracks();
+  setMusicSource(DEFAULT_SOUNDCLOUD_MUSIC_TRACK);
   if (musicAudio && musicVolume) {
     musicAudio.volume = Number.parseFloat(musicVolume.value || "0.45");
   }
-  updateMusicUI(null); // Initial empty state
-  updateMusicTrackTitle();
   updateMusicPlayLabel();
   reorderGameCollection();
   applyGameFilter("all");
