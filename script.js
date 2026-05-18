@@ -20,6 +20,7 @@ revealItems.forEach((item, index) => {
 });
 
 const desktopStage = document.querySelector(".desktop-stage");
+const bootScreen = document.querySelector("#boot-screen");
 const draggableWindows = document.querySelectorAll(".desktop-stage .window");
 const homeWindow = document.querySelector(".home-window");
 const homeTitlebar = document.querySelector(".home-titlebar");
@@ -92,12 +93,14 @@ let catMediaRendered = false;
 let mediaLightboxItems = [];
 let mediaLightboxIndex = 0;
 const nativeFullscreenAutoResumeTimers = new WeakMap();
+const bootScreenStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
 const WINDOW_OPEN_ANIMATION_MS = 260;
 const WINDOW_CLOSE_ANIMATION_MS = 220;
 const START_PANEL_CLOSE_ANIMATION_MS = 180;
 const FULLSCREEN_WINDOW_Z_INDEX = 10020;
 const FULLSCREEN_WINDOW_TOP_OFFSET = "var(--fullscreen-window-top)";
 const NATIVE_FULLSCREEN_AUTO_RESUME_MS = 500;
+const BOOT_SCREEN_MIN_MS = 2600;
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
 const DEFAULT_MUSIC_COVER_ART = "assets/wallpaper/kojima-please-hire-me.png";
 const SOUNDCLOUD_MUSIC_TRACKS = [
@@ -121,6 +124,27 @@ const SOUNDCLOUD_MUSIC_TRACKS = [
   },
 ];
 const DEFAULT_SOUNDCLOUD_MUSIC_TRACK = SOUNDCLOUD_MUSIC_TRACKS[0];
+
+function completeBootScreen({ immediate = false } = {}) {
+  if (!bootScreen || document.body.classList.contains("is-boot-complete")) {
+    return;
+  }
+
+  if (immediate && !document.body.classList.contains("is-ready")) {
+    bootScreen.dataset.skipRequested = "true";
+    return;
+  }
+
+  const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+  const elapsed = now - bootScreenStartedAt;
+  const delay = immediate ? 0 : Math.max(0, BOOT_SCREEN_MIN_MS - elapsed);
+
+  window.setTimeout(() => {
+    document.body.classList.add("is-boot-complete");
+    bootScreen.setAttribute("aria-hidden", "true");
+  }, delay);
+}
+
 let MUSIC_TRACKS = [
   {
     "label": "Cá Hồi Hoang - 2004",
@@ -5927,6 +5951,9 @@ window.addEventListener("resize", syncViewportInsets);
 
 musicSearchInput?.addEventListener("input", populateMusicTracks);
 
+bootScreen?.addEventListener("pointerdown", () => completeBootScreen({ immediate: true }), { once: true });
+window.addEventListener("keydown", () => completeBootScreen({ immediate: true }), { once: true });
+
 window.addEventListener("pageshow", () => {
   document.body.classList.remove("is-transitioning");
 });
@@ -5967,4 +5994,5 @@ window.addEventListener("load", () => {
   updateTaskbarClock();
   window.setInterval(updateTaskbarClock, 1000);
   document.body.classList.add("is-ready");
+  completeBootScreen({ immediate: bootScreen?.dataset.skipRequested === "true" });
 });
