@@ -100,12 +100,27 @@ const FULLSCREEN_WINDOW_TOP_OFFSET = "var(--fullscreen-window-top)";
 const NATIVE_FULLSCREEN_AUTO_RESUME_MS = 500;
 const BUTTON_CLICK_SOUND_SRC = "sounds/universfield-computer-mouse-click-352734.mp3";
 const DEFAULT_MUSIC_COVER_ART = "assets/wallpaper/kojima-please-hire-me.png";
-const DEFAULT_SOUNDCLOUD_MUSIC_TRACK = {
-  label: "Magnolian - Indigo",
-  type: "soundcloud",
-  soundcloudUrl: "https://soundcloud.com/magnolianmusic/indigo",
-  duration: "",
-};
+const SOUNDCLOUD_MUSIC_TRACKS = [
+  {
+    label: "Ntreboot - Plastic Love",
+    type: "soundcloud",
+    soundcloudUrl: "https://soundcloud.com/ntreboot/plastic-love",
+    duration: "",
+  },
+  {
+    label: "Ca Hoi Hoang - 2004",
+    type: "soundcloud",
+    soundcloudUrl: "https://soundcloud.com/nguyetanh3694/2004-ca-hoi-hoang",
+    duration: "",
+  },
+  {
+    label: "Anri - I Can't Stop The Loneliness",
+    type: "soundcloud",
+    soundcloudUrl: "https://soundcloud.com/psych-witches/anri-i-cant-stop-the-loneliness",
+    duration: "",
+  },
+];
+const DEFAULT_SOUNDCLOUD_MUSIC_TRACK = SOUNDCLOUD_MUSIC_TRACKS[0];
 let MUSIC_TRACKS = [
   {
     "label": "Cá Hồi Hoang - 2004",
@@ -639,6 +654,39 @@ const gameFilterTags = {
   "into-the-dungeon": ["downloadable", "unity"],
   "a-game-about-me": ["playable", "narrative", "downloadable"],
 };
+
+const gameFilterSearchEntries = [
+  {
+    filter: "playable",
+    label: "Playable Games",
+    aliases: "play browser web webgl embedded playable game games",
+  },
+  {
+    filter: "unity",
+    label: "Unity Games",
+    aliases: "unity csharp c# engine game games",
+  },
+  {
+    filter: "2d",
+    label: "2D Games",
+    aliases: "2d 2 d two dimensional platformer pixel side scroller game games",
+  },
+  {
+    filter: "3d",
+    label: "3D Games",
+    aliases: "3d 3 d three dimensional blockout dungeon survival game games",
+  },
+  {
+    filter: "narrative",
+    label: "Narrative Games",
+    aliases: "narrative story dialogue choice emotional personal game games",
+  },
+  {
+    filter: "downloadable",
+    label: "Downloadable Games",
+    aliases: "download downloadable windows build zip release game games",
+  },
+];
 
 const gameCaseStudies = {
   "thrifting-101": {
@@ -1593,7 +1641,7 @@ function enableAutoplayForVideos(root = document) {
       return;
     }
 
-    if (videoEl.hasAttribute("controls")) {
+    if (videoEl.hasAttribute("controls") && !videoEl.autoplay && !videoEl.hasAttribute("autoplay")) {
       forceVideoMuted(videoEl);
       return;
     }
@@ -4661,10 +4709,19 @@ function getDocumentSearchEntries() {
 }
 
 function getGameSearchText(gameId, game, searchQuery) {
+  const tags = getGameFilters(gameId);
+  const filterLabels = gameFilterSearchEntries
+    .filter((entry) => tags.includes(entry.filter))
+    .flatMap((entry) => [entry.label, entry.aliases]);
   const primaryText = [
     gameId,
     game.routeSlug,
     game.title,
+    "game",
+    "games",
+    "project",
+    ...tags,
+    ...filterLabels,
   ].join(" ");
 
   if (normalizeMusicSearchText(searchQuery).length < 3) {
@@ -4675,15 +4732,38 @@ function getGameSearchText(gameId, game, searchQuery) {
     primaryText,
     game.shortDescription,
     game.overview,
+    ...(game.meta || []),
     ...(game.actions || []).map((action) => action.label),
     ...(game.devlog || []).flatMap((entry) => [entry.title, entry.body]),
   ].join(" ");
+}
+
+function getMatchedGameCategory(gameId, searchQuery) {
+  const normalizedQuery = normalizeMusicSearchText(searchQuery);
+  const matchedFilter = gameFilterSearchEntries.find((entry) => {
+    return getGameFilters(gameId).includes(entry.filter)
+      && doesSearchTextMatch(`${entry.label} ${entry.aliases}`, normalizedQuery);
+  });
+
+  return matchedFilter ? matchedFilter.label.replace(/s$/, "").toLowerCase() : "game";
 }
 
 function getDocumentSearchText(entry, searchQuery) {
   return normalizeMusicSearchText(searchQuery).length < 3
     ? entry.primarySearchText
     : entry.deepSearchText;
+}
+
+function openFilteredGameCollection(filter) {
+  const gameCollectionWindow = document.querySelector('[data-window-id="game-collection"]');
+
+  if (!gameCollectionWindow) {
+    return;
+  }
+
+  showWindow(gameCollectionWindow);
+  applyGameFilter(filter);
+  closeStartPanel();
 }
 
 function renderStartSearchResults(searchQuery, visibleAppCount) {
@@ -4701,6 +4781,10 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
   const appMatches = getAppSearchEntries()
     .filter((entry) => doesSearchTextMatch(entry.searchText, searchQuery))
     .slice(0, 5);
+
+  const gameFilterMatches = gameFilterSearchEntries
+    .filter((entry) => doesSearchTextMatch(`${entry.label} ${entry.aliases}`, searchQuery))
+    .slice(0, 3);
 
   const gameMatches = Object.entries(gameDetails)
     .filter(([gameId, game]) => {
@@ -4721,10 +4805,21 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
     }));
   });
 
+  gameFilterMatches.forEach((entry) => {
+    const matchCount = Object.keys(gameDetails).filter((gameId) => getGameFilters(gameId).includes(entry.filter)).length;
+
+    startSearchResults.appendChild(createStartSearchResult({
+      label: entry.label,
+      category: `${matchCount} ${matchCount === 1 ? "game" : "games"}`,
+      icon: "assets/xp-icons/games.ico",
+      onClick: () => openFilteredGameCollection(entry.filter),
+    }));
+  });
+
   gameMatches.forEach(([gameId, game]) => {
     startSearchResults.appendChild(createStartSearchResult({
       label: game.title,
-      category: "game",
+      category: getMatchedGameCategory(gameId, searchQuery),
       icon: "assets/xp-icons/games.ico",
       onClick: () => {
         if (!gameDetailWindow) return;
@@ -4750,7 +4845,7 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
     }));
   });
 
-  if (!visibleAppCount && !appMatches.length && !gameMatches.length && !documentMatches.length) {
+  if (!visibleAppCount && !appMatches.length && !gameFilterMatches.length && !gameMatches.length && !documentMatches.length) {
     const emptyState = document.createElement("div");
     emptyState.className = "start-search-empty";
     emptyState.textContent = "No results";
@@ -5845,7 +5940,7 @@ window.addEventListener("hashchange", () => {
 });
 
 window.addEventListener("load", () => {
-  MUSIC_TRACKS = [DEFAULT_SOUNDCLOUD_MUSIC_TRACK];
+  MUSIC_TRACKS = [...SOUNDCLOUD_MUSIC_TRACKS];
   populateMusicTracks();
   setMusicSource(DEFAULT_SOUNDCLOUD_MUSIC_TRACK);
   if (musicAudio && musicVolume) {

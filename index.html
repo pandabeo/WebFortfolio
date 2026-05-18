@@ -205,8 +205,16 @@
                       <img src="assets/software-icons/blender.png" alt="Blender logo" />
                       <span>3D Modeling (Blender)</span>
                     </div>
+                    <div class="about-software-item">
+                      <img src="assets/software-icons/pixel-art.svg" alt="Pixel art logo" />
+                      <span>Pixel Art</span>
+                    </div>
+                    <div class="about-software-item">
+                      <img src="assets/software-icons/github.svg" alt="GitHub logo" />
+                      <span>GitHub / Version Control</span>
+                    </div>
                     <div class="about-software-item about-software-item-text">
-                      <span>Pixel Art, GitHub, AI-assisted prototyping, performance optimization</span>
+                      <span>AI-assisted prototyping, performance optimization</span>
                     </div>
                   </div>
                 </section>
@@ -578,9 +586,11 @@
                   <h4>About This Project</h4>
                   <div class="game-detail-meta" data-game-detail-meta></div>
                 </section>
-                <section class="game-detail-section" data-game-detail-case-study-section>
-                  <h4>Case Study</h4>
-                  <div class="game-case-study-grid" data-game-detail-case-study></div>
+                <section class="game-detail-section is-hidden" data-game-detail-stills-section>
+                  <div class="game-detail-stills-heading">
+                    <h4>In-Game Image</h4>
+                  </div>
+                  <div class="game-detail-stills" data-game-detail-stills></div>
                 </section>
                 <section class="game-detail-section is-hidden" data-game-detail-trailer-section>
                   <h4>Trailer</h4>
@@ -596,11 +606,9 @@
                     <div class="game-detail-trailer-status" data-game-detail-trailer-status aria-live="polite"></div>
                   </div>
                 </section>
-                <section class="game-detail-section is-hidden" data-game-detail-stills-section>
-                  <div class="game-detail-stills-heading">
-                    <h4>In-Game Image</h4>
-                  </div>
-                  <div class="game-detail-stills" data-game-detail-stills></div>
+                <section class="game-detail-section" data-game-detail-case-study-section>
+                  <h4>Case Study</h4>
+                  <div class="game-case-study-grid" data-game-detail-case-study></div>
                 </section>
                 <section class="game-detail-section is-hidden" data-game-detail-player-section>
                   <h4>Playable Build</h4>
@@ -640,31 +648,33 @@
           <div class="xp-window-body">
             <div class="collection-body xp-content">
               <h3>3D Work</h3>
-              <p>Environment studies and walkthrough captures.</p>
+              <p>
+                Environment and movement studies focused on spatial composition, atmosphere, lighting, scale, and how a player reads a 3D scene while moving through it. These captures show both presentation work and practical level-design thinking.
+              </p>
               <div class="collection-grid xp-icon-grid">
               <article class="collection-card">
-                <video controls preload="none" muted playsinline>
+                <video controls autoplay loop preload="metadata" muted playsinline>
                   <source src="3d/buitruongthinh s3975580 benthanhmarketvideo.mp4" type="video/mp4" />
                 </video>
                 <button class="video-fullscreen-button" type="button" data-fullscreen-video>Fullscreen</button>
                 <span class="card-title">Ben Thanh Market</span>
-                <span class="card-description">Scene walkthrough focused on atmosphere, composition, and environmental detail.</span>
+                <span class="card-description">A Vietnamese market environment study focused on dense spatial composition, recognizable local atmosphere, prop placement, and camera walkthrough readability. The scene explores how architectural scale, stalls, lighting, and environmental detail can guide the viewer through a crowded public space without losing orientation.</span>
               </article>
               <article class="collection-card">
-                <video controls preload="none" muted playsinline>
+                <video controls autoplay loop preload="metadata" muted playsinline>
                   <source src="3d/buitruongthinh s3975580 orenchicafevideo.mp4" type="video/mp4" />
                 </video>
                 <button class="video-fullscreen-button" type="button" data-fullscreen-video>Fullscreen</button>
                 <span class="card-title">Orenchi Cafe</span>
-                <span class="card-description">Cafe environment showcase with mood-first interior presentation.</span>
+                <span class="card-description">An interior cafe showcase built around mood, warmth, and small-space composition. The walkthrough highlights furniture arrangement, lighting contrast, material feeling, and how props can make an environment feel used, comfortable, and believable instead of empty or purely decorative.</span>
               </article>
               <article class="collection-card">
-                <video controls preload="none" muted playsinline>
+                <video controls autoplay loop preload="metadata" muted playsinline>
                   <source src="3d/movement showcase.mp4" type="video/mp4" />
                 </video>
                 <button class="video-fullscreen-button" type="button" data-fullscreen-video>Fullscreen</button>
                 <span class="card-title">Movement Showcase</span>
-                <span class="card-description">Movement-focused 3D showcase demonstrating player control and traversal feel.</span>
+                <span class="card-description">A movement-focused prototype capture demonstrating traversal feel, player control, camera response, and readable navigation through a 3D space. The focus is less on final environment polish and more on how motion, spacing, ramps, platforms, and route clarity affect the player's sense of control.</span>
               </article>
               </div>
             </div>

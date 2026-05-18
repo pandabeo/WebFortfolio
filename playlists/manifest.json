@@ -83,9 +83,21 @@
           "duration": ""
         },
         {
-          "label": "Magnolian - Indigo",
+          "label": "Ntreboot - Plastic Love",
           "type": "soundcloud",
-          "soundcloudUrl": "https://soundcloud.com/magnolianmusic/indigo",
+          "soundcloudUrl": "https://soundcloud.com/ntreboot/plastic-love",
+          "duration": ""
+        },
+        {
+          "label": "Ca Hoi Hoang - 2004",
+          "type": "soundcloud",
+          "soundcloudUrl": "https://soundcloud.com/nguyetanh3694/2004-ca-hoi-hoang",
+          "duration": ""
+        },
+        {
+          "label": "Anri - I Can't Stop The Loneliness",
+          "type": "soundcloud",
+          "soundcloudUrl": "https://soundcloud.com/psych-witches/anri-i-cant-stop-the-loneliness",
           "duration": ""
         }
       ]
