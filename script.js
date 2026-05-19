@@ -1711,7 +1711,7 @@ function prepareGameDetailTrailerAutoplay(videoEl = gameDetailTrailer) {
 
   videoEl.autoplay = true;
   videoEl.playsInline = true;
-  videoEl.preload = "metadata";
+  videoEl.preload = "auto";
   videoEl.setAttribute("autoplay", "");
   videoEl.setAttribute("playsinline", "");
 
@@ -1764,7 +1764,17 @@ function isGameDetailTrailerLoaded() {
     return false;
   }
 
-  return Boolean(gameDetailTrailer.currentSrc || gameDetailTrailer.getAttribute("src"));
+  const loadedSrc = gameDetailTrailer.currentSrc || gameDetailTrailer.getAttribute("src") || "";
+
+  if (!loadedSrc) {
+    return false;
+  }
+
+  try {
+    return new URL(loadedSrc, document.baseURI).href === new URL(trailerSrc, document.baseURI).href;
+  } catch {
+    return loadedSrc === trailerSrc;
+  }
 }
 
 function loadGameDetailTrailerSource() {
@@ -1780,6 +1790,7 @@ function loadGameDetailTrailerSource() {
 
   if (!isGameDetailTrailerLoaded()) {
     setGameDetailTrailerState("loading", "Loading trailer");
+    prepareGameDetailTrailerAutoplay(gameDetailTrailer);
     gameDetailTrailer.src = trailerSrc;
     gameDetailTrailer.load();
   }
@@ -1882,7 +1893,7 @@ function syncGameDetailTrailerPlayback() {
 
   syncGameDetailTrailerLoading();
 
-  if (!isMediaInActiveWindow(gameDetailTrailer) || !isMediaVisibleInPanel(gameDetailTrailer)) {
+  if (!isMediaInActiveWindow(gameDetailTrailer)) {
     gameDetailTrailer.pause();
     syncBackgroundMusicForTrailerAudio();
     return;
@@ -1892,13 +1903,101 @@ function syncGameDetailTrailerPlayback() {
     return;
   }
 
-  gameDetailTrailer.play().catch(() => {
-    if (!gameDetailTrailer.muted) {
-      forceVideoMuted(gameDetailTrailer);
-      gameDetailTrailer.play().catch(() => {
-        // Browser policy can still delay playback until media data is ready.
-      });
+  playGameDetailTrailer();
+}
+
+function playGameDetailTrailer() {
+  if (!gameDetailTrailer) {
+    return;
+  }
+
+  gameDetailTrailer.autoplay = true;
+  gameDetailTrailer.playsInline = true;
+  gameDetailTrailer.preload = "auto";
+  gameDetailTrailer.setAttribute("autoplay", "");
+  gameDetailTrailer.setAttribute("playsinline", "");
+
+  if (gameDetailTrailer.paused) {
+    forceVideoMuted(gameDetailTrailer);
+  }
+
+  gameDetailTrailer.play().then(() => {
+    syncBackgroundMusicForTrailerAudio();
+  }).catch(() => {
+    forceVideoMuted(gameDetailTrailer);
+    gameDetailTrailer.play().then(() => {
+      syncBackgroundMusicForTrailerAudio();
+    }).catch(() => {
+      // Native controls remain available if the browser still blocks autoplay.
+    });
+  });
+}
+
+function requestGameDetailTrailerAutoplay({ restart = false } = {}) {
+  if (!gameDetailTrailer || !gameDetailTrailerSection || gameDetailTrailerSection.classList.contains("is-hidden")) {
+    return;
+  }
+
+  prepareGameDetailTrailerAutoplay(gameDetailTrailer);
+
+  if (!loadGameDetailTrailerSource()) {
+    return;
+  }
+
+  if (restart) {
+    try {
+      gameDetailTrailer.currentTime = 0;
+    } catch {
+      // The trailer may not be seekable until metadata is available.
     }
+  }
+
+  const startPlayback = () => {
+    if (!isMediaInActiveWindow(gameDetailTrailer)) {
+      return;
+    }
+
+    playGameDetailTrailer();
+  };
+
+  startPlayback();
+  window.requestAnimationFrame(startPlayback);
+  window.setTimeout(startPlayback, 120);
+  window.setTimeout(startPlayback, 360);
+}
+
+function primeGameDetailTrailerFromGesture(gameId) {
+  if (!gameId || !gameDetails[gameId] || !gameDetailWindow || !gameDetailTrailer || !gameDetailTrailerSection) {
+    return;
+  }
+
+  const game = gameDetails[gameId];
+
+  if (!game.trailer?.src) {
+    return;
+  }
+
+  gameDetailWindow.dataset.gameId = gameId;
+  gameDetailTrailerSection.classList.remove("is-hidden");
+  gameDetailTrailer.dataset.trailerSrc = game.trailer.src;
+  gameDetailTrailer.title = game.trailer.title || `${game.title} trailer`;
+  gameDetailTrailer.autoplay = true;
+  gameDetailTrailer.preload = "auto";
+  gameDetailTrailer.playsInline = true;
+  gameDetailTrailer.muted = true;
+  gameDetailTrailer.defaultMuted = true;
+  gameDetailTrailer.setAttribute("autoplay", "");
+  gameDetailTrailer.setAttribute("muted", "");
+  gameDetailTrailer.setAttribute("preload", "auto");
+  gameDetailTrailer.setAttribute("playsinline", "");
+
+  if (gameDetailTrailer.getAttribute("src") !== game.trailer.src) {
+    gameDetailTrailer.src = game.trailer.src;
+    gameDetailTrailer.load();
+  }
+
+  gameDetailTrailer.play().catch(() => {
+    // The normal open flow retries after the detail window is visible.
   });
 }
 
@@ -1941,7 +2040,7 @@ function setupGameDetailTrailerAutoplay() {
           return;
         }
 
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting || isMediaInActiveWindow(gameDetailTrailer)) {
           syncGameDetailTrailerPlayback();
         } else if (!isMediaFullscreen(gameDetailTrailer)) {
           gameDetailTrailer.pause();
@@ -1967,13 +2066,18 @@ function setupGameDetailTrailerAutoplay() {
     }
   });
 
+  gameDetailTrailer.addEventListener("loadedmetadata", () => {
+    requestGameDetailTrailerAutoplay();
+  });
+
   gameDetailTrailer.addEventListener("loadeddata", () => {
     setGameDetailTrailerState("", "");
-    syncGameDetailTrailerPlayback();
+    requestGameDetailTrailerAutoplay();
   });
 
   gameDetailTrailer.addEventListener("canplay", () => {
     setGameDetailTrailerState("", "");
+    requestGameDetailTrailerAutoplay();
   });
 
   gameDetailTrailer.addEventListener("error", () => {
@@ -2540,7 +2644,7 @@ function syncVisibleMediaPlayback(root = document) {
       return;
     }
 
-    if (!isMediaVisibleInPanel(videoEl)) {
+    if (videoEl.dataset.gameDetailTrailer === undefined && !isMediaVisibleInPanel(videoEl)) {
       videoEl.pause();
       return;
     }
@@ -2557,7 +2661,7 @@ function syncVisibleMediaPlayback(root = document) {
       return;
     }
 
-    if (!isMediaInActiveWindow(mediaEl) || isMuted || !isMediaVisibleInPanel(mediaEl)) {
+    if (!isMediaInActiveWindow(mediaEl) || isMuted || (mediaEl.dataset.gameDetailTrailer === undefined && !isMediaVisibleInPanel(mediaEl))) {
       return;
     }
 
@@ -3722,13 +3826,17 @@ function renderGameDetail(gameId) {
   if (gameDetailTrailerSection && gameDetailTrailer) {
     if (game.trailer?.src) {
       gameDetailTrailer.dataset.trailerSrc = game.trailer.src;
-      gameDetailTrailer.removeAttribute("src");
+      if (gameDetailTrailer.getAttribute("src") !== game.trailer.src) {
+        gameDetailTrailer.removeAttribute("src");
+      }
       gameDetailTrailer.title = game.trailer.title || `${game.title} trailer`;
       gameDetailTrailerSection.classList.remove("is-hidden");
-      gameDetailTrailer.load();
+      if (!gameDetailTrailer.currentSrc && gameDetailTrailer.getAttribute("src") !== game.trailer.src) {
+        gameDetailTrailer.load();
+      }
       prepareGameDetailTrailerAutoplay(gameDetailTrailer);
       setGameDetailTrailerState("", "");
-      syncGameDetailTrailerPlayback();
+      requestGameDetailTrailerAutoplay({ restart: true });
     } else {
       delete gameDetailTrailer.dataset.trailerSrc;
       gameDetailTrailer.removeAttribute("src");
@@ -3825,6 +3933,7 @@ function renderGameDetail(gameId) {
   }
 
   syncMediaMutedState();
+  requestGameDetailTrailerAutoplay();
 }
 
 function bringToFront(windowEl) {
@@ -4074,7 +4183,7 @@ function showWindow(windowEl, options = {}) {
   syncFullscreenState();
   renderTaskbarTabs();
   syncMediaMutedState();
-  syncGameDetailTrailerPlayback();
+  requestGameDetailTrailerAutoplay();
 
   if (options.updateRoute !== false) {
     syncHistoryRoute(getRouteForWindow(windowEl), { replace: options.replaceRoute });
@@ -4099,7 +4208,7 @@ function focusWindow(windowEl, options = {}) {
   syncFullscreenState();
   renderTaskbarTabs();
   syncMediaMutedState();
-  syncGameDetailTrailerPlayback();
+  requestGameDetailTrailerAutoplay();
 
   if (options.updateRoute) {
     syncHistoryRoute(getRouteForWindow(windowEl), { replace: options.replaceRoute !== false });
@@ -4847,6 +4956,7 @@ function renderStartSearchResults(searchQuery, visibleAppCount) {
       icon: "assets/xp-icons/games.ico",
       onClick: () => {
         if (!gameDetailWindow) return;
+        primeGameDetailTrailerFromGesture(gameId);
         renderGameDetail(gameId);
         showWindow(gameDetailWindow);
         closeStartPanel();
@@ -5356,6 +5466,12 @@ function openShortcutWindow(shortcut, event) {
 }
 
 folderShortcuts.forEach((shortcut) => {
+  shortcut.addEventListener("pointerdown", () => {
+    if (shortcut.dataset.gameId) {
+      primeGameDetailTrailerFromGesture(shortcut.dataset.gameId);
+    }
+  });
+
   shortcut.addEventListener("pointerup", (event) => {
     if (event.pointerType === "mouse") {
       return;
