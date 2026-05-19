@@ -1520,6 +1520,8 @@ body.is-dark .collection-card:focus-visible {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  content-visibility: hidden;
+  contain-intrinsic-size: 720px 520px;
   scale: 0.72;
   translate: 0 28px;
   box-shadow:
@@ -1590,6 +1592,8 @@ body.is-dark .collection-card:focus-visible {
 
 .start-panel.is-hidden {
   display: block !important;
+  content-visibility: hidden;
+  contain-intrinsic-size: 320px 520px;
 }
 
 .titlebar {
@@ -2802,6 +2806,16 @@ body.is-dark .video-fullscreen-button {
   max-height: 100vh;
   aspect-ratio: auto;
   border: 0;
+  object-fit: contain;
+}
+
+video:fullscreen,
+video:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  background: #000;
   object-fit: contain;
 }
 
@@ -4566,11 +4580,6 @@ body.is-dark .card-badge {
     transform: none;
     width: calc(100vw - 20px);
     margin: 14px auto 0;
-  }
-
-  body.has-open-window .home-window {
-    opacity: 0;
-    pointer-events: none;
   }
 
   .home-actions {

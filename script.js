@@ -1389,6 +1389,50 @@ function arrangeVisiblePanels() {
     });
 }
 
+function getVisibleWindows() {
+  return Array.from(draggableWindows).filter((windowEl) => {
+    return !windowEl.classList.contains("is-hidden") && !windowEl.classList.contains("is-closing") && windowEl.dataset.windowId;
+  });
+}
+
+function normalizeMobileWindowLayout() {
+  if (desktopModeQuery.matches) {
+    return;
+  }
+
+  draggableWindows.forEach((windowEl) => {
+    if (windowEl.classList.contains("is-fullscreen")) {
+      return;
+    }
+
+    windowEl.style.position = "";
+    windowEl.style.left = "";
+    windowEl.style.top = "";
+    windowEl.style.right = "";
+    windowEl.style.bottom = "";
+    windowEl.style.margin = "";
+    windowEl.style.transform = "";
+    delete windowEl.dataset.dragReady;
+  });
+}
+
+function syncMobileActiveWindow() {
+  if (desktopModeQuery.matches) {
+    return;
+  }
+
+  const topWindow = getTopVisibleWindow();
+
+  draggableWindows.forEach((windowEl) => {
+    windowEl.classList.toggle("is-active", windowEl === topWindow);
+  });
+}
+
+function syncResponsiveWindowLayout() {
+  normalizeMobileWindowLayout();
+  syncMobileActiveWindow();
+}
+
 function setupCursorEffect() {
   if (!window.matchMedia("(pointer: fine)").matches) {
     return;
@@ -4011,9 +4055,7 @@ function normalizeRoutePath(pathname) {
 }
 
 function getTopVisibleWindow() {
-  const visibleWindows = Array.from(draggableWindows).filter((windowEl) => {
-    return !windowEl.classList.contains("is-hidden") && !windowEl.classList.contains("is-closing") && windowEl.dataset.windowId;
-  });
+  const visibleWindows = getVisibleWindows();
 
   return visibleWindows.reduce((topWindow, windowEl) => {
     if (!topWindow) {
@@ -4179,6 +4221,7 @@ function showWindow(windowEl, options = {}) {
   if (windowEl.dataset.windowId === "document-collection") {
     renderActiveDocumentPdf();
   }
+  syncResponsiveWindowLayout();
   enableAutoplayForVideos(windowEl);
   syncFullscreenState();
   renderTaskbarTabs();
@@ -4204,6 +4247,7 @@ function focusWindow(windowEl, options = {}) {
   if (windowEl.dataset.windowId === "document-collection") {
     renderActiveDocumentPdf();
   }
+  syncResponsiveWindowLayout();
   enableAutoplayForVideos(windowEl);
   syncFullscreenState();
   renderTaskbarTabs();
@@ -5441,12 +5485,14 @@ desktopModeQuery.addEventListener("change", () => {
     startPanel.style.transform = "";
     delete startPanel.dataset.dragReady;
   }
+  syncResponsiveWindowLayout();
   arrangeVisiblePanels();
 });
 
 finePointerQuery.addEventListener("change", () => {
   stopDragging();
   syncViewportInsets();
+  syncResponsiveWindowLayout();
 });
 
 function openShortcutWindow(shortcut, event) {
@@ -5848,12 +5894,56 @@ gamePlayerLoadButton?.addEventListener("click", () => {
   activateGameFrame(gameDetailFrame);
 });
 
+function getVideoForFullscreenButton(button) {
+  const card = button.closest(".collection-card, .document-preview, .game-detail-trailer-shell");
+  const scopedVideo = card?.querySelector("video");
+
+  if (scopedVideo) {
+    return scopedVideo;
+  }
+
+  return button.previousElementSibling?.matches?.("video") ? button.previousElementSibling : null;
+}
+
+async function requestVideoFullscreen(videoEl, fallbackEl = null) {
+  if (!videoEl) {
+    return false;
+  }
+
+  if (videoEl.webkitEnterFullscreen) {
+    videoEl.webkitEnterFullscreen();
+    return true;
+  }
+
+  if (videoEl.requestFullscreen) {
+    await videoEl.requestFullscreen();
+    return true;
+  }
+
+  if (videoEl.webkitRequestFullscreen) {
+    videoEl.webkitRequestFullscreen();
+    return true;
+  }
+
+  if (fallbackEl?.requestFullscreen) {
+    await fallbackEl.requestFullscreen();
+    return true;
+  }
+
+  if (fallbackEl?.webkitRequestFullscreen) {
+    fallbackEl.webkitRequestFullscreen();
+    return true;
+  }
+
+  return false;
+}
+
 videoFullscreenButtons.forEach((button) => {
   button.addEventListener("click", async (event) => {
     event.stopPropagation();
 
     const card = button.closest(".collection-card");
-    const videoEl = card?.querySelector("video");
+    const videoEl = getVideoForFullscreenButton(button);
 
     if (!videoEl) {
       return;
@@ -5873,19 +5963,14 @@ videoFullscreenButtons.forEach((button) => {
     try {
       videoEl.dataset.nativeFullscreenRequested = "true";
       armNativeFullscreenAutoResume(videoEl);
-      const fullscreenTarget = card || videoEl;
 
       const initialPlay = videoEl.play().catch(() => {
         // Fullscreen still needs to be attempted even if playback is temporarily blocked.
       });
 
-      if (fullscreenTarget.requestFullscreen) {
-        await fullscreenTarget.requestFullscreen();
-      } else if (fullscreenTarget.webkitRequestFullscreen) {
-        fullscreenTarget.webkitRequestFullscreen();
-      } else if (videoEl.webkitEnterFullscreen) {
-        videoEl.webkitEnterFullscreen();
-      } else {
+      const didRequestFullscreen = await requestVideoFullscreen(videoEl, card);
+
+      if (!didRequestFullscreen) {
         delete videoEl.dataset.nativeFullscreenRequested;
       }
 
@@ -6063,7 +6148,12 @@ document.addEventListener("pointerdown", (event) => {
 syncViewportInsets();
 window.visualViewport?.addEventListener("resize", syncViewportInsets);
 window.visualViewport?.addEventListener("scroll", syncViewportInsets);
-window.addEventListener("resize", syncViewportInsets);
+window.visualViewport?.addEventListener("resize", syncResponsiveWindowLayout);
+window.visualViewport?.addEventListener("scroll", syncResponsiveWindowLayout);
+window.addEventListener("resize", () => {
+  syncViewportInsets();
+  syncResponsiveWindowLayout();
+});
 
 musicSearchInput?.addEventListener("input", populateMusicTracks);
 
@@ -6095,6 +6185,7 @@ window.addEventListener("load", () => {
   setupCursorEffect();
   setupGameDetailTrailerAutoplay();
   setupHoverTrailerPreviews();
+  syncResponsiveWindowLayout();
   arrangeVisiblePanels();
   syncFullscreenState();
   updateThemeToggleLabel();
